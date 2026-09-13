@@ -9,7 +9,7 @@
 | Name             | GitHub Handle | Contribution                                                             |
 |------------------|---------------|--------------------------------------------------------------------------|
 | Jenna Hunte      | @jehunte      | Break Through Tech Coach                                                 |
-|                  | @             |                                                                          |
+| Ruhma Arshad     | @ruhma-       | Simplifier Agent                                                         |
 |                  | @             |                                                                          |
 |                  | @             |                                                                          |
 |                  | @             |                                                                          |
