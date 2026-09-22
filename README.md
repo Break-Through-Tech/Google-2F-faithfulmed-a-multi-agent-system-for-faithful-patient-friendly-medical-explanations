@@ -10,7 +10,7 @@
 |------------------|---------------|--------------------------------------------------------------------------|
 | Jenna Hunte      | @jehunte      | Break Through Tech Coach                                                 |
 | Ruhma Arshad     | @ruhma-a      | Simplifier Agent                                                         |
-|                  | @             |                                                                          |
+| Rafi Hossain     | @rafihoss     | Verifier Agent                                                           |
 |                  | @             |                                                                          |
 |                  | @             |                                                                          |
 
