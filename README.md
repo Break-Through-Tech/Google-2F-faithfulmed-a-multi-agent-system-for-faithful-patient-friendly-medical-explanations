@@ -6,13 +6,13 @@
 
 ### 👥 **Team Members**
 
-| Name             | GitHub Handle | Contribution                                                             |
-|------------------|---------------|--------------------------------------------------------------------------|
-| Jenna Hunte      | @jehunte      | Break Through Tech Coach                                                 |
-| Ruhma Arshad     | @ruhma-a      | Simplifier Agent                                                         |
-| Rafi Hossain     | @rafihoss     | Verifier Agent                                                           |
-|                  | @             |                                                                          |
-|                  | @             |                                                                          |
+| Name                  | GitHub Handle | Contribution                                                             |
+|-----------------------|---------------|--------------------------------------------------------------------------|
+| Jenna Hunte           | @jehunte      | Break Through Tech Coach                                                 |
+| Ruhma Arshad          | @ruhma-a      | Simplifier Agent                                                         |
+| Sajib "Rafi" Hossain  | @rafihoss     | Verifier Agent                                                           |
+|                       | @             |                                                                          |
+|                       | @             |                                                                          |
 
 ---
 
