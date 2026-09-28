@@ -17,8 +17,12 @@ This analysis is a crucial step for the **Verifier agent** in the FaithfulMed pr
 
 ## 3. What this Folder Contains
 
-- `Verifier_MedAESQA_EDA.ipynb`: The primary Jupyter Notebook executing the analysis pipeline.
+- `MedAESQA_EDA.ipynb`: The primary Jupyter Notebook executing the analysis pipeline.
 - `README.md`: This file, providing an overview of the exploratory analysis.
+- `verifier_rubric.py`: A deterministic, reusable baseline rubric for classifying sentence- and answer-level evidence patterns.
+- `test_verifier_rubric.py`: Tests for the reusable rubric categories and precedence rules.
+
+The notebook now includes a category-specific example extraction cell for fully supported, unreferenced, irrelevant, neutral, invalid-citation, and contradictory cases.
 
 ## 4. Key Findings
 
@@ -29,12 +33,31 @@ This analysis is a crucial step for the **Verifier agent** in the FaithfulMed pr
     - **22.37%** present verification issues: **16.14%** are `not relevant`, **4.26%** are `invalid citations`, and **1.97%** are `contradicting`.
     These statistics emphasize the need for a granular citation verification pipeline, even for answers marked as globally accurate.
 
-## 5. How to Run the Notebook
+## 5. Verifier Foundation
 
-1. Ensure the raw `medaesqa_v1.json` dataset is located in the root or appropriate path relative to the notebook.
-2. Open `Verifier_MedAESQA_EDA.ipynb` in your Jupyter environment or Google Colab.
+The EDA supports the first Verifier foundation with six transparent categories:
+
+- `fully_supported`: required sentence with only supporting evidence.
+- `unreferenced`: sentence with no citation assessments.
+- `neutral`: at least one neutral evidence relation.
+- `irrelevant_evidence`: at least one `not relevant` relation.
+- `invalid_citation`: at least one invalid citation relation.
+- `contradictory`: at least one contradicting relation.
+
+Sentences with supporting evidence but non-required relevance, or other mixed cases not covered above, are classified as `weakly_supported`. For answer-level classification, the highest-risk category is retained. This is a deterministic baseline for analysis and calibration, not a substitute for human review or an LLM judge.
+
+Run the rubric tests from the repository root with:
+
+```text
+python -m unittest discover -s EDAs/MedAESQA -p "test_*.py" -v
+```
+
+## 6. How to Run the Notebook
+
+1. Ensure the raw `medaesqa_v1.json` dataset is available from `data/MedAESQA_data/medaesqa_v1.json` in this repository, or alongside the notebook when using Colab.
+2. Open `MedAESQA_EDA.ipynb` in your Jupyter environment or Google Colab.
 3. Run the cells sequentially to parse the data, calculate statistics, and display the distribution plots.
 
-## 6. Raw Dataset Source
+## 7. Raw Dataset Source
 
 The `medaesqa_v1.json` dataset is a curated benchmark for medical answer sentence-level evaluation, mapping LLM generations to verified PubMed articles (PMIDs) for ground-truth comparison.
