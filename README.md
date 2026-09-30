@@ -11,7 +11,7 @@
 | Jenna Hunte           | @jehunte      | Break Through Tech Coach                                                 |
 | Ruhma Arshad          | @ruhma-a      | Simplifier Agent                                                         |
 | Sajib "Rafi" Hossain  | @rafihoss     | Verifier Agent                                                           |
-|                       | @             |                                                                          |
+| Alicia Garcia        | @ag45566       | Readability Agent                                                                          |
 |                       | @             |                                                                          |
 
 ---
