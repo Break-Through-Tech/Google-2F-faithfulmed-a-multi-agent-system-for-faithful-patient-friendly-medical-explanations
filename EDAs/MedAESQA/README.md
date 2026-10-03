@@ -46,6 +46,8 @@ The EDA supports the first Verifier foundation with six transparent categories:
 
 Sentences with supporting evidence but non-required relevance, or other mixed cases not covered above, are classified as `weakly_supported`. For answer-level classification, the highest-risk category is retained. This is a deterministic baseline for analysis and calibration, not a substitute for human review or an LLM judge.
 
+An answer with no sentences is classified as `empty_answer`, rather than `fully_supported`.
+
 Run the rubric tests from the repository root with:
 
 ```text

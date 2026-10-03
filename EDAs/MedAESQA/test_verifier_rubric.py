@@ -2,6 +2,7 @@ import unittest
 
 from verifier_rubric import (
     CONTRADICTORY,
+    EMPTY_ANSWER,
     FULLY_SUPPORTED,
     INVALID,
     IRRELEVANT,
@@ -77,8 +78,9 @@ class VerifierRubricTests(unittest.TestCase):
         ]
         self.assertEqual(classify_answer(sentences), CONTRADICTORY)
 
-    def test_empty_answer_is_fully_supported_by_vacuous_rule(self):
-        self.assertEqual(classify_answer([]), FULLY_SUPPORTED)
+    def test_empty_answer_is_flagged_instead_of_fully_supported(self):
+        self.assertEqual(classify_answer([]), EMPTY_ANSWER)
+        self.assertEqual(classify_answer(iter(())), EMPTY_ANSWER)
 
 
 if __name__ == "__main__":

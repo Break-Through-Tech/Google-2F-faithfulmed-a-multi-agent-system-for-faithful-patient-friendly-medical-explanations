@@ -11,6 +11,7 @@ IRRELEVANT = "irrelevant_evidence"
 INVALID = "invalid_citation"
 CONTRADICTORY = "contradictory"
 WEAK = "weakly_supported"
+EMPTY_ANSWER = "empty_answer"
 
 _SEVERE_RELATIONS = (CONTRADICTORY, INVALID, IRRELEVANT, NEUTRAL)
 _RELATION_TO_CATEGORY = {
@@ -53,7 +54,7 @@ def classify_sentence(
 
 
 def classify_answer(sentences: Iterable[Mapping[str, Any]]) -> str:
-    """Return the highest-risk rubric category found in an answer.
+    """Return the highest-risk category, or ``empty_answer`` if no sentences exist.
 
     Categories are ordered from most serious to least serious. This is a
     transparent baseline rule for analysis, not a replacement for human review.
@@ -65,6 +66,8 @@ def classify_answer(sentences: Iterable[Mapping[str, Any]]) -> str:
         )
         for sentence in sentences
     ]
+    if not sentence_categories:
+        return EMPTY_ANSWER
     priority = [CONTRADICTORY, INVALID, IRRELEVANT, NEUTRAL, UNREFERENCED, WEAK]
     for category in priority:
         if category in sentence_categories:
