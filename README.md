@@ -14,7 +14,7 @@ September baseline: see [the runnable demo, task specification, and retrieval ha
 | Ruhma Arshad          | @ruhma-a      | Simplifier Agent                                                         |
 | Sajib "Rafi" Hossain  | @rafihoss     | Verifier Agent                                                           |
 | Alicia Garcia        | @ag45566       | Readability Agent                                                                          |
-| Zurabi Kochiashvili   | @Zurab1K      | Refiner Agent; September single-Gemini RAG baseline and task specification |
+| Zurabi Kochiashvili   | @Zurab1K      | Refiner Agent |
 
 ---
 
