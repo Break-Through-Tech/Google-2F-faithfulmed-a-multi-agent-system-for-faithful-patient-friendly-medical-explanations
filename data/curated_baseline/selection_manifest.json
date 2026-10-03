@@ -1,0 +1,125 @@
+{
+  "subset_version": "v1-proposed",
+  "status": "selected source reports; awaiting team review and freeze; unannotated",
+  "source_filename": "mtsamples.csv",
+  "source_sha256": "a92cb78569f460606661ee7da50c92305b60d0fac2be4b06c8d2de0f234612d4",
+  "source_rows": 4999,
+  "source_row_id_definition": "zero-based data-row position, excluding the header; source_dataset_id preserves Unnamed: 0 if present",
+  "random_seed": 42,
+  "minimum_words": 40,
+  "near_duplicate_jaccard": 0.85,
+  "specialty_targets": {
+    "General Medicine": 4,
+    "Cardiovascular / Pulmonary": 4,
+    "Neurology": 4,
+    "Gastroenterology": 3,
+    "Orthopedic": 3,
+    "Urology": 3,
+    "Allergy / Immunology": 3,
+    "Endocrinology": 3,
+    "Hematology - Oncology": 3,
+    "Emergency Room Reports": 4,
+    "Discharge Summary": 4,
+    "Surgery": 3,
+    "Consult - History and Phy.": 3,
+    "Radiology": 3,
+    "SOAP / Chart / Progress Notes": 3
+  },
+  "length_targets": {
+    "short": 17,
+    "medium": 17,
+    "long": 16
+  },
+  "selected_source_row_ids": [
+    4995,
+    4997,
+    4996,
+    4874,
+    4690,
+    4787,
+    4965,
+    4447,
+    4345,
+    4427,
+    3963,
+    3962,
+    3911,
+    3966,
+    3864,
+    3838,
+    3818,
+    3859,
+    3800,
+    3798,
+    3797,
+    3604,
+    3472,
+    3525,
+    3362,
+    3375,
+    3319,
+    3287,
+    3150,
+    3127,
+    3119,
+    2920,
+    2868,
+    2964,
+    2796,
+    2270,
+    2365,
+    2078,
+    1618,
+    1663,
+    1639,
+    1307,
+    1396,
+    1392,
+    783,
+    422,
+    768,
+    113,
+    137,
+    130
+  ],
+  "cleaning": {
+    "length_tertiles": [
+      294.0,
+      528.0
+    ],
+    "complexity_tertiles": [
+      0.3791704238052299,
+      0.6262962128043282
+    ],
+    "near_duplicate_pairs": [
+      [
+        153,
+        168,
+        0.9219858156028369
+      ]
+    ],
+    "normalized_unique_before_near_dedup": 2219,
+    "candidate_count": 2218,
+    "exclusions": {
+      "normalized duplicate transcription": 2436,
+      "ends with an empty heading/field (apparent truncation)": 134,
+      "explicit template or standalone opening fragment": 96,
+      "fewer than 40 whitespace words (too little text for this subset)": 76,
+      "missing transcription": 33,
+      "ends mid-phrase (apparent truncation)": 5,
+      "near-duplicate transcription": 1
+    }
+  },
+  "sampler_sha256": "2bf3b810a915a984c9c2c3f88ccd9bb5bdfb4151ed286a7eb049dd119aae5cef",
+  "versions": {
+    "pandas": "3.0.6",
+    "numpy": "2.5.3",
+    "scikit-learn": "1.9.1",
+    "openpyxl": "3.1.5"
+  },
+  "output_sha256": {
+    "mtsamples_curated_50.csv": "9f7b48481f2fd0767ec3c38bb50baac63e2853d46030c5d3a64c91e3d2b60eb6",
+    "mtsamples_curated_50.xlsx": "7baf71556dae541133b9223419ba986df2de9d3ecc8ec89bf7a6f48a759e6457",
+    "candidate_audit.csv": "0186aaf6300e4df2ed0d32a8aa44e5d257bde620e5f23a64def91535df9ed066"
+  }
+}

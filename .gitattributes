@@ -1,0 +1,4 @@
+# Preserve bytes used by the sampling reproducibility manifest across platforms.
+EDAs/mtsamples_sampling.py text eol=lf
+data/curated_baseline/*.csv text eol=lf
+data/curated_baseline/*.xlsx binary
