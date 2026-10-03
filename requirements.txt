@@ -1,30 +1,5 @@
-# ── Google GCP-first stack ─────────────────────────────────────────────
-google-genai          # unified Gemini SDK (Google AI Studio + Vertex AI)
-google-adk            # Agent Development Kit — multi-agent orchestration
-litellm               # lets ADK call Gemma / external open models for the leaderboard
-
-# ── RAG / retrieval ────────────────────────────────────────────────────
-chromadb
-# sentence-transformers   # optional offline-embeddings fallback
-# faiss-cpu               # optional offline vector index
-
-# ── Evaluation ─────────────────────────────────────────────────────────
-textstat              # Flesch-Kincaid, SMOG readability
-nltk                  # pronunciation dictionary setup for local readability scoring
-scikit-learn          # Cohen's kappa, agreement metrics
-
-# ── Data / analysis ────────────────────────────────────────────────────
-pandas
-numpy
-datasets
-openpyxl              # read the MedAESQA methods .xlsx
-matplotlib
-seaborn
-
-# ── Demo (December: HF Spaces or Cloud Run) ────────────────────────────
-gradio
-# streamlit            # alternative demo framework
-
-# ── Optional alternatives ──────────────────────────────────────────────
-# langgraph            # alternative orchestration to ADK
-# groq                 # one external open model (Llama-3) for the leaderboard
+# Versions used for the real-file validation in this session.
+chromadb==1.5.9
+sentence-transformers==6.1.0
+# Optional: only for legacy Gemini helpers in extractor.py.
+# google-genai
