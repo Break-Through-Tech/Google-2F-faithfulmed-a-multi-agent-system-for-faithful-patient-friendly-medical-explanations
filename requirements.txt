@@ -10,6 +10,7 @@ chromadb
 
 # ── Evaluation ─────────────────────────────────────────────────────────
 textstat              # Flesch-Kincaid, SMOG readability
+nltk                  # pronunciation dictionary setup for local readability scoring
 scikit-learn          # Cohen's kappa, agreement metrics
 
 # ── Data / analysis ────────────────────────────────────────────────────
