@@ -16,32 +16,56 @@ python -m unittest discover -s EDAs/MedAESQA -p 'test_*.py' -v
 
 The demo uses a synthetic collection and a hard-coded response. Its model is
 `offline-stub-not-gemini` and `demo` is true. It verifies plumbing only; do not
-include it in benchmark results. Offline tests require only the standard library.
+include it in benchmark results. The baseline and retrieval tests require only the
+standard library; `tests/test_readability.py` also needs `pandas` and `textstat`
+from the root requirements.
 
 ## Real integration
 
-Install `google-genai` and the dependencies needed by the collection owner
-(`chromadb` is already in the root requirements). Set `GEMINI_API_KEY` and
+Real retrieval comes from Vaibhavi's MedlinePlus vector store in
+[`extractor/`](../extractor/README.md): collection
+`faithfulmed_medlineplus_minilm_v1`, built from Ruhma's embeddings with
+`sentence-transformers/all-MiniLM-L6-v2` (384 dimensions). The Chroma database is
+gitignored, so build it locally first. From the repository root, using Python
+3.11 or 3.12:
+
+```sh
+python -m pip install -r extractor/requirements.txt google-genai
+python -m extractor.rag ingest data/RAG_Embeddings_Full.jsonl --db extractor/chroma_data
+python -m extractor.rag search "hypertension" --db extractor/chroma_data --top-k 3
+```
+
+The embeddings JSONL is shared outside the repository
+(`data_pipeline/RAG_Embeddings_Full.jsonl` is an empty placeholder); put it in
+`data/` or point the command at its location. Set `GEMINI_API_KEY` and
 `GEMINI_MODEL` in your environment; do not put keys into source code. Select an
 available text-generation model explicitly so model changes are deliberate.
+
+Pass `extractor.rag.TextQueryCollection` as the collection. Rafi's
+`retrieve_context` calls `query(query_texts=...)`, and this wrapper embeds those
+query texts with the same MiniLM model as the stored vectors. Do not pass a raw
+Chroma collection: it would not embed queries with MiniLM, so retrieval would
+fail or return mismatched results.
 
 ```python
 import os
 from google import genai
 from baseline import BaselineInput, GeminiGenerator, run_baseline
+from extractor.rag import TextQueryCollection
 
-# Supply the existing populated Chroma collection from Vaibhavi.
-# Its query embedding function MUST match ingestion's model and dimensions.
-# Do not create a new empty collection or silently use Chroma's default embedding.
-def explain(collection, clinical_text, example_id):
+def explain(clinical_text, example_id, retrieval_query=None):
+    collection = TextQueryCollection("extractor/chroma_data")
     with genai.Client(api_key=os.environ["GEMINI_API_KEY"]) as client:
         return run_baseline(
-            BaselineInput(example_id=example_id, clinical_text=clinical_text),
+            BaselineInput(example_id, clinical_text, retrieval_query),
             collection=collection,
             generator=GeminiGenerator(client, model=os.environ["GEMINI_MODEL"]),
             top_k=5,
         )
 ```
+
+Through this wrapper, each chunk's `text` is the exact embedded document and its
+`metadata` carries `term`, `url`, `source_id`, and a cleaned `definition`.
 
 `GeminiGenerator` follows the [Google Gen AI Python SDK](https://googleapis.github.io/python-genai/)
 `models.generate_content` interface. Clients are injected so callers control
@@ -103,14 +127,19 @@ for the current notebook). Count retrieval/API failures separately instead of
 scoring empty strings as easy-to-read answers. Rafi's rubric/manual assessment
 is still needed to assess faithfulness.
 
-At the reviewed main revision (`b4c00cb`):
+Current status:
 
-- `data_pipeline/RAG_Embeddings_Full.jsonl` is an empty placeholder.
-- The data notebook embeds using `all-MiniLM-L6-v2`, while its README describes
-  Gemini `text-embedding-004`. Resolve the ingestion/query model contract with
-  Ruhma and Vaibhavi before using a real index.
-- The curated 50-report set is in open PR #7, not yet on main. No benchmark
-  results or dataset completeness are claimed by this baseline.
+- `data_pipeline/RAG_Embeddings_Full.jsonl` is still an empty placeholder; get
+  the embeddings file from Ruhma or Vaibhavi to build the index.
+- The embedding model is settled on `all-MiniLM-L6-v2` for September (see the
+  extractor README). `data_pipeline/README.md` still describes Gemini
+  `text-embedding-004` and is stale. Moving to Gemini embeddings would need a new
+  collection with document and query vectors regenerated together.
+- The curated 50-report set is on main in
+  [`data/curated_baseline/`](../data/curated_baseline/README.md) (v1-proposed,
+  awaiting team freeze). Use its `source_row_id` as `example_id`. No benchmark
+  results are claimed by this baseline.
 
-Next: obtain a populated collection with its matching query embedding function,
-run a de-identified live Gemini smoke test, then evaluate the agreed frozen set.
+Next: build the local index from the embeddings file, then do a quick test run
+with real Gemini on a few curated reports (no patient-identifying data) through
+`TextQueryCollection`. Once that works, run and evaluate the full agreed set.
