@@ -13,8 +13,9 @@ September baseline: see [the runnable demo, task specification, and retrieval ha
 | Jenna Hunte           | @jehunte      | Break Through Tech Coach                                                 |
 | Ruhma Arshad          | @ruhma-a      | Simplifier Agent                                                         |
 | Sajib "Rafi" Hossain  | @rafihoss     | Verifier Agent                                                           |
-| Alicia Garcia        | @ag45566       | Readability Agent                                                                          |
-| Zurabi Kochiashvili   | @Zurab1K      | Refiner Agent |
+| Alicia Garcia         | @ag45566      | Readability Agent                                                        |
+| Zurabi Kochiashvili   | @Zurab1K      | Refiner Agent                                                            |
+| Carlin Verano         | @carlinnv     |                                                                          |
 
 ---
 
