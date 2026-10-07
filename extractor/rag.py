@@ -13,6 +13,7 @@ from pathlib import Path
 MODEL = 'sentence-transformers/all-MiniLM-L6-v2'
 DIMENSION = 384
 COLLECTION = 'faithfulmed_medlineplus_minilm_v1'
+DEFAULT_DB = Path(__file__).resolve().parent / 'chroma_data'
 
 class PlainText(HTMLParser):
     def __init__(self):
@@ -103,14 +104,14 @@ def embed_queries(texts):
         _model = SentenceTransformer(MODEL)
     return _model.encode(texts, normalize_embeddings=False).tolist()
 
-def retrieve(query, db_path='./chroma_data', top_k=3):
+def retrieve(query, db_path=DEFAULT_DB, top_k=3):
     """Framework-neutral interface. Return source-attributed records, not generated advice."""
     if not isinstance(query,str) or not query.strip(): raise ValueError('query must be nonempty')
     return query_vector(embed_queries([query])[0], open_collection(db_path), top_k)
 
 class TextQueryCollection:
     """Match Rafi's existing query_texts adapter without Chroma's default embedder."""
-    def __init__(self, db_path='./chroma_data'):
+    def __init__(self, db_path=DEFAULT_DB):
         self.target = open_collection(db_path)
     def query(self, *, query_texts, n_results=3, **kwargs):
         if type(n_results) is not int or n_results < 1: raise ValueError('n_results must be positive')
@@ -126,8 +127,8 @@ def format_context(results):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__); sub=p.add_subparsers(dest='command',required=True)
-    a=sub.add_parser('ingest'); a.add_argument('file'); a.add_argument('--db',default='./chroma_data')
-    a=sub.add_parser('search'); a.add_argument('query'); a.add_argument('--db',default='./chroma_data'); a.add_argument('--top-k',type=int,default=3)
+    a=sub.add_parser('ingest'); a.add_argument('file'); a.add_argument('--db',default=str(DEFAULT_DB))
+    a=sub.add_parser('search'); a.add_argument('query'); a.add_argument('--db',default=str(DEFAULT_DB)); a.add_argument('--top-k',type=int,default=3)
     a=sub.add_parser('audit'); a.add_argument('file')
     args=p.parse_args()
     if args.command=='ingest': output=ingest(args.file,args.db)

@@ -25,3 +25,4 @@ data/*
 *.pt
 *.faiss
 chroma/
+extractor/chroma_data/

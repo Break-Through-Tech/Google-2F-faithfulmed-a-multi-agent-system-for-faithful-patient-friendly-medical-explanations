@@ -2,6 +2,8 @@
 
 Last updated: 2026-10-03. Owner: Vaibhavi Srivastava. This describes generated and tested code in this task folder; it does not imply the owner has run it personally or pushed it yet.
 
+Repository note (2026-10-07): This is Vaibhavi's original progress record, now housed in `extractor/`. Its upload and push-status statements describe the earlier handoff, not the current repository state. The files listed below beyond `rag.py`, `Extractor_Vector_Store.ipynb`, `PROJECT_CONTEXT.md`, and `README.md` were described in that handoff but were not included in Vaibhavi's merged commit. Her tested dependency pins are now in `extractor/requirements.txt`; the repository-root `requirements.txt` has been restored to the project-wide list from before her merge.
+
 ## 1. Project Goal
 FaithfulMed is a Google-hosted Break Through Tech AI Studio Fall 2026 project for patient-friendly explanations that remain faithful to clinical sources. The official architecture has Extractor, Simplifier, Verifier, Refiner, and Readability agents. September builds EDA, retrieval, a single-Gemini baseline, and evaluation. October adds Google ADK orchestration and clinical-atom extraction.
 
@@ -71,7 +73,8 @@ Stored metadata: `source`, `source_id` (URL), `url`, `term`, plain-text `definit
 | `Extractor_Vector_Store.ipynb` | Setup and reproducible walkthrough |
 | `PROJECT_CONTEXT.md` | Extractor continuity notes and log |
 | `VALIDATION.json` | Actual counts, persistence check, five-query retrieval observations, tested versions |
-| `README.md`, `requirements.txt` | Run instructions, handoff contract, tested dependency versions |
+| `README.md` | Extractor run instructions and handoff contract |
+| `requirements.txt` | Extractor's tested dependency versions |
 | `MTSAMPLES_EDA.md`, `SYNTHEA_EDA.md` | Earlier sample EDA reports |
 | `extractor.py` | Earlier audit/field extraction helpers and separate legacy ingestion prototype |
 | `fhir.py`, `synthea_audit.py`, `medaesqa_audit.py` | Clinical-data flattening and structure audits |
