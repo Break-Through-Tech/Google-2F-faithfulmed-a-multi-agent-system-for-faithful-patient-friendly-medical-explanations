@@ -15,7 +15,7 @@ September baseline: see [the runnable demo, task specification, and retrieval ha
 | Sajib "Rafi" Hossain  | @rafihoss     | Verifier Agent                                                           |
 | Alicia Garcia         | @ag45566      | Readability Agent                                                        |
 | Zurabi Kochiashvili   | @Zurab1K      | Refiner Agent                                                            |
-| Carlin Verano         | @carlinnv     |                                                                          |
+| Carlin Verano         | @carlinnv     | Refiner and test spec |
 
 ---
 
