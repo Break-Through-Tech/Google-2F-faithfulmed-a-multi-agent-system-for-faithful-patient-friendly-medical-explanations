@@ -1,10 +1,12 @@
-# Reflection: Name
+# Historical September monthly reflection template
+
+For October 2026 onward, use `biweekly-reflection-template.md` instead. Keep this file for the September monthly format.
 
 ## Name
 
 Your name
 
-## Date / Week
+## Date / Month
 
 YYYY-MM-DD or YYYY-MM-DD to YYYY-MM-DD
 

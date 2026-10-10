@@ -13,7 +13,7 @@ ADRs are not for small personal implementation details. If a decision affects th
 Contains individual progress reflections. Each teammate is responsible for writing their own reflection, using the provided template and an individual file.
 
 - **September 2026:** Each of the 5 team members creates exactly one monthly reflection covering their work for the entire month. Do not create weekly September files.
-- **October 2026 onward:** Each team member creates one reflection every week. Use a consistent `YYYY-MM-DD-name.md` filename, such as `2026-10-05-name.md`, and organize files by month when practical (`october/`, `november/`, and so on).
+- **October 2026 onward:** Each team member creates one reflection every two weeks, divided into Week 1 and Week 2. Start with October 1–14, then October 15–28, and continue in consecutive 14-day periods. Use the period end date in `YYYY-MM-DD-name.md`, such as `october/2026-10-14-name.md`, and file it under that end month's folder. See `reflections/README.md` for the schedule and in-progress reports.
 
 Reflections should cover work completed, learning, results or findings, blockers, decisions contributed to, and next steps.
 
@@ -49,7 +49,7 @@ Use individual reflection files so teammates do not edit the same file and creat
 ## Naming at a glance
 
 - September monthly reflection: `reflections/september/2026-09-name.md`
-- Weekly reflection from October onward: `reflections/october/YYYY-MM-DD-name.md`
+- Biweekly reflection from October onward: `reflections/october/YYYY-MM-DD-name.md` (period end date)
 - ADR: `adr/ADR-001-short-title.md`
 
 The example ADR in `adr/ADR-001-example.md` is a format sample only. It is not a real FaithfulMed decision.
