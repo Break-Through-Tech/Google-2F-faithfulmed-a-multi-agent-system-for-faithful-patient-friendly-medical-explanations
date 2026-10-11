@@ -116,7 +116,7 @@ Two decisions that will save the team weeks — please take these seriously (the
 **Recommended stack (GCP-first):**
 - **Models:** **Gemini** (via Google AI Studio — free API key, no billing) as primary; **Gemma-2** open weights (runnable on the free Colab tier) for the open-model comparison; **one external open model** (e.g., Llama-3 via Groq, called through ADK's `LiteLlm`) to keep the leaderboard honest.
 - **Orchestration:** **`google-adk`** (Agent Development Kit) — `SequentialAgent`, `LoopAgent`, `LlmAgent`. Model-agnostic, so one harness runs every model. *(LangGraph or CrewAI are acceptable alternatives.)*
-- **RAG:** **Gemini `text-embedding-004`** + **ChromaDB** (offline fallback: `sentence-transformers` + `faiss-cpu`).
+- **RAG:** **Gemini `gemini-embedding-2`** + **ChromaDB** (offline fallback: `sentence-transformers` + `faiss-cpu`). The originally listed `text-embedding-004` was [shut down in January 2026](https://ai.google.dev/gemini-api/docs/deprecations/); the MedlinePlus implementation uses its current Gemini replacement.
 - **Readability & agreement:** `textstat` (Flesch-Kincaid, SMOG), `scikit-learn` (Cohen's κ).
 - **Data / viz:** `pandas`, `numpy`, `openpyxl`, `matplotlib`, `seaborn`, `datasets`.
 - **Demo:** `gradio` or `streamlit` on Hugging Face Spaces (free); Cloud Run is the GCP-native alternative (needs billing). ADK's built-in dev UI (`adk web`) is great for showing agent traces during development.
