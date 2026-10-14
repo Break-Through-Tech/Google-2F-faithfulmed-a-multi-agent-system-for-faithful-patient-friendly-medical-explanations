@@ -1,5 +1,7 @@
 {
-  "subset_version": "v1-proposed",
+  "subset_version": "v3-medium-with-allergy-exceptions-proposed",
+  "sampling_profile": "medium",
+  "supersedes": "v1-proposed (mixed lengths)",
   "status": "selected source reports; awaiting team review and freeze; unannotated",
   "source_filename": "mtsamples.csv",
   "source_sha256": "a92cb78569f460606661ee7da50c92305b60d0fac2be4b06c8d2de0f234612d4",
@@ -26,61 +28,85 @@
     "SOAP / Chart / Progress Notes": 3
   },
   "length_targets": {
-    "short": 17,
-    "medium": 17,
-    "long": 16
+    "medium": 48,
+    "short": 1,
+    "long": 1
   },
+  "documented_length_exceptions": [
+    {
+      "source_row_id": 0,
+      "sample_name": "Allergic Rhinitis",
+      "word_count": 204,
+      "length_category": "short",
+      "reason": "Allergy/Immunology has only one medium-length source report; this complete, gap-free allergy report restores the original three-report quota"
+    },
+    {
+      "source_row_id": 4998,
+      "sample_name": "Allergy Evaluation Consult",
+      "word_count": 638,
+      "length_category": "long",
+      "reason": "Allergy/Immunology has only one medium-length source report; this complete, gap-free allergy report restores the original three-report quota"
+    }
+  ],
+  "medium_word_range": {
+    "lower_exclusive": 294.0,
+    "upper_inclusive": 528.0
+  },
+  "medium_candidate_count": 740,
+  "medium_after_gap_screen": 679,
+  "transcription_gap_pattern": "_{2,}|\\[(?:inaudible|unintelligible)\\]",
+  "medium_target_specialty_candidate_count": 653,
   "selected_source_row_ids": [
-    4995,
+    0,
     4997,
-    4996,
-    4874,
-    4690,
+    4998,
+    4626,
+    4720,
     4787,
-    4965,
-    4447,
+    4976,
+    4457,
     4345,
-    4427,
-    3963,
-    3962,
+    4218,
+    3938,
+    3885,
+    3925,
     3911,
-    3966,
-    3864,
-    3838,
-    3818,
-    3859,
-    3800,
-    3798,
-    3797,
-    3604,
-    3472,
-    3525,
-    3362,
-    3375,
+    3846,
+    3826,
+    3860,
+    3847,
+    3808,
+    3805,
+    3811,
+    3608,
+    3685,
+    3606,
+    3341,
     3319,
-    3287,
-    3150,
+    3381,
+    3290,
+    3186,
     3127,
-    3119,
-    2920,
-    2868,
+    3159,
     2964,
-    2796,
-    2270,
+    2936,
+    2756,
+    2946,
+    2359,
     2365,
-    2078,
-    1618,
+    2059,
+    1571,
+    1516,
     1663,
-    1639,
-    1307,
+    1394,
+    1384,
     1396,
-    1392,
-    783,
+    343,
+    1190,
     422,
-    768,
-    113,
-    137,
-    130
+    85,
+    131,
+    108
   ],
   "cleaning": {
     "length_tertiles": [
@@ -110,7 +136,10 @@
       "near-duplicate transcription": 1
     }
   },
-  "sampler_sha256": "2bf3b810a915a984c9c2c3f88ccd9bb5bdfb4151ed286a7eb049dd119aae5cef",
+  "sampler_sha256": {
+    "mtsamples_sampling.py": "be123d1c77c13bb6d76d459da4a5b56e29bbddd1f5fcd2d62785728c0da016a6",
+    "mtsamples_medium_sampling.py": "4739221f1e88b911c0e1727e0fb022351dc26866ea3f9aa50b10f73d17d23684"
+  },
   "versions": {
     "pandas": "3.0.6",
     "numpy": "2.5.3",
@@ -118,8 +147,8 @@
     "openpyxl": "3.1.5"
   },
   "output_sha256": {
-    "mtsamples_curated_50.csv": "9f7b48481f2fd0767ec3c38bb50baac63e2853d46030c5d3a64c91e3d2b60eb6",
-    "mtsamples_curated_50.xlsx": "7baf71556dae541133b9223419ba986df2de9d3ecc8ec89bf7a6f48a759e6457",
-    "candidate_audit.csv": "0186aaf6300e4df2ed0d32a8aa44e5d257bde620e5f23a64def91535df9ed066"
+    "mtsamples_curated_50.csv": "48052d03db068e8e7b5ec18e8d9ecf0c104a0de61285b512dcb4a6de5000da84",
+    "mtsamples_curated_50.xlsx": "58c8c570d84a96f788c050586cfa4b975c406b4eac7be3eab02931f4a422f8dd",
+    "candidate_audit.csv": "e4d22a2842660ba4fabe54ef9c4e98d2be78c557eefd7108c213a75053f65c16"
   }
 }

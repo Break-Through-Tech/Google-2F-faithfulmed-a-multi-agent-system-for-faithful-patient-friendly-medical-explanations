@@ -1,6 +1,7 @@
 """Reproduce the FaithfulMed 50-report source subset; no generation or annotation.
 
-Run from the repository root: python EDAs/mtsamples_sampling.py
+Run from the repository root: python EDAs/mtsamples_sampling.py (active medium set).
+Use --profile mixed --output <another-directory> for historical mixed-length exports.
 The notebook uses the same functions. Raw source text is never normalized in exports.
 """
 from __future__ import annotations
@@ -302,12 +303,15 @@ def select_reports(candidates: pd.DataFrame) -> pd.DataFrame:
     return result[columns].reset_index(drop=True)
 
 
-def validate_selection(selected: pd.DataFrame, raw: pd.DataFrame) -> None:
+def validate_selection(selected: pd.DataFrame, raw: pd.DataFrame, *,
+                       specialty_targets=None, length_targets=None) -> None:
+    specialty_targets = SPECIALTY_TARGETS if specialty_targets is None else specialty_targets
+    length_targets = LENGTH_TARGETS if length_targets is None else length_targets
     assert len(selected) == 50 and selected.source_row_id.is_unique
     assert not blank_mask(selected.transcription).any()
     assert not selected.transcription.map(normalize_text).duplicated().any()
-    assert selected.medical_specialty.value_counts().to_dict() == SPECIALTY_TARGETS
-    assert selected.length_category.value_counts().to_dict() == LENGTH_TARGETS
+    assert selected.medical_specialty.value_counts().to_dict() == specialty_targets
+    assert selected.length_category.value_counts().to_dict() == length_targets
     assert selected.medical_specialty.value_counts().max() <= 4
     assert set(selected.text_complexity_category) == {"lower", "middle", "higher"}
     assert selected.text_complexity_category.value_counts().min() >= 10
@@ -336,10 +340,8 @@ def distribution_table(series: pd.Series, name: str) -> str:
     return markdown_table(series.rename_axis(name).reset_index(name="Reports"))
 
 
-def save_outputs(source: Path, raw: pd.DataFrame, candidates: pd.DataFrame, audit: pd.DataFrame, details: dict, selected: pd.DataFrame, outdir: Path) -> None:
-    import sklearn
-    import openpyxl
-    validate_selection(selected, raw)
+def export_tables(selected: pd.DataFrame, audit: pd.DataFrame, outdir: Path) -> tuple[Path, Path]:
+    """Write the single active CSV/Excel set and verify lossless round trips."""
     outdir.mkdir(parents=True, exist_ok=True)
     csv_path = outdir / "mtsamples_curated_50.csv"
     excel_path = outdir / "mtsamples_curated_50.xlsx"
@@ -368,6 +370,14 @@ def save_outputs(source: Path, raw: pd.DataFrame, candidates: pd.DataFrame, audi
     pd.testing.assert_frame_equal(csv_back, selected, check_dtype=False)
     pd.testing.assert_frame_equal(excel_back, selected, check_dtype=False)
     audit.to_csv(outdir / "candidate_audit.csv", index=False, lineterminator="\n")
+    return csv_path, excel_path
+
+
+def save_outputs(source: Path, raw: pd.DataFrame, candidates: pd.DataFrame, audit: pd.DataFrame, details: dict, selected: pd.DataFrame, outdir: Path) -> None:
+    import sklearn
+    import openpyxl
+    validate_selection(selected, raw)
+    csv_path, excel_path = export_tables(selected, audit, outdir)
     manifest = {
         "subset_version": "v1-proposed", "status": "selected source reports; awaiting team review and freeze; unannotated",
         "source_filename": source.name, "source_sha256": sha256(source), "source_rows": len(raw),
@@ -453,14 +463,14 @@ Content counts overlap because one note can match multiple cues:
 From the repository root, with dependencies in `requirements.txt` installed:
 
 ```powershell
-python EDAs/mtsamples_sampling.py --source data/mtsamples.csv
+python EDAs/mtsamples_sampling.py --profile mixed --source data/mtsamples.csv --output data/mtsamples_mixed_history
 # Existing Windows virtual environment:
-.\\.venv\\Scripts\\python.exe EDAs/mtsamples_sampling.py --source data/mtsamples.csv
+.\\.venv\\Scripts\\python.exe EDAs/mtsamples_sampling.py --profile mixed --source data/mtsamples.csv --output data/mtsamples_mixed_history
 ```
 
 The sampler also accepts `.xlsx`/`.xlsm` input using pandas/openpyxl. It fails explicitly if another source cannot meet these quotas. For this version, verify the source hash above and use the library versions recorded in `selection_manifest.json`. Running the command overwrites generated subset artifacts; archive a reviewed/frozen version before deliberately changing source data or selection rules. CSV content, selected IDs, and metadata are deterministic; Excel archive timestamps may differ between runs.
 
-Open `EDAs/mtsamples_eda.ipynb` and run all cells for the sampling EDA, plots, in-memory selection, and checks. The notebook does not overwrite exports. The reusable cleaning/selection implementation is `EDAs/mtsamples_sampling.py`. Its SHA-256 and selected row IDs are in the manifest.
+This is the historical mixed-length profile. Open `EDAs/mtsamples_eda.ipynb` for both the historical and active medium-length analyses. The notebook does not overwrite exports. The reusable cleaning/selection implementation is `EDAs/mtsamples_sampling.py`. Its SHA-256 and selected row IDs are in the manifest.
 
 Files: `mtsamples_curated_50.xlsx` (formatted sheet; expand row height/formula bar to read long notes), matching `mtsamples_curated_50.csv`, this README, `candidate_audit.csv`, and `selection_manifest.json`. The script verifies full CSV and Excel round-trips, including every transcription. Current repository rules ignore `data/curated_baseline/`; these local artifacts are not automatically tracked or published by Git.
 
@@ -473,7 +483,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=ROOT / "data/mtsamples.csv")
     parser.add_argument("--output", type=Path, default=ROOT / "data/curated_baseline")
+    parser.add_argument("--profile", choices=["medium", "mixed"], default="medium",
+                        help="Medium is the active set; mixed reproduces the historical analysis.")
     args = parser.parse_args()
+    if args.profile == "medium":
+        try:
+            from .mtsamples_medium_sampling import generate
+        except ImportError:
+            from mtsamples_medium_sampling import generate
+        generate(args.source, args.output)
+        return
+    if args.output.resolve() == (ROOT / "data/curated_baseline").resolve():
+        parser.error("Use --output with a different directory for historical mixed-length exports.")
     source_hash = sha256(args.source)
     raw = load_source(args.source)
     candidates, audit, details = clean_candidates(raw)
