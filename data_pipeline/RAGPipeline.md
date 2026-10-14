@@ -1,5 +1,16 @@
 # Medical RAG Data Pipeline
 
+> **Temporary local retrieval:** [MINILM_MEDLINEPLUS.md](MINILM_MEDLINEPLUS.md)
+> builds a separate MiniLM index from the current cleaned MedlinePlus chunks
+> while the Gemini build is limited by daily quota. Both use the same chunk file.
+
+> **Historical notebook description:** This page describes Ruhma's earlier
+> multi-source pipeline. The current MedlinePlus-only, chunked Gemini route is
+> documented in [GEMINI_MEDLINEPLUS.md](GEMINI_MEDLINEPLUS.md). The earlier
+> `text-embedding-004` references below are obsolete; Google shut that model
+> down in January 2026. The supplied older embeddings file contains MiniLM
+> vectors and is not used by the new Gemini collection.
+
 This folder contains the data aggregation and processing pipeline for the Medical RAG system. The primary notebook merges three medical terminology datasets, cleans the data, and generates vector embeddings using Google's Gemini API.
 
 ## Workflow Overview

@@ -1,5 +1,14 @@
 # FaithfulMed — Vaibhavi's Extractor / Vector Store
 
+> This documents the September MiniLM collection. The new MedlinePlus-only
+> Gemini embedding route is in
+> [data_pipeline/GEMINI_MEDLINEPLUS.md](../data_pipeline/GEMINI_MEDLINEPLUS.md).
+> Keep the two collections separate.
+
+For the temporary MiniLM index of the newer 6,883-chunk export, see
+[MINILM_MEDLINEPLUS.md](../data_pipeline/MINILM_MEDLINEPLUS.md). The older ingestion
+commands below load supplied vectors; they do not build that new chunked index.
+
 September contribution: load Ruhma's MedlinePlus embeddings into persistent ChromaDB and retrieve the three closest lay-language definitions for a medical term. MTSamples and Synthea are clinical inputs for EDA and later extraction; they are **not** the lay-language retrieval database.
 
 ## Start here
