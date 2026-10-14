@@ -1,0 +1,5 @@
+{
+  "example_id": "synthetic-chest-pain-smoke",
+  "clinical_text": "A patient came to the hospital with chest pain. Serial troponin tests did not show a heart attack. A nuclear stress test was done, but its result is still pending. Liver enzyme levels were elevated, and the cause is uncertain. The patient also has acid reflux. The patient will see a cardiologist in two weeks and a primary care doctor in two to four weeks. Discharge medications will depend on the stress-test result.",
+  "retrieval_query": "chest pain heart attack troponin stress test"
+}
