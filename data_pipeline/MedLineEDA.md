@@ -1,21 +1,37 @@
-# Exploratory Data Analysis: MedlinePlus Lay-Language Glossary
+# Exploratory Data Analysis: MedlinePlus Lay-Language Topics
 
-## 1. Data Assessment & Identified Issues
-* **Missing Data:** Several XML entries lack definitions or contain empty `<full-summary>` tags. Some definitions are just short reference links (e.g., "See [Other Topic]").
-* **Duplicate Entries:** There are occurrences of duplicate medical terms caused by terms being assigned to multiple XML category trees. 
-* **Formatting Artifacts:** The raw text contains heavy XML/HTML tagging (like `<ul>`, `<p>`, `<br>`) and excessive whitespace/newlines from the nested data structure.
-* **Length Constraints:** While most lay-language definitions are concise, several comprehensive health topics contain massive blocks of text. Passing these directly into the vector database risks diluting the embedding accuracy, meaning these long entries must be split into smaller "chunks".
+This report uses the local `data/MedLineGlossary/mplus_topics_2026-09-23.xml` source. The counts below were measured from that file using the same cleaning rules as [the reusable export script](export_medlineplus_cleaned.py) and the same splitting rule as [the chunking script](chunk_medlineplus.py). They replace the earlier illustrative counts.
 
-## 2. Cleaning Instructions & Parsing Plan
-1. **Extraction & Sanitization:** Parse the XML tree and use Regex to strip all HTML tags and normalize whitespace.
-2. **Filter Nulls:** Drop any records where the definition string is shorter than 15 characters to eliminate dead links and empty tags.
-3. **Deduplicate:** Drop records that share the exact same `Medical_Term` string.
-4. **Text Chunking:** Identify any definitions exceeding 800 characters. Split these long definitions by sentence into smaller chunks so the semantic meaning remains dense for the RAG retriever. 
+## 1. Data assessment and issues
 
-## 3. Preparation Pipeline Log
-*(Here are sample metrics. Run the Python script to generate the exact numbers for this dataset)*
-* **Original records extracted:** 1,050
-* **After removing empty/invalid records:** 1,040
-* **After removing duplicate terms:** 1,035
-* **Records exceeding length limits (Chunked):** 180
-* **Final chunks ready for vector store:** 1,320
+- **Missing definitions:** The XML contains **2,033** health-topic entries. Four have no usable `<full-summary>` text after cleaning. No nonempty definition was only 1–15 characters long.
+- **Repeated titles:** Of the **2,029** entries left after the length filter, **50** repeat a title already kept. The export keeps the first occurrence of each exact cleaned title.
+- **Formatting:** Summaries contain XML/HTML structure and irregular whitespace. The parser extracts the text within each summary and normalizes whitespace before export.
+- **Length:** The **1,979** retained definitions have a median length of **1,255 characters** and a maximum of **8,201**. **1,612** retained topics need more than one chunk under the 800-character rule. Long entries should not be stored as one search passage.
+- **Languages and sources:** The retained topics include **1,002 English** and **977 Spanish** entries. All retained records have a source ID and MedlinePlus URL. The bilingual source needs separate retrieval-quality checks; these counts alone do not show that search works equally well in both languages.
+
+## 2. Cleaning and parsing rules used
+
+1. Read each XML `<health-topic>` title, ID, URL, and `<full-summary>` text; normalize whitespace.
+2. Remove definitions of **15 characters or fewer** after cleaning. In this source snapshot, this removes the four empty summaries.
+3. Keep the **first** entry for each exact cleaned title; remove later repeated titles.
+4. Split each retained definition into non-overlapping passages of **at most 800 characters**, preferring sentence boundaries and then word boundaries. The chunker checks that joining the passages reproduces the cleaned definition exactly. Each chunk keeps its source ID, URL, title, and position.
+
+## 3. Measured preparation counts
+
+| Step | Entries/topics remaining | Removed or produced at this step |
+| --- | ---: | ---: |
+| Health-topic entries in the XML | 2,033 | — |
+| After removing empty or ≤15-character definitions | 2,029 | 4 removed |
+| After removing repeated cleaned titles | **1,979** | 50 removed |
+| Topics split into multiple passages | 1,612 of the 1,979 | 367 stay as one passage |
+| Final passages ready for embedding | **6,883** | 800 characters maximum per passage |
+
+The existing `medlineplus_cleaned.jsonl` matches these export rules record for record, and the existing `medlineplus_chunks_800.jsonl` has **6,883** rows. To regenerate them from the repository root:
+
+```powershell
+python data_pipeline/export_medlineplus_cleaned.py
+python data_pipeline/chunk_medlineplus.py
+```
+
+These counts describe data preparation, not retrieval relevance or medical accuracy. Inspect sample chunk boundaries and search results before treating the index as an evaluated knowledge base.
