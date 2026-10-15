@@ -20,57 +20,50 @@ include it in benchmark results. The baseline and retrieval tests require only t
 standard library; `tests/test_readability.py` also needs `pandas` and `textstat`
 from the root requirements.
 
-## Real integration
+## Real MedlinePlus integration
 
-Real retrieval comes from Vaibhavi's MedlinePlus vector store in
-[`extractor/`](../extractor/README.md): collection
-`faithfulmed_medlineplus_minilm_v1`, built from Ruhma's embeddings with
-`sentence-transformers/all-MiniLM-L6-v2` (384 dimensions). The Chroma database is
-gitignored, so build it locally first. From the repository root, using Python
-3.11 or 3.12:
+The current source is the cleaned, chunked MedlinePlus collection described in
+[the MiniLM handoff](../data_pipeline/MINILM_MEDLINEPLUS.md). It contains all
+6,883 chunks from 1,979 topics. The Gemini **embedding** collection is still
+incomplete; the baseline can use MiniLM to search locally and Gemini to write
+its one explanation. The two embedding models have separate Chroma collections.
 
-```sh
-python -m pip install -r extractor/requirements.txt google-genai
-python -m extractor.rag ingest data/RAG_Embeddings_Full.jsonl --db extractor/chroma_data
-python -m extractor.rag search "hypertension" --db extractor/chroma_data --top-k 3
+Download the verified MiniLM ZIP from the team's shared Drive folder **Google 2F -
+Faithfulmed / MedlinePlus MiniLM Index**, extract it to `data/MedLineGlossary/`,
+and follow the handoff's `status` command. The Chroma files and generated output
+are ignored by Git. Do not send identifying patient information to the API.
+
+From the repository root, install the retrieval and generation dependencies:
+
+```powershell
+python -m pip install -r data_pipeline/requirements-minilm.txt
+python -m pip install -r data_pipeline/requirements-gemini.txt
 ```
 
-The embeddings JSONL is shared outside the repository
-(`data_pipeline/RAG_Embeddings_Full.jsonl` is an empty placeholder); put it in
-`data/` or point the command at its location. Set `GEMINI_API_KEY` and
-`GEMINI_MODEL` in your environment; do not put keys into source code. Select an
-available text-generation model explicitly so model changes are deliberate.
+Put your key in the ignored root `.env` file as `GEMINI_API_KEY=...`, or set the
+environment variable. Choose an available **text-generation** model explicitly;
+this tested run used `gemini-3.8-flash`. The new runner takes one JSON input with
+`example_id`, `clinical_text`, and optional `retrieval_query`, then saves the
+baseline's evaluation-ready JSON output:
 
-Pass `extractor.rag.TextQueryCollection` as the collection. Rafi's
-`retrieve_context` calls `query(query_texts=...)`, and this wrapper embeds those
-query texts with the same MiniLM model as the stored vectors. Do not pass a raw
-Chroma collection: it would not embed queries with MiniLM, so retrieval would
-fail or return mismatched results.
-
-```python
-import os
-from google import genai
-from baseline import BaselineInput, GeminiGenerator, run_baseline
-from extractor.rag import TextQueryCollection
-
-def explain(clinical_text, example_id, retrieval_query=None):
-    collection = TextQueryCollection("extractor/chroma_data")
-    with genai.Client(api_key=os.environ["GEMINI_API_KEY"]) as client:
-        return run_baseline(
-            BaselineInput(example_id, clinical_text, retrieval_query),
-            collection=collection,
-            generator=GeminiGenerator(client, model=os.environ["GEMINI_MODEL"]),
-            top_k=5,
-        )
+```powershell
+python -m retrieval.minilm_chroma status
+python -m baseline.run_medlineplus --input baseline/examples/synthetic_chest_pain.json --output data/baseline_results/chest_pain.json --model gemini-3.8-flash
 ```
 
-Through this wrapper, each chunk's `text` is the exact embedded document and its
-`metadata` carries `term`, `url`, `source_id`, and a cleaned `definition`.
+On Windows, replace `python` with `.\.venv\Scripts\python.exe` if the virtual
+environment is not activated. The second synthetic example is
+`baseline/examples/synthetic_low_glucose.json`. The output includes the query,
+retrieved text and MedlinePlus URLs, Gemini model, prompt version, and MiniLM
+collection/model/source hash. A successful `status: ok` means the code completed;
+it is **not** a clinical or faithfulness verdict. Keep the same model and index
+snapshot across examples intended for comparison.
 
-`GeminiGenerator` follows the [Google Gen AI Python SDK](https://googleapis.github.io/python-genai/)
-`models.generate_content` interface. Clients are injected so callers control
-credentials, transport timeout/retry settings, and lifecycle. A single SDK call
-may involve transport retries configured on that client.
+The older `extractor/rag.py` collection is a separate September handoff. This
+runner uses `retrieval.minilm_chroma.MiniLMTextQueryCollection` to embed queries
+with the same model as the current chunked index, then passes the results to
+`run_baseline`. After the Gemini embedding collection is complete and checked,
+its query wrapper can replace MiniLM without changing the baseline generator.
 
 ## Input/output task specification
 
@@ -127,19 +120,25 @@ for the current notebook). Count retrieval/API failures separately instead of
 scoring empty strings as easy-to-read answers. Rafi's rubric/manual assessment
 is still needed to assess faithfulness.
 
-Current status:
+Current status (October 14, 2026):
 
-- `data_pipeline/RAG_Embeddings_Full.jsonl` is still an empty placeholder; get
-  the embeddings file from Ruhma or Vaibhavi to build the index.
-- The embedding model is settled on `all-MiniLM-L6-v2` for September (see the
-  extractor README). `data_pipeline/README.md` still describes Gemini
-  `text-embedding-004` and is stale. Moving to Gemini embeddings would need a new
-  collection with document and query vectors regenerated together.
-- The curated 50-report set is on main in
-  [`data/curated_baseline/`](../data/curated_baseline/README.md) (v1-proposed,
-  awaiting team freeze). Use its `source_row_id` as `example_id`. No benchmark
-  results are claimed by this baseline.
-
-Next: build the local index from the embeddings file, then do a quick test run
-with real Gemini on a few curated reports (no patient-identifying data) through
-`TextQueryCollection`. Once that works, run and evaluate the full agreed set.
+- The real baseline ran end-to-end with the complete local MiniLM MedlinePlus
+  index and Gemini `gemini-3.8-flash` on two synthetic, de-identified notes.
+  Both returned `status: ok` with three retrieved chunks and saved JSON results
+  under the ignored `data/baseline_results/` folder.
+- In the chest-pain smoke test, the first prompt added an unsupported detail
+  about how a stress test worked. Prompt version `medlineplus-baseline-v3`
+  stopped that addition in a repeat run while retaining the negative heart-attack
+  finding, pending test result, uncertain liver finding, and follow-up timing.
+- For the low-blood-sugar note, a broad query returned Spanish diabetes pages.
+  A focused query using terms from the note returned English Blood Glucose and
+  Hypoglycemia pages; Gemini retained the 84-to-60-unit history, hold tonight,
+  55-unit morning dose, and next-week review. This is a retrieval-quality warning,
+  not proof the query strategy works across all reports.
+- Alicia's local readability scorer gave the two final smoke outputs
+  Flesch-Kincaid grades of **5.47** and **6.97**; neither was flagged as a
+  refusal. These numbers describe only those outputs, not baseline performance.
+- The proposed 50-report source set still needs team review and freezing.
+  Neither these two smoke tests nor `status: ok` are benchmark or clinical
+  validation. A full scored comparison, Verifier calibration, and the multi-agent
+  Refiner loop remain later work.

@@ -1,0 +1,5 @@
+{
+  "example_id": "synthetic-low-glucose-smoke",
+  "clinical_text": "A patient with diabetes has had low morning blood sugar readings in the 70s despite reducing nighttime Lantus insulin from about 84 units to 60 units. The patient is eating normally but feels tired. The clinician plans to hold Lantus tonight, give 55 units tomorrow morning, reduce the before-meal Humalog sliding-scale insulin, and review blood sugar readings next week.",
+  "retrieval_query": "low blood sugar insulin"
+}
