@@ -112,3 +112,21 @@ The baseline-generation pipeline and readability/faithfulness evaluation are oth
 - Next step: user opens notebook and uploads code through their account, then team integrates retrieval.
 
 Update this file after meaningful work. Preserve verified results and distinguish implemented code, smoke tests, and evaluated quality.
+
+## Session Log: October 16, 2026
+
+- Created the `vaibhavi-extractor` branch.
+- Set up a local Python 3.12 environment with Google ADK 2.12.0.
+- Added `faithfulmed_demo/roles/extractor.py`.
+- The Extractor reads `source_report` and writes structured output to `atoms`.
+- Each atom contains text, type, assertion status, and an exact source quote.
+- Ran a live Gemini 3.8 Flash smoke test on the synthetic chest-pain note.
+- Observed preservation of pending results, uncertainty, follow-up times,
+  and conditional medications. Schema and source-quote checks passed.
+- Ran a synthetic penicillin/metformin test. Automatic checks passed for
+  negation and preservation of "500 mg twice daily".
+- The current `test_extractor.py` runs the penicillin/metformin example.
+- These are smoke tests, not a clinical accuracy benchmark.
+- Next: teammate review and integration into the shared ADK pipeline.
+- Integration must call `validate_source_quotes` explicitly; the agent
+  factory does not automatically enforce quote validation.
