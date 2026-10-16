@@ -2,16 +2,13 @@
 
 This package provides the framework-neutral retrieval interface for FaithfulMed's Verifier work.
 
-For the temporary MiniLM index built from the current 6,883 MedlinePlus chunks,
-see [data_pipeline/MINILM_MEDLINEPLUS.md](../data_pipeline/MINILM_MEDLINEPLUS.md).
-Use `retrieval.minilm_chroma.MiniLMTextQueryCollection` with `retrieve_context`.
-This is a separate collection from the older September MiniLM handoff.
-
-For the new Gemini-based MedlinePlus collection, see
+For the completed Gemini-based MedlinePlus collection, see
 [`data_pipeline/GEMINI_MEDLINEPLUS.md`](../data_pipeline/GEMINI_MEDLINEPLUS.md).
-It wraps Gemini query embeddings in a Chroma-compatible collection so the
-`retrieve_context` interface below remains the same. The older MiniLM collection
-is a separate historical index and its vectors are not used by the Gemini path.
+Use `retrieval.gemini_chroma.GeminiTextQueryCollection` with `retrieve_context`.
+It embeds queries with `gemini-embedding-2` and searches the matching 6,883
+stored MedlinePlus vectors. The `retrieve_context` interface below is unchanged.
+The earlier local fallback index and scripts were retired after Gemini retrieval
+was verified. They are available only in Git history.
 
 ## Interface
 

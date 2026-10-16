@@ -1,10 +1,13 @@
 # MedlinePlus chunks and Gemini vector index
 
-This is the new Gemini path for the MedlinePlus-only retrieval collection. It does
-not reuse the older MiniLM vectors: changing the chunk text or embedding model
-requires new document embeddings and matching query embeddings. The project
+This is the Gemini path for the MedlinePlus-only retrieval collection. Changing
+the chunk text or embedding model requires new document embeddings and matching
+query embeddings. The project
 overview's `text-embedding-004` model was shut down in January 2026; this path
 uses the current stable `gemini-embedding-2` model with 768 dimensions.
+
+The local collection is complete as of October 16, 2026: **6,883/6,883**
+chunks. The single-Gemini baseline uses this collection for retrieval.
 
 ## Prepare the data (no API key)
 
@@ -96,12 +99,48 @@ collection = GeminiTextQueryCollection(open_collection(DB_PATH), GeminiEmbedder(
 results = retrieve_context(collection, "high blood pressure", top_k=3)
 ```
 
-This builds a **local** Chroma collection. The team's shared-access delivery
-still requires an agreed distribution or hosted Chroma arrangement. Keep a live
-SQLite/Chroma directory on local disk while writing to it; share an immutable
-snapshot after closing the writer, or have teammates rebuild it from the same
-chunk file and scripts. Record the exact model, dimension, chunk rule, and
-collection name in that handoff.
+## Get the completed index from the team Drive
+
+The finished Chroma database is already available in
+**Google 2F FaithfulMed → MedlinePlus Gemini Index**. Teammates should download
+these two files from that folder:
+
+- `data/MedLineGlossary/medlineplus_gemini_embedding_2_768_v1.zip`
+- `data/MedLineGlossary/medlineplus_gemini_embedding_2_768_v1.zip.sha256`
+
+The ZIP already contains the entire `chroma_gemini_2/` database folder. The
+archive and checksum were verified locally, and both files are now in the team
+Drive folder named above. Teammates can use the completed index without
+re-embedding 6,883 chunks:
+
+1. Clone or pull this repository and install the Gemini index dependencies:
+   `python -m pip install -r data_pipeline/requirements-gemini.txt`.
+2. Download **both** files from that Drive folder into
+   `data/MedLineGlossary/` in the repository. Create that folder if needed.
+3. From the repository root, run the commands below to check the download,
+   extract the database, and confirm its record count. The hash check and
+   record count do **not** use the Gemini API.
+
+```powershell
+$zip = 'data/MedLineGlossary/medlineplus_gemini_embedding_2_768_v1.zip'
+$checksum = 'data/MedLineGlossary/medlineplus_gemini_embedding_2_768_v1.zip.sha256'
+$expected = (Get-Content $checksum).Split(' ')[0]
+$actual = (Get-FileHash -Algorithm SHA256 $zip).Hash
+if ($actual -ne $expected) { throw 'ZIP checksum mismatch: download both files again.' }
+if (Test-Path 'data/MedLineGlossary/chroma_gemini_2') { throw 'Close Chroma and move or remove the existing database folder before extracting.' }
+Expand-Archive -LiteralPath data/MedLineGlossary/medlineplus_gemini_embedding_2_768_v1.zip -DestinationPath data/MedLineGlossary/
+python -c "from retrieval.gemini_chroma import open_collection; print(open_collection().count())"
+```
+
+The last command should print `6883`. The extracted database is at
+`data/MedLineGlossary/chroma_gemini_2/`. For a live search, put a Gemini API
+key in the ignored root `.env` file as `GEMINI_API_KEY=...`, then run
+`python -m retrieval.gemini_chroma search "high blood pressure"`. The baseline
+can use the same database without rebuilding document vectors. **Searches still
+need Gemini API access** to embed each new query; generating an answer also
+needs API access. The `status` command additionally needs the locally generated
+chunk JSONL file, so use the record-count command above to check a downloaded
+database on its own.
 
 Google references: [model lifecycle](https://ai.google.dev/gemini-api/docs/deprecations/),
 [embedding request and retrieval formatting](https://ai.google.dev/gemini-api/docs/embeddings),

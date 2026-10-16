@@ -23,20 +23,15 @@ from the root requirements.
 ## Real MedlinePlus integration
 
 The current source is the cleaned, chunked MedlinePlus collection described in
-[the MiniLM handoff](../data_pipeline/MINILM_MEDLINEPLUS.md). It contains all
-6,883 chunks from 1,979 topics. The Gemini **embedding** collection is still
-incomplete; the baseline can use MiniLM to search locally and Gemini to write
-its one explanation. The two embedding models have separate Chroma collections.
-
-Download the verified MiniLM ZIP from the team's shared Drive folder **Google 2F -
-Faithfulmed / MedlinePlus MiniLM Index**, extract it to `data/MedLineGlossary/`,
-and follow the handoff's `status` command. The Chroma files and generated output
-are ignored by Git. Do not send identifying patient information to the API.
+[the Gemini index handoff](../data_pipeline/GEMINI_MEDLINEPLUS.md): 6,883 chunks
+from 1,979 topics. The completed local `gemini-embedding-2` Chroma collection
+is the runner's retrieval index. The Chroma files and
+generated output are ignored by Git. Do not send identifying patient
+information to the API.
 
 From the repository root, install the retrieval and generation dependencies:
 
 ```powershell
-python -m pip install -r data_pipeline/requirements-minilm.txt
 python -m pip install -r data_pipeline/requirements-gemini.txt
 ```
 
@@ -47,23 +42,24 @@ this tested run used `gemini-3.8-flash`. The new runner takes one JSON input wit
 baseline's evaluation-ready JSON output:
 
 ```powershell
-python -m retrieval.minilm_chroma status
-python -m baseline.run_medlineplus --input baseline/examples/synthetic_chest_pain.json --output data/baseline_results/chest_pain.json --model gemini-3.8-flash
+python -m retrieval.gemini_chroma status
+python -m baseline.run_medlineplus --input baseline/examples/synthetic_chest_pain.json --output data/baseline_results/chest_pain_gemini_index.json --model gemini-3.8-flash
 ```
+
+The runner embeds each query with `gemini-embedding-2`, searches the matching
+Gemini vectors, then calls `gemini-3.8-flash` once to write the answer.
 
 On Windows, replace `python` with `.\.venv\Scripts\python.exe` if the virtual
 environment is not activated. The second synthetic example is
 `baseline/examples/synthetic_low_glucose.json`. The output includes the query,
-retrieved text and MedlinePlus URLs, Gemini model, prompt version, and MiniLM
-collection/model/source hash. A successful `status: ok` means the code completed;
+retrieved text and MedlinePlus URLs, Gemini generation model, prompt version,
+and selected retrieval collection/embedding model/source hash. A successful
+`status: ok` means the code completed;
 it is **not** a clinical or faithfulness verdict. Keep the same model and index
 snapshot across examples intended for comparison.
 
-The older `extractor/rag.py` collection is a separate September handoff. This
-runner uses `retrieval.minilm_chroma.MiniLMTextQueryCollection` to embed queries
-with the same model as the current chunked index, then passes the results to
-`run_baseline`. After the Gemini embedding collection is complete and checked,
-its query wrapper can replace MiniLM without changing the baseline generator.
+The runner uses the Gemini query wrapper with `run_baseline`. Pass `--db` only
+when the Gemini index is stored outside its default local folder.
 
 ## Input/output task specification
 
@@ -120,25 +116,14 @@ for the current notebook). Count retrieval/API failures separately instead of
 scoring empty strings as easy-to-read answers. Rafi's rubric/manual assessment
 is still needed to assess faithfulness.
 
-Current status (October 14, 2026):
+Gemini retrieval smoke test (October 16, 2026):
 
-- The real baseline ran end-to-end with the complete local MiniLM MedlinePlus
-  index and Gemini `gemini-3.8-flash` on two synthetic, de-identified notes.
-  Both returned `status: ok` with three retrieved chunks and saved JSON results
-  under the ignored `data/baseline_results/` folder.
-- In the chest-pain smoke test, the first prompt added an unsupported detail
-  about how a stress test worked. Prompt version `medlineplus-baseline-v3`
-  stopped that addition in a repeat run while retaining the negative heart-attack
-  finding, pending test result, uncertain liver finding, and follow-up timing.
-- For the low-blood-sugar note, a broad query returned Spanish diabetes pages.
-  A focused query using terms from the note returned English Blood Glucose and
-  Hypoglycemia pages; Gemini retained the 84-to-60-unit history, hold tonight,
-  55-unit morning dose, and next-week review. This is a retrieval-quality warning,
-  not proof the query strategy works across all reports.
-- Alicia's local readability scorer gave the two final smoke outputs
-  Flesch-Kincaid grades of **5.47** and **6.97**; neither was flagged as a
-  refusal. These numbers describe only those outputs, not baseline performance.
-- The proposed 50-report source set still needs team review and freezing.
-  Neither these two smoke tests nor `status: ok` are benchmark or clinical
-  validation. A full scored comparison, Verifier calibration, and the multi-agent
-  Refiner loop remain later work.
+- The local `gemini-embedding-2` collection reached 6,883/6,883 chunks. Both
+  synthetic examples ran through Gemini retrieval, `gemini-3.8-flash` generation,
+  and JSON export with `status: ok`. Results are saved locally as
+  `data/baseline_results/synthetic_chest_pain_gemini_index.json` and
+  `data/baseline_results/synthetic_low_glucose_gemini_index.json`.
+- The chest-pain top three included an English heart-tests page, its Spanish
+  counterpart, and an English heart-attack page. The low-glucose top three were
+  different chunks from the same English Hypoglycemia page. Topic diversity and
+  language filtering still need evaluation; these two runs only verify the path.
