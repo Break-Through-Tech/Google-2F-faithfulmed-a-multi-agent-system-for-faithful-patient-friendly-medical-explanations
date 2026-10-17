@@ -1,11 +1,13 @@
-﻿# September Extractor/vector-store history
+# Extractor handoff
 
-Vaibhavi built and tested an early MedlinePlus vector-store prototype for the
-team. Its MiniLM ingestion script, notebook, dependency file, and generated
-results were retired after the complete Gemini index became the active RAG
-source. The original work is still visible in Git history; this folder keeps
-[her project context](PROJECT_CONTEXT.md) as a historical record.
+Vaibhavi's [original progress notes](vaibhaviContext.md) document her earlier
+MedlinePlus vector-store prototype. They are kept as a historical record. The
+MiniLM code and local results were retired after the complete Gemini index
+became the active retrieval source.
 
-For current retrieval setup, use [the Gemini MedlinePlus handoff](../data_pipeline/GEMINI_MEDLINEPLUS.md).
-The clinical-fact Extractor agent planned for ADK is separate from this earlier
-vector-store prototype and still needs its own implementation.
+The [current Extractor handoff](EXTRACTOR_HANDOFF.md) summarizes the Gemini
+retrieval path and Vaibhavi's ADK clinical-fact Extractor, including its smoke
+tests and remaining integration step. The agent code is in
+[`faithfulmed_demo/roles/extractor.py`](../faithfulmed_demo/roles/extractor.py).
+For the shared Gemini index download and setup steps, see the
+[MedlinePlus Gemini handoff](../data_pipeline/GEMINI_MEDLINEPLUS.md).

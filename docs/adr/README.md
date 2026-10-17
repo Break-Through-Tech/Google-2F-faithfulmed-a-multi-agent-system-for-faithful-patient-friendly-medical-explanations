@@ -28,4 +28,4 @@ Recommended statuses are:
 - **Accepted**: approved and currently in effect
 - **Superseded**: replaced by a later ADR; link to the replacement
 
-Copy `templates/adr-template.md` when creating a new ADR. `ADR-001-example.md` is a sample format only, not an actual project decision.
+Copy `templates/adr-template.md` when creating a new ADR. `ADR-example.md` is a sample format only, not an actual project decision. `ADR-001-september-single-model-baseline.md` is the first accepted project decision.

@@ -1,4 +1,4 @@
-# ADR-001: SAMPLE - Example Decision Record
+# ADR-example: SAMPLE - Example Decision Record
 
 > **This is a SAMPLE/EXAMPLE only.** It is not a real FaithfulMed architectural decision and must not be treated as team policy.
 

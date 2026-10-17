@@ -1,4 +1,4 @@
-# Extractor project context
+# Extractor handoff and current status
 
 Vaibhavi's September prototype searched MedlinePlus records in a local ChromaDB
 collection using MiniLM vectors. It established a retrieval interface and
