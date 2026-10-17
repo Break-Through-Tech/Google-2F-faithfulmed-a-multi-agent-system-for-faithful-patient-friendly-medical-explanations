@@ -1,6 +1,6 @@
 # Extractor handoff
 
-Vaibhavi's [original progress notes](vaibhaviContext.md) document her earlier
+[original progress notes](vaibhaviContext.md) document my earlier
 MedlinePlus vector-store prototype. They are kept as a historical record. The
 MiniLM code and local results were retired after the complete Gemini index
 became the active retrieval source.
