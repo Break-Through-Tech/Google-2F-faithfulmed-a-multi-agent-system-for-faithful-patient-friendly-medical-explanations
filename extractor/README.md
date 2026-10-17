@@ -6,7 +6,7 @@ MiniLM code and local results were retired after the complete Gemini index
 became the active retrieval source.
 
 The [current Extractor handoff](EXTRACTOR_HANDOFF.md) summarizes the Gemini
-retrieval path and Vaibhavi's ADK clinical-fact Extractor, including its smoke
+retrieval path and the ADK clinical-fact Extractor, including its smoke
 tests and remaining integration step. The agent code is in
 [`faithfulmed_demo/roles/extractor.py`](../faithfulmed_demo/roles/extractor.py).
 For the shared Gemini index download and setup steps, see the
