@@ -2,7 +2,7 @@
 
 Last updated: 2026-10-03. Owner: Vaibhavi Srivastava. This describes generated and tested code in this task folder; it does not imply the owner has run it personally or pushed it yet.
 
-Repository note (2026-10-07): This is Vaibhavi's original progress record, now housed in `extractor/`. Its upload and push-status statements describe the earlier handoff, not the current repository state. The files listed below beyond `rag.py`, `Extractor_Vector_Store.ipynb`, `PROJECT_CONTEXT.md`, and `README.md` were described in that handoff but were not included in Vaibhavi's merged commit. Her tested dependency pins are now in `extractor/requirements.txt`; the repository-root `requirements.txt` has been restored to the project-wide list from before her merge.
+Repository note (2026-10-07): This is the original progress record, now housed in `extractor/`. Its upload and push-status statements describe the earlier handoff, not the current repository state. The files listed below beyond `rag.py`, `Extractor_Vector_Store.ipynb`, `PROJECT_CONTEXT.md`, and `README.md` were described in that handoff but were not included in my merged commit. Her tested dependency pins are now in `extractor/requirements.txt`; the repository-root `requirements.txt` has been restored to the project-wide list from before her merge.
 
 ## 1. Project Goal
 FaithfulMed is a Google-hosted Break Through Tech AI Studio Fall 2026 project for patient-friendly explanations that remain faithful to clinical sources. The official architecture has Extractor, Simplifier, Verifier, Refiner, and Readability agents. September builds EDA, retrieval, a single-Gemini baseline, and evaluation. October adds Google ADK orchestration and clinical-atom extraction.
@@ -10,7 +10,7 @@ FaithfulMed is a Google-hosted Break Through Tech AI Studio Fall 2026 project fo
 Source: [Challenge Project Overview](https://github.com/Break-Through-Tech/Google-2F-faithfulmed-a-multi-agent-system-for-faithful-patient-friendly-medical-explanations/blob/main/Challenge-Project-Overview.md), retrieved 2026-10-03, plus the user's September task assignment. Advisor's Oct 1 guidance supplied earlier in this conversation narrows RAG to MedlinePlus.
 
 ## 2. My Role / Task
-Vaibhavi owns the September ChromaDB infrastructure: ingest the Simplifier owner's prepared embeddings, retain source metadata, implement top-three similarity search, document the interface, and inspect clinical inputs. The eventual Extractor agent will return typed clinical facts. The current retrieval component returns definitions and sources; it does not perform full free-text clinical extraction or generate patient advice.
+I own the September ChromaDB infrastructure: ingest the Simplifier owner's prepared embeddings, retain source metadata, implement top-three similarity search, document the interface, and inspect clinical inputs. The eventual Extractor agent will return typed clinical facts. The current retrieval component returns definitions and sources; it does not perform full free-text clinical extraction or generate patient advice.
 
 ## 3. September Milestone Responsibilities
 - Deep-dive EDA on MTSamples and a Synthea sample; document structure and limitations.
@@ -112,3 +112,21 @@ The baseline-generation pipeline and readability/faithfulness evaluation are oth
 - Next step: user opens notebook and uploads code through their account, then team integrates retrieval.
 
 Update this file after meaningful work. Preserve verified results and distinguish implemented code, smoke tests, and evaluated quality.
+
+## Session Log: October 16, 2026
+
+- Created the `vaibhavi-extractor` branch.
+- Set up a local Python 3.12 environment with Google ADK 2.12.0.
+- Added `faithfulmed_demo/roles/extractor.py`.
+- The Extractor reads `source_report` and writes structured output to `atoms`.
+- Each atom contains text, type, assertion status, and an exact source quote.
+- Ran a live Gemini 3.8 Flash smoke test on the synthetic chest-pain note.
+- Observed preservation of pending results, uncertainty, follow-up times,
+  and conditional medications. Schema and source-quote checks passed.
+- Ran a synthetic penicillin/metformin test. Automatic checks passed for
+  negation and preservation of "500 mg twice daily".
+- The current `test_extractor.py` runs the penicillin/metformin example.
+- These are smoke tests, not a clinical accuracy benchmark.
+- Next: teammate review and integration into the shared ADK pipeline.
+- Integration must call `validate_source_quotes` explicitly; the agent
+  factory does not automatically enforce quote validation.
