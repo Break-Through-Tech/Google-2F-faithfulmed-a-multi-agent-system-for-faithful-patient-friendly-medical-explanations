@@ -7,7 +7,7 @@ load_dotenv(os.path.join(root_dir, '.env'))
 from google import genai
 from google.genai import types
 
-def run_simplifier(atoms: str, retrieved_context: str) -> str:
+def run_simplifier(atoms: list | str, retrieved_context: str) -> str:
     """
     Simplifier Agent: Drafts a patient-friendly medical explanation.
     
@@ -18,9 +18,8 @@ def run_simplifier(atoms: str, retrieved_context: str) -> str:
     Output:
     - draft: First patient-friendly explanation.
     """
-    # Initialize Gemini client
-    client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
-    
+    client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+
     # system instructions to enforce Simplifier's specific rules
     system_instruction = (
         "You are a medical simplification agent. Your job is to write a patient-friendly "
@@ -36,11 +35,11 @@ def run_simplifier(atoms: str, retrieved_context: str) -> str:
     # create prompt using inputs agreed upon
     prompt = f"""
     Patient Facts (Atoms):
-    {atoms}
-    
+    {str(atoms)}
+
     General Background (MedlinePlus Context):
     {retrieved_context}
-    
+
     Draft the explanation:
     """
     
@@ -53,17 +52,29 @@ def run_simplifier(atoms: str, retrieved_context: str) -> str:
             temperature=0.2, # low for factual drafting
         ),
     )
-    
     return response.text
 
-# Test block for local verification
 if __name__ == "__main__":
-    sample_atoms = "- Patient has elevated blood pressure (145/90).\n- Prescribed Lisinopril 10mg."
+    # Test data mimicking the Extractor's output and the MedlinePlus RAG pipeline
+    sample_atoms = [
+        {
+            "text": "Patient has no allergy to penicillin",
+            "type": "diagnosis",
+            "assertion": "negated",
+            "source_quote": "The patient has no allergy to penicillin."
+        },
+        {
+            "text": "Patient takes metformin 500 mg twice daily",
+            "type": "medication",
+            "assertion": "affirmed",
+            "source_quote": "The patient takes metformin 500 mg twice daily."
+        }
+    ]
+
     sample_context = (
-        "MedlinePlus Glossary entry: Lisinopril is in a class of medications called "
-        "angiotensin-converting enzyme (ACE) inhibitors. It works by decreasing certain "
-        "chemicals that tighten the blood vessels, so blood flows more smoothly and the "
-        "heart can pump blood more efficiently. "
+        "MedlinePlus Glossary entry: Metformin is used to treat high blood sugar levels "
+        "that are caused by a type of diabetes mellitus or sugar diabetes called type 2 diabetes. "
+        "It helps your body respond better to the insulin it makes naturally. "
         "(Source: https://medlineplus.gov/)"
     )
     
