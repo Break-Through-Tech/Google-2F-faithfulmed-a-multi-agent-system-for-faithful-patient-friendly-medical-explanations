@@ -1,4 +1,5 @@
 # FaithfulMed ADK demo
+### Note that the Windows instructions are not tested yet!
 
 How to run the FaithfulMed pipeline in your browser with Google's Agent
 Development Kit (ADK). Each step has commands for Windows (PowerShell) and Mac
