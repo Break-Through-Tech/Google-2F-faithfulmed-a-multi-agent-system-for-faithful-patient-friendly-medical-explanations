@@ -1,8 +1,8 @@
 # FaithfulMed ADK demo
 
 How to run the FaithfulMed pipeline in your browser with Google's Agent
-Development Kit (ADK). These steps are for Windows PowerShell. You don't need
-to edit any code.
+Development Kit (ADK). Each step has commands for Windows (PowerShell) and Mac
+(Terminal). You don't need to edit any code.
 
 ## 1. What this is
 
@@ -22,7 +22,8 @@ and never call Gemini.
 
 ## 2. Get the code
 
-If you haven't cloned the repo yet:
+These git commands are the same on Windows and Mac. If you haven't cloned the
+repo yet:
 
 ```powershell
 git clone https://github.com/Break-Through-Tech/Google-2F-faithfulmed-a-multi-agent-system-for-faithful-patient-friendly-medical-explanations.git
@@ -40,13 +41,22 @@ git pull
 ## 3. Set up Python
 
 You need Python 3.11 or newer, because ADK requires it. Check with
-`python --version`.
+`python --version` on Windows or `python3 --version` on Mac.
 
 From the repo root:
+
+**Windows:**
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+**Mac:**
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
 ```
 
 This installs ADK, the Gemini library and everything the demo uses. You don't
@@ -58,10 +68,19 @@ need to activate the virtual environment, because every command here calls
 Each teammate uses their own free key. Don't share keys.
 
 1. Get a key from Google AI Studio: https://aistudio.google.com/apikey
-2. In the repo root, create a file named `.env`:
+2. In the repo root, create a file named `.env` and open it:
+
+   **Windows:**
 
    ```powershell
    notepad .env
+   ```
+
+   **Mac** (Finder hides files whose names start with a dot, so use Terminal):
+
+   ```bash
+   touch .env
+   open -e .env
    ```
 
 3. Add this one line, using your key, then save:
@@ -80,14 +99,22 @@ its message says `live call skipped: no API key`.
 
 From the repo root (the folder that contains `faithfulmed_demo`):
 
+**Windows:**
+
 ```powershell
 .\.venv\Scripts\adk.exe web .
+```
+
+**Mac:**
+
+```bash
+.venv/bin/adk web .
 ```
 
 Open the address it prints, usually http://127.0.0.1:8000. Pick
 **faithfulmed_demo** from the agent dropdown in the top left.
 
-Press `Ctrl+C` in PowerShell to stop the server.
+Press `Ctrl+C` in the terminal to stop the server.
 
 ## 6. Try it
 
@@ -140,7 +167,8 @@ message again. If it keeps failing, share the failing quote with the team.
 The free tier has usage limits. Wait a few minutes and try again. To keep
 working without Gemini, rename `.env` to `.env.off` and restart `adk web`. The
 key is only checked when the server starts. If you also set `GOOGLE_API_KEY`
-in your Windows environment, the demo uses that key instead of `.env`.
+in your Windows environment variables or your Mac shell profile (such as
+`~/.zshrc`), the demo uses that key instead of `.env`.
 
 ## 9. What's next (mostly for Carlin)
 
