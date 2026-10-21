@@ -28,4 +28,9 @@ Recommended statuses are:
 - **Accepted**: approved and currently in effect
 - **Superseded**: replaced by a later ADR; link to the replacement
 
-Copy `templates/adr-template.md` when creating a new ADR. `ADR-example.md` is a sample format only, not an actual project decision. `ADR-001-september-single-model-baseline.md` is the first accepted project decision.
+Copy `templates/adr-template.md` when creating a new ADR. `ADR-example.md` is a sample format only, not an actual project decision.
+
+## Project decisions
+
+- [ADR-001: Single-Gemini retrieval baseline](ADR-001-september-single-model-baseline.md) — Accepted.
+- [ADR-002: MedlinePlus-only Gemini retrieval index](ADR-002-medlineplus-gemini-retrieval.md) — Accepted.
