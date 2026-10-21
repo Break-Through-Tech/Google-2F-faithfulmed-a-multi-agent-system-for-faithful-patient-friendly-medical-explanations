@@ -1,4 +1,4 @@
-"""FaithfulMed ADK entry point for `adk web .` (placeholder stages only).
+"""FaithfulMed ADK entry point for `adk web .` (live Extractor, other stages placeholders).
 
 State flow: source_report -> atoms -> retrieved_context -> draft -> verdict
 -> revised_draft -> final_answer. Each placeholder uses the name and output
@@ -13,6 +13,14 @@ from dotenv import load_dotenv
 from google.adk.agents import BaseAgent, InvocationContext, SequentialAgent
 from google.adk.events import Event, EventActions
 from google.genai import types
+
+from .roles.extractor import (
+    ClinicalAtoms,
+    create_extractor,
+    validate_source_quotes,
+)
+
+MODEL = "gemini-3.8-flash"
 
 # Load the key without printing it. A missing .env or key is fine here.
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
@@ -70,11 +78,14 @@ class PlaceholderStage(BaseAgent):
     reads: list[str] = []
     outputs: dict[str, Any] = {}
     reply_key: Optional[str] = None  # an output to show as the chat reply
+    note: Optional[str] = None  # extra text shown right after the label
 
     async def _run_async_impl(
         self, ctx: InvocationContext
     ) -> AsyncGenerator[Event, None]:
         label = f"[DEMO PLACEHOLDER: {self.name}]"
+        if self.note:
+            label += f" {self.note}."
         missing = [key for key in self.reads if key not in ctx.session.state]
 
         if missing:
@@ -94,6 +105,43 @@ class PlaceholderStage(BaseAgent):
             text += f"\n\n{self.outputs[self.reply_key]}"
 
         yield _message(ctx, self.name, text, dict(self.outputs))
+
+
+class QuoteCheck(BaseAgent):
+    """Check that every atom's source_quote appears in source_report."""
+
+    async def _run_async_impl(
+        self, ctx: InvocationContext
+    ) -> AsyncGenerator[Event, None]:
+        state = ctx.session.state
+        missing = [k for k in ("source_report", "atoms") if k not in state]
+
+        if missing:
+            yield _message(
+                ctx,
+                self.name,
+                f"[{self.name}] Missing state field(s): {', '.join(missing)}. "
+                "Check skipped.",
+            )
+            return
+
+        # atoms may be saved as a parsed list or as raw JSON text.
+        try:
+            atoms = state["atoms"]
+            if isinstance(atoms, str):
+                result = ClinicalAtoms.model_validate_json(atoms)
+            else:
+                result = ClinicalAtoms.model_validate(atoms)
+            validate_source_quotes(state["source_report"], result.root)
+        except ValueError as error:
+            text = f"[{self.name}] Quote check failed: {error}"
+        else:
+            text = (
+                f"[{self.name}] All {len(result.root)} quotes found "
+                "in the source."
+            )
+
+        yield _message(ctx, self.name, text)
 
 
 # Fixed demo fixtures, based on baseline/examples/synthetic_chest_pain.json.
@@ -143,15 +191,24 @@ FINAL_ANSWER = (
 )
 
 
+# Use the live Extractor only when a key is set; never print the key.
+if os.environ.get("GOOGLE_API_KEY"):
+    extractor = create_extractor(MODEL)
+else:
+    extractor = PlaceholderStage(
+        name="Extractor",
+        reads=["source_report"],
+        outputs={"atoms": ATOMS},
+        note="live call skipped: no API key",
+    )
+
+
 root_agent = SequentialAgent(
     name="FaithfulMed",
     sub_agents=[
         Intake(name="Intake"),
-        PlaceholderStage(
-            name="Extractor",
-            reads=["source_report"],
-            outputs={"atoms": ATOMS},
-        ),
+        extractor,
+        QuoteCheck(name="QuoteCheck"),
         PlaceholderStage(
             name="Simplifier",
             reads=["atoms"],
