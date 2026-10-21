@@ -64,7 +64,7 @@ This installs ADK, the Gemini library and everything the demo uses. You don't
 need to activate the virtual environment, because every command here calls
 `.venv` directly.
 
-## 4. Add your own key
+## 4. Add your own key (only if you haven't already!)
 
 Each teammate uses their own free key. Don't share keys.
 
