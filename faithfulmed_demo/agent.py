@@ -191,9 +191,37 @@ FINAL_ANSWER = (
 )
 
 
+class RequireFields(BaseAgent):
+    """Run the wrapped live agent only when the state fields it needs exist."""
+
+    fields: list[str] = []
+
+    async def _run_async_impl(
+        self, ctx: InvocationContext
+    ) -> AsyncGenerator[Event, None]:
+        wrapped = self.sub_agents[0]
+        missing = [key for key in self.fields if key not in ctx.session.state]
+
+        if missing:
+            yield _message(
+                ctx,
+                self.name,
+                f"[{wrapped.name}] Missing state field(s): "
+                f"{', '.join(missing)}. Live call skipped.",
+            )
+            return
+
+        async for event in wrapped.run_async(ctx):
+            yield event
+
+
 # Use the live Extractor only when a key is set; never print the key.
 if os.environ.get("GOOGLE_API_KEY"):
-    extractor = create_extractor(MODEL)
+    extractor = RequireFields(
+        name="ExtractorGate",
+        fields=["source_report"],
+        sub_agents=[create_extractor(MODEL)],
+    )
 else:
     extractor = PlaceholderStage(
         name="Extractor",
