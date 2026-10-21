@@ -95,8 +95,10 @@ The data source is the same as for metric 1.
 - **How it's computed:** the Verifier compares the draft with the Extractor's
   atoms and returns `faithful`, `unsupported_claims`, and `omissions`
   ([`notebooks/adk_pipeline.py`](../notebooks/adk_pipeline.py), Verifier
-  instruction). The exact score formula is not decided yet (see
-  [Open decisions](#open-decisions)).
+  instruction). These field names come from the starter skeleton's
+  placeholder Verifier and may change when the Verifier role
+  (`faithfulmed_demo/roles/verifier.py`) is added. The exact score formula is
+  not decided yet (see [Open decisions](#open-decisions)).
 - **Faithfulness categories:** Rafi's rule-based rubric sorts MedAESQA
   sentences and answers into these categories
   ([`EDAs/MedAESQA/verifier_rubric.py`](../EDAs/MedAESQA/verifier_rubric.py)):
@@ -133,7 +135,12 @@ The data source is the same as for metric 1.
   "Evaluation metrics").
 - **How it's computed:** the share of outputs with at least one clinically
   meaningful addition. Additions come from the Verifier's `unsupported_claims`
-  list ([`notebooks/adk_pipeline.py`](../notebooks/adk_pipeline.py)).
+  list ([`notebooks/adk_pipeline.py`](../notebooks/adk_pipeline.py)). That
+  field comes from the starter skeleton and may change when
+  `faithfulmed_demo/roles/verifier.py` is added. The skeleton Verifier only
+  compares the draft with the Extractor's atoms, not with the source note or
+  the retrieved MedlinePlus text, so it does not yet match this definition
+  (see [Open decisions](#open-decisions), item 11).
 - **Produced by:** the Verifier agent.
 - **Pass target:** <10% of outputs
   ([`Challenge-Project-Overview.md`](../Challenge-Project-Overview.md)).
@@ -148,8 +155,10 @@ The data source is the same as for metric 1.
   quote ([`extractor/EXTRACTOR_HANDOFF.md`](../extractor/EXTRACTOR_HANDOFF.md);
   schema in [`faithfulmed_demo/roles/extractor.py`](../faithfulmed_demo/roles/extractor.py)).
 - **How it's computed:** the Verifier's `omissions` list for each output
-  ([`notebooks/adk_pipeline.py`](../notebooks/adk_pipeline.py)). The repo does
-  not yet say whether the rate is counted per atom or per output.
+  ([`notebooks/adk_pipeline.py`](../notebooks/adk_pipeline.py)). That field
+  comes from the starter skeleton and may change when
+  `faithfulmed_demo/roles/verifier.py` is added. The repo does not yet say
+  whether the rate is counted per atom or per output.
 - **Checking the Verifier:** MedAESQA has no omission labels, so it cannot be
   used to check the Verifier's omission calls. A small hand-labeled check is
   needed: a person marks which atoms are missing from a sample of drafts, and
@@ -233,7 +242,21 @@ repeated here.
    it gets its own agreement target.
 9. **Word limit.** `max_words` is off by default. Decide whether outputs need a
    length limit to pass readability.
-10. **Two FK implementations.** `notebooks/eval_harness.py` uses textstat's
-    built-in FK, while `evaluation/readability.py` uses its own sentence count.
+10. **Two readability implementations.** They differ in two ways:
+    - **FK grade:** `notebooks/eval_harness.py` uses textstat's built-in FK,
+      while `evaluation/readability.py` uses its own sentence count.
+    - **Jargon density:** `notebooks/eval_harness.py` counts textstat's
+      "difficult words" (words not on the Dale-Chall familiar-word list),
+      while `evaluation/readability.py` counts words from its `MEDICAL_TERMS`
+      list.
+
     This rubric uses `evaluation/readability.py`. The team should confirm that
     choice so all reported numbers use the same one.
+11. **What the Verifier checks additions against.** The addition definition
+    covers the source note and MedlinePlus, but the skeleton Verifier in
+    [`notebooks/adk_pipeline.py`](../notebooks/adk_pipeline.py) only compares
+    the draft with the Extractor's atoms. Decide whether it should check
+    against the atoms, the original `source_report`, the `retrieved_context`,
+    or a mix of these. Checking only the atoms would wrongly flag correct
+    plain-language definitions taken from MedlinePlus, and would miss facts
+    the Extractor left out.
