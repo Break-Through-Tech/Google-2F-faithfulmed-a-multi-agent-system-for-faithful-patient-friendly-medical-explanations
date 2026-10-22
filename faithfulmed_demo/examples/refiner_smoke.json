@@ -1,0 +1,24 @@
+{
+  "mode": "deterministic synthetic fixture; verdict supplied, not a live Verifier",
+  "source_report": "A patient came to the hospital with chest pain. A nuclear stress test was done, but its result is still pending. The patient will see a cardiologist in two weeks.",
+  "draft": "You came to the hospital with chest pain.\nYour stress test result was normal.\nYour follow-up is in two weeks.",
+  "verdict": {
+    "faithful": false,
+    "findings": [
+      {
+        "category": "unsupported",
+        "start": 42,
+        "end": 77,
+        "original": "Your stress test result was normal.",
+        "replacement": "A nuclear stress test was done, but its result is still pending.",
+        "source_quote": "A nuclear stress test was done, but its result is still pending.",
+        "reason": "The source says the result is pending, not normal."
+      }
+    ]
+  },
+  "revised_draft": "You came to the hospital with chest pain.\nA nuclear stress test was done, but its result is still pending.\nYour follow-up is in two weeks.",
+  "unflagged_text_preserved": true,
+  "clean_case_input": "You came to the hospital with chest pain.\nA nuclear stress test was done, but its result is still pending.\nYour follow-up is in two weeks.",
+  "clean_verdict_preserves_input": true,
+  "requires_verifier_recheck": true
+}
