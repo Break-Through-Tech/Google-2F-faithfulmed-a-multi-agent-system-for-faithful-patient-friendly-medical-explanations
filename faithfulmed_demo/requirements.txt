@@ -1,0 +1,9 @@
+# Versions used for the local ADK Web demo. Install from the repository root.
+google-adk==2.9.2
+google-genai==2.25.0
+chromadb==1.5.9
+pydantic==2.13.5
+python-dotenv==1.2.3
+textstat==0.7.13
+pandas==3.0.6
+nltk==3.10.3
