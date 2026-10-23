@@ -9,6 +9,9 @@ __pycache__/
 venv/
 env/
 
+# ADK local session data (created by `adk web`)
+.adk/
+
 # Secrets — never commit API keys (Gemini, Groq, HF, etc.)
 .env
 *.key
