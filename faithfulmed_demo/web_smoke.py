@@ -45,7 +45,7 @@ def main():
     print('Stage authors:', list(dict.fromkeys(e['author'] for e in events if e.get('content'))))
     print('Status:', state.get('run_status'), '; mode:', state.get('mode'))
     print('Error:', state.get('error'))
-    print('Readability:', state.get('readability'))
+    print('Readability:', state.get('readability_score'))
     print('Saved:', args.output)
     if state.get('run_status') not in ('complete', 'needs_review'):
         raise SystemExit(1)

@@ -30,7 +30,18 @@ Start with `/offline-error` to learn the UI, then `/demo` to see the live path.
 The chat events identify each stage. Inspect event/state details to see
 `source_report`, `atoms`, `retrieved_context`, `draft`, `verdict`,
 `revised_draft`, and `final_answer`. `final_verdict`, `refinement_history`,
-`readability`, `stage_modes`, and `run_status` provide additional trace information.
+`readability_score`, `readability_status`, `stage_modes`, and `run_status`
+provide additional trace information.
+
+The State tab displays raw saved fields and does not support comments beside
+individual keys. `readability_score.status: ok` means the scorer could measure
+the text; `readability_status: passed` means Alicia's wrapper judged it to meet
+the readability rules. Inside `readability_score`, `passes_readability`
+shows the scorer's yes/no result.
+`run_status: complete` means the workflow finished; it is not clinical approval.
+The score lives only in `readability_score` (there is no separate legacy
+`readability` copy). Hovering over a State Update shows the fields written by
+that event; the State tab shows the accumulated state of the whole run.
 The original `verdict` is retained so you can compare it with the recheck.
 
 Stop the server with **Ctrl+C** in its terminal. No website, cloud deployment,

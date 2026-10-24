@@ -33,8 +33,9 @@ def prepare(callback_context):
     # Reset all per-note state on EVERY turn; never reuse a previous patient's data.
     for key, value in dict(source_report=fixtures.SOURCE if known else message,
             atoms=[], retrieved_context=[], draft='', verdict={}, revised_draft='',
-            final_answer='', final_verdict={}, readability={}, refinement_history=[],
-            readability_suggestion='', repair_blocker='', error='', run_status='running',
+            final_answer='', final_verdict={}, readability_score={},
+            readability_status='', suggestion=None, refinement_history=[],
+            repair_blocker='', error='', run_status='running',
             mode='offline-scripted' if offline else 'live', model=MODEL,
             inject_demo_error=message == '/offline-error',
             retrieval_query=fixtures.EXAMPLE['retrieval_query'] if known else message[:1500],
@@ -177,13 +178,16 @@ class ReadabilityStage(DemoStage):
         answer = result['final_answer'] if not unresolved else None
         display_answer = answer or 'Draft for review:\n' + state['revised_draft']
         message = (f'{banner}\n\n{display_answer}\n\n'
-                   f'Readability grade: {grade}; passes grade-8 check: {passed}.\n'
+                   f'Readability: grade {grade}; grade-8 check passed: {passed}. '
+                   'Scorer status "ok" means it measured the text; '
+                   f'readability status "{result["readability_status"]}" is Alicia’s pass decision.\n'
                    f'{result["suggestion"] or ""}\n'
                    + ('Unresolved Verifier findings: needs review.' if unresolved else
                       'No unresolved findings in this demo check. This is not a clinical validation.'))
-        updates = {**result, 'final_answer': answer or '',
-                   'readability': result['readability_score'],
-                   'readability_suggestion': result['suggestion'] or '',
+        updates = {'final_answer': answer or '',
+                   'readability_status': result['readability_status'],
+                   'readability_score': result['readability_score'],
+                   'suggestion': result['suggestion'],
                    'run_status': status,
                    'stage_modes': {**state['stage_modes'], 'Readability': 'Alicia wrapper; no rewrite'}}
         yield emit(ctx, self.name, message, **updates)
