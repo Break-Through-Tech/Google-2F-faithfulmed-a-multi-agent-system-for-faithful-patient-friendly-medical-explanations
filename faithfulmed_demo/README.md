@@ -1,181 +1,136 @@
-# FaithfulMed ADK demo
-### Note that the Windows instructions are not tested yet!
+# Run the FaithfulMed ADK Web demo
 
-How to run the FaithfulMed pipeline in your browser with Google's Agent
-Development Kit (ADK). Each step has commands for Windows (PowerShell) and Mac
-(Terminal). You don't need to edit any code.
+This package builds on Carlin's ADK scaffold and connects seven visible steps:
+**Intake → Extractor → QuoteCheck → Simplifier → Verifier → Refiner → Readability**.
+It is an initial development demo, not a calibrated clinical system or a benchmark result.
+Carlin's original runnable scaffold and setup guide are preserved as
+[`scaffold_agent.py`](scaffold_agent.py) and [`SCAFFOLD_README.md`](SCAFFOLD_README.md).
+The active `agent.py` adds live roles to that flow; the scaffold files record her
+original contribution and can be inspected separately.
 
-## 1. What this is
+## Start on Rafi's computer
 
-The demo takes a patient note and passes it through seven steps in order:
-Intake → Extractor → QuoteCheck → Simplifier → Verifier → Refiner →
-Readability. Each step reads what the steps before it saved and adds its own
-result. Today, three steps do real work:
-
-- **Intake** saves your chat message as the note.
-- **Extractor** pulls the clinical facts out of the note with a live Gemini call
-  when you have an API key.
-- **QuoteCheck** confirms that each fact's quote really appears in the note.
-
-Simplifier, Verifier, Refiner and Readability are still **placeholders**. They
-return fixed example text, start their messages with `[DEMO PLACEHOLDER: ...]`
-and never call Gemini.
-
-## 2. Get the code
-
-These git commands are the same on Windows and Mac. If you haven't cloned the
-repo yet:
+From the repository root in VS Code's PowerShell terminal:
 
 ```powershell
-git clone https://github.com/Break-Through-Tech/Google-2F-faithfulmed-a-multi-agent-system-for-faithful-patient-friendly-medical-explanations.git
-cd Google-2F-faithfulmed-a-multi-agent-system-for-faithful-patient-friendly-medical-explanations
+.\.venv\Scripts\adk.exe web --host 127.0.0.1 --port 8000 .
 ```
 
-Then switch to the demo branch:
+Leave that terminal running. Open **http://127.0.0.1:8000**, select
+**faithfulmed_demo**, and enter one of these messages:
 
-```powershell
-git fetch origin
-git checkout carlin/adk-orchestration
-git pull
-```
+| Message | What happens |
+| --- | --- |
+| `/offline-error` | A scripted synthetic chest-pain example includes the deliberately false claim “You have pneumonia.” The fixture Verifier flags it; the Refiner removes only that sentence and rechecks it. No Gemini calls or vector search. |
+| `/offline` | The same scripted example without the false claim. The Refiner leaves the draft unchanged. |
+| `/demo` | The existing synthetic chest-pain note runs through the real Extractor, Gemini/Chroma retrieval, Gemini Simplifier and Verifier, targeted repairs if needed, and local readability scoring. |
+| Paste a synthetic note | The live path uses that note. Each new message starts a fresh note and clears the previous run's state. |
 
-## 3. Set up Python
+Start with `/offline-error` to learn the UI, then `/demo` to see the live path.
+The chat events identify each stage. Inspect event/state details to see
+`source_report`, `atoms`, `retrieved_context`, `draft`, `verdict`,
+`revised_draft`, and `final_answer`. `final_verdict`, `refinement_history`,
+`readability_score`, `readability_status`, `stage_modes`, and `run_status`
+provide additional trace information.
 
-You need Python 3.11 or newer, because ADK requires it. Check with
-`python --version` on Windows or `python3 --version` on Mac.
+The State tab displays raw saved fields and does not support comments beside
+individual keys. `readability_score.status: ok` means the scorer could measure
+the text; `readability_status: passed` means Alicia's wrapper judged it to meet
+the readability rules. Inside `readability_score`, `passes_readability`
+shows the scorer's yes/no result.
+`run_status: complete` means the workflow finished; it is not clinical approval.
+The score lives only in `readability_score` (there is no separate legacy
+`readability` copy). Hovering over a State Update shows the fields written by
+that event; the State tab shows the accumulated state of the whole run.
+The original `verdict` is retained so you can compare it with the recheck.
 
-From the repo root:
+Stop the server with **Ctrl+C** in its terminal. No website, cloud deployment,
+or public hosting account is needed. ADK Web is a local development interface.
+If port 8000 is busy, use `--port 8001` and open that port instead.
 
-**Windows:**
+## First setup on another computer
+
+Use Python 3.11 or later and a virtual environment. Install the tested dependencies:
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r faithfulmed_demo/requirements.txt
+.\.venv\Scripts\python.exe -m nltk.downloader cmudict
 ```
 
-**Mac:**
+Offline mode needs no API key or database. Live mode also needs:
 
-```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-```
+1. `GEMINI_API_KEY=...` in the ignored repository-root `.env`. The demo maps it to
+   `GOOGLE_API_KEY` in memory for ADK. Do not paste keys into the chat UI.
+2. The completed local database described in [the Gemini index setup](../data_pipeline/GEMINI_MEDLINEPLUS.md).
+   Download the existing snapshot; do not rebuild document embeddings for this demo.
+3. Access and quota for the configured generation model and query-embedding model.
+   The generation default follows the existing baseline: `gemini-3.8-flash`.
+   To choose a different accessible generation model, set `FAITHFULMED_MODEL` in
+   `.env` and restart ADK Web. This does not change the embedding model.
 
-This installs ADK, the Gemini library and everything the demo uses. You don't
-need to activate the virtual environment, because every command here calls
-`.venv` directly.
+Live errors stop the run and appear in the stage trace. The demo never silently
+substitutes scripted output for a failed model call. Run `/offline-error` explicitly
+if you want the no-API walkthrough instead.
 
-## 4. Add your own key (only if you haven't already!)
+## What each stage does
 
-Each teammate uses their own free key. Don't share keys.
+- **Intake:** records the source note after resolving `/demo` to the fixed synthetic note.
+- **Extractor:** uses Vaibhavi's ADK agent. Scripted mode uses fixed atoms for the supplied example only.
+- **QuoteCheck:** applies the source-quote validation from Carlin's scaffold.
+  A failed quote stops the workflow before drafting.
+- **Simplifier:** uses Ruhma's function with the original note, extracted facts, and
+  up to three real MedlinePlus chunks. Scripted mode uses one checked-in cited passage.
+- **Verifier:** compares the draft with the original note, atoms, and background.
+  Its structured findings distinguish unsupported claims, contradictions, and omissions.
+  The live judgment is not calibrated. The offline check recognizes only the intentional
+  demonstration error; it cannot judge arbitrary medical text.
+- **Refiner:** uses Zurabi's `run_refiner` through an adapter. Only an exact
+  source-quote replacement or deletion of one unambiguous draft span is applied.
+  Omissions, paraphrased replacements, and ambiguous spans are marked for review.
+  Every applied repair is rechecked; at most two rounds are allowed.
+- **Readability:** uses Alicia's `run_readability` wrapper around her scorer.
+  A passing, resolved draft becomes `final_answer`. A failing grade gets a
+  suggestion; an unresolved Verifier finding leaves `final_answer` empty and
+  shows the draft for review. This stage does not rewrite medical text.
 
-1. Get a key from Google AI Studio: https://aistudio.google.com/apikey
-2. In the repo root, create a file named `.env` and open it:
+`complete` means the demo finished without unresolved findings from its own check;
+it is not a clinical faithfulness certificate. Readability can still fail separately.
+The 50-report evaluation, human calibration, and model comparison remain later work.
 
-   **Windows:**
+## Reproduce a run outside the browser
 
-   ```powershell
-   notepad .env
-   ```
-
-   **Mac** (Finder hides files whose names start with a dot, so use Terminal):
-
-   ```bash
-   touch .env
-   open -e .env
-   ```
-
-3. Add this one line, using your key, then save:
-
-   ```
-   GEMINI_API_KEY=your-key-here
-   ```
-
-The demo copies `GEMINI_API_KEY` to `GOOGLE_API_KEY` for ADK and never prints
-it. `.env` is already in `.gitignore`. **Never commit it.**
-
-No key? The demo still runs. The Extractor just becomes a placeholder too, and
-its message says `live call skipped: no API key`.
-
-## 5. Run it
-
-From the repo root (the folder that contains `faithfulmed_demo`):
-
-**Windows:**
+These commands use the same root agent and save JSON traces under ignored `data/`:
 
 ```powershell
-.\.venv\Scripts\adk.exe web .
+.\.venv\Scripts\python.exe -m faithfulmed_demo.smoke --message /offline-error --output data/adk_demo_results/offline.json
+.\.venv\Scripts\python.exe -m faithfulmed_demo.smoke --message /demo --output data/adk_demo_results/live.json
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p test_adk_demo.py -v
 ```
 
-**Mac:**
+To test the already-running Web server's streaming endpoint and save its trace:
 
-```bash
-.venv/bin/adk web .
+```powershell
+.\.venv\Scripts\python.exe -m faithfulmed_demo.web_smoke --sse --message /offline-error
 ```
 
-Open the address it prints, usually http://127.0.0.1:8000. Pick
-**faithfulmed_demo** from the agent dropdown in the top left.
+See [the October 21 run record](RUN_RECORD.md) for measured results and limitations.
 
-Press `Ctrl+C` in the terminal to stop the server.
+## Original ownership of this work
 
-## 6. Try it
+Rafi implemented the integration and missing demo pieces in this working change,
+using the existing teammate modules below. This table preserves the milestone ownership;
+it does not attribute the new work to teammates who did not write it.
 
-Paste this note into the chat box and send it. It's a made-up example from
-`baseline/examples/synthetic_chest_pain.json`.
-
-```
-A patient came to the hospital with chest pain. Serial troponin tests did not show a heart attack. A nuclear stress test was done, but its result is still pending. Liver enzyme levels were elevated, and the cause is uncertain. The patient also has acid reflux. The patient will see a cardiologist in two weeks and a primary care doctor in two to four weeks. Discharge medications will depend on the stress-test result.
-```
-
-## 7. What you should see
-
-One message per step, in this order:
-
-| Step | Message |
+| Milestone owner | Responsibility covered by this demo |
 | --- | --- |
-| Intake | `Read the chat message. Wrote source_report (418 characters).` |
-| Extractor | A JSON list of facts, each with `text`, `type`, `assertion` and `source_quote`. With no key, you'll see the `live call skipped` placeholder instead. |
-| QuoteCheck | `All N quotes found in the source.` N is usually about 10 with a key, or 2 without one. |
-| Simplifier | `Read atoms. Wrote retrieved_context, draft.` |
-| Verifier | `Read source_report, atoms, draft. Wrote verdict.` |
-| Refiner | `Read draft, verdict. Wrote revised_draft.` |
-| Readability | `Read revised_draft. Wrote final_answer.`, followed by the final answer |
+| Carlin | Original seven-step ADK scaffold, Intake, QuoteCheck, shared-state flow, credential setup, and setup guide. These are preserved and built upon here. |
+| Rafi | Shared contract, source-note preservation, Verifier example and implementation, live retrieval connection, and demo checks. |
+| Vaibhavi | Existing Extractor reused; integration adds quote validation to the workflow. |
+| Ruhma | Existing Simplifier reused; added model configuration, output checks, original-note context, and real retrieval handoff. |
+| Zurabi | His merged strict Refiner is called by the new adapter; the integration adds bounded repair/recheck behavior. His baseline remains separate. |
+| Alicia | Her merged `run_readability` wrapper and existing scorer are called by the final stage. |
 
-Intake's message also starts with `[DEMO PLACEHOLDER: Intake]`, even though it
-really saves your note. With a key, you may also see an `ExtractorGate` step
-next to the Extractor. That gate skips the Extractor if there is no note.
-
-The **State** tab should list `source_report`, `atoms`, `retrieved_context`,
-`draft`, `verdict`, `revised_draft` and `final_answer`.
-
-Only `source_report` and `atoms` come from your note. The draft, verdict and
-final answer are **fixed placeholder text**, so they stay the same whatever you
-paste.
-
-## 8. Troubleshooting
-
-**faithfulmed_demo isn't in the dropdown.** You started `adk web` from the
-wrong folder. Stop it, `cd` to the repo root (the folder that contains
-`faithfulmed_demo`) and run it again.
-
-**Messages say "Missing state field(s)".** The chat message was empty, so
-nothing was saved for the later steps. Send the note again.
-
-**QuoteCheck says "Quote check failed".** One of the Extractor's quotes isn't
-word for word in the note. The rest of the run still finishes. Send the
-message again. If it keeps failing, share the failing quote with the team.
-
-**A Gemini error or a quota limit (for example `429 RESOURCE_EXHAUSTED`).**
-The free tier has usage limits. Wait a few minutes and try again. To keep
-working without Gemini, rename `.env` to `.env.off` and restart `adk web`. The
-key is only checked when the server starts. If you also set `GOOGLE_API_KEY`
-in your Windows environment variables or your Mac shell profile (such as
-`~/.zshrc`), the demo uses that key instead of `.env`.
-
-## 9. What's next (mostly for Carlin)
-
-- A Verifier ↔ Refiner loop that repeats at most twice, in place of a single
-  pass.
-- A fallback for when Gemini fails or hits its limit.
-- Real Simplifier, Verifier, Refiner and Readability agents in place of the
-  placeholders. The Simplifier first needs to be turned into an ADK agent like
-  `roles/extractor.py`.
+Official references: [ADK Python/Web setup](https://adk.dev/get-started/python/),
+[sequential workflows](https://adk.dev/agents/workflow-agents/sequential-agents/),
+[custom agents and state events](https://adk.dev/agents/custom-agents/).

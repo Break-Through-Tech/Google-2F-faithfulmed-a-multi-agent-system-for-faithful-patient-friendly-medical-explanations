@@ -2,6 +2,15 @@
 
 Owner: Carlin Verano (September task). 
 
+**Implementation note (October 23):** Carlin's targets and open measurement
+decisions remain the team's scoring guide. The newer live demo uses
+[`faithfulmed_demo/roles/verifier.py`](../faithfulmed_demo/roles/verifier.py),
+which returns `issues`, `supported_examples`, and `scope` after reading the
+original note, atoms, draft, and retrieved passages. The `faithful`,
+`unsupported_claims`, and `omissions` fields cited below describe the earlier
+ADK scaffold; they are not the live demo's output schema. No demo run has yet
+established the headline success rates in this rubric.
+
 This page says what counts as success for FaithfulMed and how each result is
 measured. Every target and definition here comes from a file already in the
 repo, cited next to it. Anything the team has not decided yet is listed under
