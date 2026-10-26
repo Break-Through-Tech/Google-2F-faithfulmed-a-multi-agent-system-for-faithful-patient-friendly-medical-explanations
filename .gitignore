@@ -23,6 +23,15 @@ data/*
 !data/README.md
 !data/MedAESQA_methods_M1-M30.xlsx
 
+# Keep small curated-set documentation and freeze metadata visible to Git.
+!data/curated_baseline/
+data/curated_baseline/*
+!data/curated_baseline/README.md
+!data/curated_baseline/selection_manifest.json
+!data/curated_baseline/REVIEW_AND_FREEZE.md
+!data/curated_baseline/source_review_annotations.jsonl
+!data/curated_baseline/freeze_manifest.json
+
 # Model checkpoints / vector indexes
 *.ckpt
 *.pt

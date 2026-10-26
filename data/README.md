@@ -22,6 +22,9 @@ Large corpora are git-ignored — download them locally into this folder.
   *Scientific Data* 2023). **Research use — cite the paper, do not redistribute.** Gold pairs for the Simplifier.
 - **MTSamples** — ~5,000 de-identified transcribed reports. https://www.mtsamples.com/ (or Kaggle
   mirror). Source documents to simplify. De-identified — handle with care, don't re-post raw records.
+  The [50-report input set](curated_baseline/README.md) was frozen on October 26
+  after completing the source review. [Read the per-report notes](curated_baseline/REVIEW_AND_FREEZE.md)
+  for case summaries, preservation priorities, and documented source caveats.
 
 ## Supporting data
 - **MedQuAD** — ~47k consumer-health Q&A. https://github.com/abachaa/MedQuAD.
