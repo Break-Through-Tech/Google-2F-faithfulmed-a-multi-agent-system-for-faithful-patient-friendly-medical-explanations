@@ -1,8 +1,8 @@
 {
-  "subset_version": "v3-medium-with-allergy-exceptions-proposed",
+  "subset_version": "v3-medium-with-allergy-exceptions-frozen-2026-10-26",
   "sampling_profile": "medium",
   "supersedes": "v1-proposed (mixed lengths)",
-  "status": "selected source reports; awaiting team review and freeze; unannotated",
+  "status": "source review completed; frozen evaluation inputs",
   "source_filename": "mtsamples.csv",
   "source_sha256": "a92cb78569f460606661ee7da50c92305b60d0fac2be4b06c8d2de0f234612d4",
   "source_rows": 4999,
@@ -150,5 +150,10 @@
     "mtsamples_curated_50.csv": "48052d03db068e8e7b5ec18e8d9ecf0c104a0de61285b512dcb4a6de5000da84",
     "mtsamples_curated_50.xlsx": "58c8c570d84a96f788c050586cfa4b975c406b4eac7be3eab02931f4a422f8dd",
     "candidate_audit.csv": "e4d22a2842660ba4fabe54ef9c4e98d2be78c557eefd7108c213a75053f65c16"
-  }
+  },
+  "selection_algorithm_version": "v3-medium-with-allergy-exceptions-proposed",
+  "frozen_on": "2026-10-26",
+  "freeze_manifest": "freeze_manifest.json",
+  "source_review": "REVIEW_AND_FREEZE.md",
+  "review_status": "completed"
 }

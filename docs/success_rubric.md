@@ -29,13 +29,13 @@ records can be scored (see [Which outputs are scored](#which-outputs-are-scored)
   [`data/curated_baseline/`](../data/curated_baseline/README.md)
   (`mtsamples_curated_50.csv`). There are 48 medium-length reports plus two
   Allergy/Immunology exceptions.
-- **Version:** `v3-medium-with-allergy-exceptions-proposed`
+- **Version:** `v3-medium-with-allergy-exceptions-frozen-2026-10-26`
   ([`selection_manifest.json`](../data/curated_baseline/selection_manifest.json)).
-- **Not frozen yet.** The set is "awaiting team review and freeze"
-  ([`data/curated_baseline/README.md`](../data/curated_baseline/README.md)).
-  The project overview requires every headline number to be reported on the
-  *frozen* set ([`Challenge-Project-Overview.md`](../Challenge-Project-Overview.md),
-  "Evaluation metrics"). Until it is frozen, any results are trial runs only.
+- **Source review completed; inputs frozen October 26.** All 50 source
+  reports were retained unchanged: 31 accept and 19 accept-with-caveat decisions.
+  [Per-report notes](../data/curated_baseline/REVIEW_AND_FREEZE.md) record source
+  conflicts and preservation priorities. Use this fixed version for both
+  baseline and ADK runs, preserving uncertainty in disputed source details.
 - **Verifier calibration data:** MedAESQA's human accuracy and evidence-support
   labels ([`Challenge-Project-Overview.md`](../Challenge-Project-Overview.md),
   "Datasets"; download steps in [`data/README.md`](../data/README.md)).
@@ -230,8 +230,8 @@ repeated here.
 
 ## Open decisions
 
-1. **Freezing the evaluation set.** The 50-report set still needs team review
-   and a freeze. Record its version with the index snapshot, model, prompt,
+1. **Experiment provenance.** Source review and input freezing are completed.
+   Record the frozen input version with the index snapshot, model, prompt,
    SDK, and retrieval settings ([ADR-001](adr/ADR-001-september-single-model-baseline.md)).
 2. **Counting `no_context` and failed runs.** ADR-001 says how these count in
    final scores "still needs agreement". This matters most for the readability

@@ -2,3 +2,6 @@
 EDAs/mtsamples_sampling.py text eol=lf
 data/curated_baseline/*.csv text eol=lf
 data/curated_baseline/*.xlsx binary
+data/curated_baseline/*.json text eol=lf
+data/curated_baseline/*.jsonl text eol=lf
+data/curated_baseline/REVIEW_AND_FREEZE.md text eol=lf

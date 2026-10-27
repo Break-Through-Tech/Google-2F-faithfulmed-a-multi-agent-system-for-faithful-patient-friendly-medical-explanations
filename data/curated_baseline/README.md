@@ -1,6 +1,8 @@
 # MTSamples: active 50-report medium-focused subset
 
-Status: **v3-medium-with-allergy-exceptions-proposed; awaiting team review and freeze**. This is the single active curated set, following Samaneh's recommendation to use medium-length reports for the first baseline. It replaces the mixed-length CSV and Excel at the same paths. The earlier analysis and selected IDs remain reproducible in `EDAs/mtsamples_eda.ipynb`; the original exports remain in Git history (commit `5d415c7`). No generated explanations or gold annotations are included.
+Status: **review completed; inputs frozen — v3-medium-with-allergy-exceptions-frozen-2026-10-26**. All 50 complete reports were reviewed and retained with unchanged IDs, order, and text. There are **31 accept decisions and 19 accept-with-caveat decisions**. See the [review and freeze guide](REVIEW_AND_FREEZE.md) for plain-language notes on every report and the [freeze manifest](freeze_manifest.json) for identity checks.
+
+This is the single active curated set, following Samaneh's recommendation to use medium-length reports for the first baseline. It replaces the mixed-length CSV and Excel at the same paths. The earlier analysis and selected IDs remain reproducible in `EDAs/mtsamples_eda.ipynb`; the original exports remain in Git history (commit `5d415c7`). Source-review annotations accompany the frozen inputs.
 
 ## Source and cleaning
 
@@ -27,7 +29,7 @@ The unchanged cleaning rules remove empty/very short text, obvious truncation an
 4. Keep the original cleaned-pool complexity cutoffs so comparisons with the earlier sample are consistent. Text complexity and regex cues are sampling aids; they are not clinical labels and can match negated statements.
 5. Validate 50 unique IDs, exact source-text preservation, the 48/1/1 length split and specialty quotas, at least 10 reports per complexity group, at least six structures, and at least three matches for every content cue. Check all 1,225 selected pairs for near-duplicates, without the length-ratio gate.
 
-This is a reproducible diversity selection, not a claim of the clinically "best" 50. The quality filters cannot catch every incomplete or inaccurate source report; team review is still required. Selection does not use any generated output or evaluation score.
+This is a reproducible diversity selection. The completed review documents source conflicts and medication ambiguities alongside each report. Preserve those uncertainties rather than silently correcting the source. Selection does not use any generated output or evaluation score.
 
 | specialty | previous_target | medium_available_after_gap_screen | documented_length_exceptions | selected_target |
 | --- | --- | --- | --- | --- |
@@ -92,13 +94,22 @@ Content cue counts overlap:
 - `mtsamples_curated_50.csv` and `.xlsx`: the same active medium-focused set, in two convenient formats.
 - `candidate_audit.csv`: each original row's cleaning decision and selection status. Eligible but unselected reports are distinguished from quality exclusions and out-of-range reports.
 - `selection_manifest.json`: source and output hashes, selected IDs, cutoffs, quotas, code hashes, and library versions.
+- `REVIEW_AND_FREEZE.md`: full review method, decisions, caveats, and reading notes for every report.
+- `source_review_annotations.jsonl`: the same source-review notes in a structured format, with exact evidence quotes and per-transcription hashes.
+- `freeze_manifest.json`: the frozen version, completed review status, selected IDs, and hashes of the immutable snapshot and review artifacts.
 
-Run from the repository root:
+Verify the frozen snapshot from the repository root:
 
 ```text
-python EDAs/mtsamples_sampling.py --profile medium --source data/mtsamples.csv
+python -m evaluation.validate_frozen_set --source data/mtsamples.csv
 ```
 
-The default profile is now `medium` (48 medium reports plus two documented length exceptions). The original mixed-length functions remain unchanged; to reproduce their exports separately use `--profile mixed --output <another-directory>`. The notebook displays both analyses but compares the active exports only with the new medium-focused set. CSV/Excel full-text round trips are checked. These existing output files are already tracked by Git; ignoring `data/` does not hide changes to them. Only one active export set is kept here.
+Reproduce the original proposed selection in a **different directory**:
 
-Review complete reports before freezing this version. Results on this set mainly describe medium-length notes from these source categories, with two explicit Allergy exceptions; they do not establish general performance on short/long reports or clinical reliability.
+```text
+python EDAs/mtsamples_sampling.py --profile medium --source data/mtsamples.csv --output data/mtsamples_reproduction
+```
+
+The default profile is `medium` (48 medium reports plus two documented length exceptions). The sampler refuses to overwrite any directory containing `freeze_manifest.json`. The original mixed-length selection remains available; reproduce it with `--profile mixed --output <another-directory>`. The notebook displays both analyses and compares active inputs with the medium-focused selection. CSV/Excel full-text round trips are checked. Original sampler hashes in the selection manifest describe the code that generated the selection; the later overwrite guard does not change the selection algorithm. These existing output files are already tracked by Git; ignoring `data/` does not hide changes to them.
+
+The source review and input freeze are completed. Use these fixed inputs for baseline and ADK runs. Source corrections require a new documented version; do not change this snapshot based on model performance. Results on this set mainly describe medium-length notes from these source categories, with two explicit Allergy exceptions.

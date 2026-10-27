@@ -340,8 +340,18 @@ def distribution_table(series: pd.Series, name: str) -> str:
     return markdown_table(series.rename_axis(name).reset_index(name="Reports"))
 
 
+def require_unfrozen_output(outdir: Path) -> None:
+    """Keep regeneration from silently replacing a reviewed input snapshot."""
+    if (outdir / "freeze_manifest.json").exists():
+        raise ValueError(
+            f"Frozen evaluation inputs at {outdir}. "
+            "Use --output with another directory to reproduce or propose a new version."
+        )
+
+
 def export_tables(selected: pd.DataFrame, audit: pd.DataFrame, outdir: Path) -> tuple[Path, Path]:
     """Write the single active CSV/Excel set and verify lossless round trips."""
+    require_unfrozen_output(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
     csv_path = outdir / "mtsamples_curated_50.csv"
     excel_path = outdir / "mtsamples_curated_50.xlsx"
@@ -486,6 +496,10 @@ def main() -> None:
     parser.add_argument("--profile", choices=["medium", "mixed"], default="medium",
                         help="Medium is the active set; mixed reproduces the historical analysis.")
     args = parser.parse_args()
+    try:
+        require_unfrozen_output(args.output)
+    except ValueError as exc:
+        parser.error(str(exc))
     if args.profile == "medium":
         try:
             from .mtsamples_medium_sampling import generate
