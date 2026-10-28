@@ -1,0 +1,663 @@
+{
+  "description": "Advisor's high-level worked examples; explicit reference claim segmentation for regression checks.",
+  "note": "Offline reference counts are not model predictions. The background excerpt is illustrative support assumed by the PDF, not a new retrieval result.",
+  "source_report": "No evidence of pulmonary embolism. The main pulmonary artery is enlarged at 4.7 cm, which can be seen with pulmonary arterial hypertension. There is a 1.5 cm nodule in the right lower lobe. There is a small left pleural effusion. Follow-up in 3 months is advised.",
+  "key_facts": [
+    {
+      "id": "K1",
+      "text": "No pulmonary embolism.",
+      "source_quote": "No evidence of pulmonary embolism."
+    },
+    {
+      "id": "K2",
+      "text": "Main pulmonary artery enlarged at 4.7 cm; any stated pulmonary-hypertension association must remain possible.",
+      "source_quote": "The main pulmonary artery is enlarged at 4.7 cm, which can be seen with pulmonary arterial hypertension."
+    },
+    {
+      "id": "K3",
+      "text": "1.5 cm right-lower-lobe nodule.",
+      "source_quote": "There is a 1.5 cm nodule in the right lower lobe."
+    },
+    {
+      "id": "K4",
+      "text": "Small left pleural effusion.",
+      "source_quote": "There is a small left pleural effusion."
+    },
+    {
+      "id": "K5",
+      "text": "Follow-up in 3 months.",
+      "source_quote": "Follow-up in 3 months is advised."
+    }
+  ],
+  "retrieved_context": [
+    {
+      "id": "illustrative-background",
+      "text": "Fluid around the lungs can have many causes.",
+      "source": "Illustrative support assumed by the advisor's example, not a fetched MedlinePlus excerpt."
+    }
+  ],
+  "examples": [
+    {
+      "id": "A",
+      "output": "No blood clots were found. Your main lung artery is larger than normal (4.7 cm), which can sometimes be seen with high blood pressure in the lung arteries. You have a 1.5 cm spot in the lower part of your right lung and a small amount of fluid around your left lung. A follow-up scan in 3 months is recommended. Fluid around the lungs can have many causes.",
+      "reference_assessment": {
+        "claims": [
+          {
+            "id": "C1",
+            "text": "No blood clots were found.",
+            "output_quote": "No blood clots were found.",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "No evidence of pulmonary embolism."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C2",
+            "text": "Your main lung artery is larger than normal (4.7 cm)",
+            "output_quote": "Your main lung artery is larger than normal (4.7 cm)",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "The main pulmonary artery is enlarged at 4.7 cm, which can be seen with pulmonary arterial hypertension."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C3",
+            "text": "which can sometimes be seen with high blood pressure in the lung arteries.",
+            "output_quote": "which can sometimes be seen with high blood pressure in the lung arteries.",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "The main pulmonary artery is enlarged at 4.7 cm, which can be seen with pulmonary arterial hypertension."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C4",
+            "text": "You have a 1.5 cm spot in the lower part of your right lung",
+            "output_quote": "You have a 1.5 cm spot in the lower part of your right lung",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "There is a 1.5 cm nodule in the right lower lobe."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C5",
+            "text": "a small amount of fluid around your left lung",
+            "output_quote": "a small amount of fluid around your left lung",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "There is a small left pleural effusion."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C6",
+            "text": "A follow-up scan in 3 months is recommended.",
+            "output_quote": "A follow-up scan in 3 months is recommended.",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "Follow-up in 3 months is advised."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C7",
+            "text": "Fluid around the lungs can have many causes.",
+            "output_quote": "Fluid around the lungs can have many causes.",
+            "scope": "general_background",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "context",
+                "context_id": "illustrative-background",
+                "quote": "Fluid around the lungs can have many causes."
+              }
+            ],
+            "is_addition": true,
+            "distortion_types": [],
+            "clinically_meaningful": false,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          }
+        ],
+        "key_fact_coverage": [
+          {
+            "fact_id": "K1",
+            "status": "covered",
+            "claim_ids": [
+              "C1"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K2",
+            "status": "covered",
+            "claim_ids": [
+              "C2"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K3",
+            "status": "covered",
+            "claim_ids": [
+              "C4"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K4",
+            "status": "covered",
+            "claim_ids": [
+              "C5"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K5",
+            "status": "covered",
+            "claim_ids": [
+              "C6"
+            ],
+            "reason": "Advisor example coverage."
+          }
+        ]
+      },
+      "expected_counts": {
+        "claims_total": 7,
+        "claims_supported": 7,
+        "omissions": 0,
+        "additions": 1,
+        "distorted_claims": 0,
+        "hallucination": false
+      }
+    },
+    {
+      "id": "B",
+      "output": "No blood clots were found. Your main lung artery is larger than normal (4.7 cm). You have a 1.5 cm spot in your right lower lung and a small amount of fluid around your left lung.",
+      "reference_assessment": {
+        "claims": [
+          {
+            "id": "C1",
+            "text": "No blood clots were found.",
+            "output_quote": "No blood clots were found.",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "No evidence of pulmonary embolism."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C2",
+            "text": "Your main lung artery is larger than normal (4.7 cm)",
+            "output_quote": "Your main lung artery is larger than normal (4.7 cm)",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "The main pulmonary artery is enlarged at 4.7 cm, which can be seen with pulmonary arterial hypertension."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C3",
+            "text": "You have a 1.5 cm spot in your right lower lung",
+            "output_quote": "You have a 1.5 cm spot in your right lower lung",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "There is a 1.5 cm nodule in the right lower lobe."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C4",
+            "text": "a small amount of fluid around your left lung",
+            "output_quote": "a small amount of fluid around your left lung",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "There is a small left pleural effusion."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          }
+        ],
+        "key_fact_coverage": [
+          {
+            "fact_id": "K1",
+            "status": "covered",
+            "claim_ids": [
+              "C1"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K2",
+            "status": "covered",
+            "claim_ids": [
+              "C2"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K3",
+            "status": "covered",
+            "claim_ids": [
+              "C3"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K4",
+            "status": "covered",
+            "claim_ids": [
+              "C4"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K5",
+            "status": "missing",
+            "claim_ids": [],
+            "reason": "Advisor example coverage."
+          }
+        ]
+      },
+      "expected_counts": {
+        "claims_total": 4,
+        "claims_supported": 4,
+        "omissions": 1,
+        "additions": 0,
+        "distorted_claims": 0,
+        "hallucination": false
+      }
+    },
+    {
+      "id": "C",
+      "output": "No blood clots were found. Your main lung artery is larger than normal (4.7 cm). You have a 1.5 cm spot in your right lower lung and a small amount of fluid around your left lung. A follow-up scan in 3 months is recommended. Your doctor will probably want to do a biopsy.",
+      "reference_assessment": {
+        "claims": [
+          {
+            "id": "C1",
+            "text": "No blood clots were found.",
+            "output_quote": "No blood clots were found.",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "No evidence of pulmonary embolism."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C2",
+            "text": "Your main lung artery is larger than normal (4.7 cm)",
+            "output_quote": "Your main lung artery is larger than normal (4.7 cm)",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "The main pulmonary artery is enlarged at 4.7 cm, which can be seen with pulmonary arterial hypertension."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C3",
+            "text": "You have a 1.5 cm spot in your right lower lung",
+            "output_quote": "You have a 1.5 cm spot in your right lower lung",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "There is a 1.5 cm nodule in the right lower lobe."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C4",
+            "text": "a small amount of fluid around your left lung",
+            "output_quote": "a small amount of fluid around your left lung",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "There is a small left pleural effusion."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C5",
+            "text": "A follow-up scan in 3 months is recommended.",
+            "output_quote": "A follow-up scan in 3 months is recommended.",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "Follow-up in 3 months is advised."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C6",
+            "text": "Your doctor will probably want to do a biopsy.",
+            "output_quote": "Your doctor will probably want to do a biopsy.",
+            "scope": "patient",
+            "support": "unsupported",
+            "evidence": [],
+            "is_addition": true,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          }
+        ],
+        "key_fact_coverage": [
+          {
+            "fact_id": "K1",
+            "status": "covered",
+            "claim_ids": [
+              "C1"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K2",
+            "status": "covered",
+            "claim_ids": [
+              "C2"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K3",
+            "status": "covered",
+            "claim_ids": [
+              "C3"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K4",
+            "status": "covered",
+            "claim_ids": [
+              "C4"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K5",
+            "status": "covered",
+            "claim_ids": [
+              "C5"
+            ],
+            "reason": "Advisor example coverage."
+          }
+        ]
+      },
+      "expected_counts": {
+        "claims_total": 6,
+        "claims_supported": 5,
+        "omissions": 0,
+        "additions": 1,
+        "distorted_claims": 0,
+        "hallucination": true
+      }
+    },
+    {
+      "id": "D",
+      "output": "No blood clots were found. Your main lung artery is larger than normal (4.7 cm), which means you have high blood pressure in your lungs. You have a 5 mm spot in your right lung and a small amount of fluid around your left lung.",
+      "reference_assessment": {
+        "claims": [
+          {
+            "id": "C1",
+            "text": "No blood clots were found.",
+            "output_quote": "No blood clots were found.",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "No evidence of pulmonary embolism."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C2",
+            "text": "Your main lung artery is larger than normal (4.7 cm)",
+            "output_quote": "Your main lung artery is larger than normal (4.7 cm)",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "The main pulmonary artery is enlarged at 4.7 cm, which can be seen with pulmonary arterial hypertension."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C3",
+            "text": "which means you have high blood pressure in your lungs.",
+            "output_quote": "which means you have high blood pressure in your lungs.",
+            "scope": "patient",
+            "support": "unsupported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "The main pulmonary artery is enlarged at 4.7 cm, which can be seen with pulmonary arterial hypertension."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [
+              "certainty"
+            ],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C4",
+            "text": "You have a 5 mm spot in your right lung",
+            "output_quote": "You have a 5 mm spot in your right lung",
+            "scope": "patient",
+            "support": "unsupported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "There is a 1.5 cm nodule in the right lower lobe."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [
+              "number_or_unit"
+            ],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          },
+          {
+            "id": "C5",
+            "text": "a small amount of fluid around your left lung",
+            "output_quote": "a small amount of fluid around your left lung",
+            "scope": "patient",
+            "support": "supported",
+            "evidence": [
+              {
+                "origin": "report",
+                "context_id": "",
+                "quote": "There is a small left pleural effusion."
+              }
+            ],
+            "is_addition": false,
+            "distortion_types": [],
+            "clinically_meaningful": true,
+            "reason": "Illustrative reference judgment from the advisor's worked example."
+          }
+        ],
+        "key_fact_coverage": [
+          {
+            "fact_id": "K1",
+            "status": "covered",
+            "claim_ids": [
+              "C1"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K2",
+            "status": "distorted",
+            "claim_ids": [
+              "C3"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K3",
+            "status": "distorted",
+            "claim_ids": [
+              "C4"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K4",
+            "status": "covered",
+            "claim_ids": [
+              "C5"
+            ],
+            "reason": "Advisor example coverage."
+          },
+          {
+            "fact_id": "K5",
+            "status": "missing",
+            "claim_ids": [],
+            "reason": "Advisor example coverage."
+          }
+        ]
+      },
+      "expected_counts": {
+        "claims_total": 5,
+        "claims_supported": 3,
+        "omissions": 1,
+        "additions": 0,
+        "distorted_claims": 2,
+        "hallucination": true
+      }
+    }
+  ]
+}
