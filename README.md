@@ -16,7 +16,7 @@ September baseline: see [the runnable demo, task specification, and retrieval ha
 | Alicia Garcia         | @ag45566      | Readability Agent                                                        |
 | Zurabi Kochiashvili   | @Zurab1K      | Refiner Agent                                                            |
 | Carlin Verano         | @carlinnv     | Refiner and test spec |
-
+| Vaibhavi Srivastava   | @vai67        | Extractor Agent
 ---
 
 ## 🎯 **Project Highlights**
