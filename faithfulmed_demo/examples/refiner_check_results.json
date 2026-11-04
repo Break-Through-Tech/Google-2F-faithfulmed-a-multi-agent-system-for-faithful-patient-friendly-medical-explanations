@@ -1,0 +1,673 @@
+{
+  "scope": "Offline scripted ADK behavior checks; no clinical/model accuracy claim.",
+  "python": "3.11.11",
+  "packages": {
+    "google-adk": "2.9.2",
+    "google-genai": "2.25.0",
+    "pydantic": "2.13.5",
+    "textstat": "0.7.13",
+    "pandas": "3.0.6",
+    "nltk": "3.10.3"
+  },
+  "cases": [
+    {
+      "case_id": "clean",
+      "result": "PASS",
+      "source_report": "A patient came to the hospital with chest pain. Serial troponin tests did not show a heart attack. A nuclear stress test was done, but its result is still pending. Liver enzyme levels were elevated, and the cause is uncertain. The patient also has acid reflux. The patient will see a cardiologist in two weeks and a primary care doctor in two to four weeks. Discharge medications will depend on the stress-test result.",
+      "original_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.\n\n  ",
+      "initial_verdict": {
+        "issues": [],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.\n\n  ",
+      "verifier_calls": [
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.\n\n  ",
+          "verdict": {
+            "issues": [],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "adapter_attempts": 0,
+      "refinement_history": [],
+      "final_verdict": {
+        "issues": [],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "repair_blocker": "",
+      "run_status": "complete",
+      "final_answer": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.\n\n  ",
+      "readability_score": {
+        "status": "ok",
+        "word_count": 71,
+        "sentence_count": 8,
+        "flesch_kincaid_grade": 2.16,
+        "smog_grade": 5.99,
+        "medical_jargon_count": 0,
+        "medical_jargon_density": 0.0,
+        "medical_terms_found": "",
+        "is_refusal": false,
+        "passes_grade_target": true,
+        "passes_length_target": true,
+        "passes_readability": true
+      },
+      "stages": [
+        "Intake",
+        "Extractor",
+        "QuoteCheck",
+        "Simplifier",
+        "Verifier",
+        "Refiner",
+        "Readability"
+      ]
+    },
+    {
+      "case_id": "deletion",
+      "result": "PASS",
+      "source_report": "A patient came to the hospital with chest pain. Serial troponin tests did not show a heart attack. A nuclear stress test was done, but its result is still pending. Liver enzyme levels were elevated, and the cause is uncertain. The patient also has acid reflux. The patient will see a cardiologist in two weeks and a primary care doctor in two to four weeks. Discharge medications will depend on the stress-test result.",
+      "original_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. You have pneumonia.",
+      "initial_verdict": {
+        "issues": [
+          {
+            "category": "unsupported",
+            "claim": "You have pneumonia.",
+            "replacement": "",
+            "source_quote": "",
+            "reason": "Scripted Refiner behavior check."
+          }
+        ],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. ",
+      "verifier_calls": [
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. You have pneumonia.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "unsupported",
+                "claim": "You have pneumonia.",
+                "replacement": "",
+                "source_quote": "",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        },
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. ",
+          "verdict": {
+            "issues": [],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "adapter_attempts": 1,
+      "refinement_history": [
+        {
+          "round": 1,
+          "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. ",
+          "verdict": {
+            "issues": [],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "final_verdict": {
+        "issues": [],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "repair_blocker": "",
+      "run_status": "complete",
+      "final_answer": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. ",
+      "readability_score": {
+        "status": "ok",
+        "word_count": 71,
+        "sentence_count": 8,
+        "flesch_kincaid_grade": 2.16,
+        "smog_grade": 5.99,
+        "medical_jargon_count": 0,
+        "medical_jargon_density": 0.0,
+        "medical_terms_found": "",
+        "is_refusal": false,
+        "passes_grade_target": true,
+        "passes_length_target": true,
+        "passes_readability": true
+      },
+      "stages": [
+        "Intake",
+        "Extractor",
+        "QuoteCheck",
+        "Simplifier",
+        "Verifier",
+        "Refiner",
+        "Readability"
+      ]
+    },
+    {
+      "case_id": "replacement",
+      "result": "PASS",
+      "source_report": "A patient came to the hospital with chest pain. Serial troponin tests did not show a heart attack. A nuclear stress test was done, but its result is still pending. Liver enzyme levels were elevated, and the cause is uncertain. The patient also has acid reflux. The patient will see a cardiologist in two weeks and a primary care doctor in two to four weeks. Discharge medications will depend on the stress-test result.",
+      "original_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.\nYour stress test result was normal.\n",
+      "initial_verdict": {
+        "issues": [
+          {
+            "category": "contradiction",
+            "claim": "Your stress test result was normal.",
+            "replacement": "A nuclear stress test was done, but its result is still pending.",
+            "source_quote": "A nuclear stress test was done, but its result is still pending.",
+            "reason": "Scripted Refiner behavior check."
+          }
+        ],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.\nA nuclear stress test was done, but its result is still pending.\n",
+      "verifier_calls": [
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.\nYour stress test result was normal.\n",
+          "verdict": {
+            "issues": [
+              {
+                "category": "contradiction",
+                "claim": "Your stress test result was normal.",
+                "replacement": "A nuclear stress test was done, but its result is still pending.",
+                "source_quote": "A nuclear stress test was done, but its result is still pending.",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        },
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.\nA nuclear stress test was done, but its result is still pending.\n",
+          "verdict": {
+            "issues": [],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "adapter_attempts": 1,
+      "refinement_history": [
+        {
+          "round": 1,
+          "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.\nA nuclear stress test was done, but its result is still pending.\n",
+          "verdict": {
+            "issues": [],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "final_verdict": {
+        "issues": [],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "repair_blocker": "",
+      "run_status": "complete",
+      "final_answer": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.\nA nuclear stress test was done, but its result is still pending.\n",
+      "readability_score": {
+        "status": "ok",
+        "word_count": 83,
+        "sentence_count": 9,
+        "flesch_kincaid_grade": 2.51,
+        "smog_grade": 6.43,
+        "medical_jargon_count": 0,
+        "medical_jargon_density": 0.0,
+        "medical_terms_found": "",
+        "is_refusal": false,
+        "passes_grade_target": true,
+        "passes_length_target": true,
+        "passes_readability": true
+      },
+      "stages": [
+        "Intake",
+        "Extractor",
+        "QuoteCheck",
+        "Simplifier",
+        "Verifier",
+        "Refiner",
+        "Readability"
+      ]
+    },
+    {
+      "case_id": "omission",
+      "result": "PASS",
+      "source_report": "A patient came to the hospital with chest pain. Serial troponin tests did not show a heart attack. A nuclear stress test was done, but its result is still pending. Liver enzyme levels were elevated, and the cause is uncertain. The patient also has acid reflux. The patient will see a cardiologist in two weeks and a primary care doctor in two to four weeks. Discharge medications will depend on the stress-test result.",
+      "original_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.",
+      "initial_verdict": {
+        "issues": [
+          {
+            "category": "omission",
+            "claim": "",
+            "replacement": "A nuclear stress test was done, but its result is still pending.",
+            "source_quote": "A nuclear stress test was done, but its result is still pending.",
+            "reason": "Scripted Refiner behavior check."
+          }
+        ],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.",
+      "verifier_calls": [
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "omission",
+                "claim": "",
+                "replacement": "A nuclear stress test was done, but its result is still pending.",
+                "source_quote": "A nuclear stress test was done, but its result is still pending.",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "adapter_attempts": 1,
+      "refinement_history": [],
+      "final_verdict": {
+        "issues": [
+          {
+            "category": "omission",
+            "claim": "",
+            "replacement": "A nuclear stress test was done, but its result is still pending.",
+            "source_quote": "A nuclear stress test was done, but its result is still pending.",
+            "reason": "Scripted Refiner behavior check."
+          }
+        ],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "repair_blocker": "Omission requires human review; automatic insertion is unsupported",
+      "run_status": "needs_review",
+      "final_answer": "",
+      "readability_score": {
+        "status": "ok",
+        "word_count": 71,
+        "sentence_count": 8,
+        "flesch_kincaid_grade": 2.16,
+        "smog_grade": 5.99,
+        "medical_jargon_count": 0,
+        "medical_jargon_density": 0.0,
+        "medical_terms_found": "",
+        "is_refusal": false,
+        "passes_grade_target": true,
+        "passes_length_target": true,
+        "passes_readability": true
+      },
+      "stages": [
+        "Intake",
+        "Extractor",
+        "QuoteCheck",
+        "Simplifier",
+        "Verifier",
+        "Refiner",
+        "Readability"
+      ]
+    },
+    {
+      "case_id": "ambiguous",
+      "result": "PASS",
+      "source_report": "A patient came to the hospital with chest pain. Serial troponin tests did not show a heart attack. A nuclear stress test was done, but its result is still pending. Liver enzyme levels were elevated, and the cause is uncertain. The patient also has acid reflux. The patient will see a cardiologist in two weeks and a primary care doctor in two to four weeks. Discharge medications will depend on the stress-test result.",
+      "original_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. You have pneumonia. You have pneumonia.",
+      "initial_verdict": {
+        "issues": [
+          {
+            "category": "unsupported",
+            "claim": "You have pneumonia.",
+            "replacement": "",
+            "source_quote": "",
+            "reason": "Scripted Refiner behavior check."
+          }
+        ],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. You have pneumonia. You have pneumonia.",
+      "verifier_calls": [
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. You have pneumonia. You have pneumonia.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "unsupported",
+                "claim": "You have pneumonia.",
+                "replacement": "",
+                "source_quote": "",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "adapter_attempts": 1,
+      "refinement_history": [],
+      "final_verdict": {
+        "issues": [
+          {
+            "category": "unsupported",
+            "claim": "You have pneumonia.",
+            "replacement": "",
+            "source_quote": "",
+            "reason": "Scripted Refiner behavior check."
+          }
+        ],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "repair_blocker": "Finding must identify one exact draft span",
+      "run_status": "needs_review",
+      "final_answer": "",
+      "readability_score": {
+        "status": "ok",
+        "word_count": 77,
+        "sentence_count": 10,
+        "flesch_kincaid_grade": 2.12,
+        "smog_grade": 6.74,
+        "medical_jargon_count": 0,
+        "medical_jargon_density": 0.0,
+        "medical_terms_found": "",
+        "is_refusal": false,
+        "passes_grade_target": true,
+        "passes_length_target": true,
+        "passes_readability": true
+      },
+      "stages": [
+        "Intake",
+        "Extractor",
+        "QuoteCheck",
+        "Simplifier",
+        "Verifier",
+        "Refiner",
+        "Readability"
+      ]
+    },
+    {
+      "case_id": "cap_unresolved",
+      "result": "PASS",
+      "source_report": "A patient came to the hospital with chest pain. Serial troponin tests did not show a heart attack. A nuclear stress test was done, but its result is still pending. Liver enzyme levels were elevated, and the cause is uncertain. The patient also has acid reflux. The patient will see a cardiologist in two weeks and a primary care doctor in two to four weeks. Discharge medications will depend on the stress-test result.",
+      "original_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. Unsupported first. Unsupported second. Unsupported third.",
+      "initial_verdict": {
+        "issues": [
+          {
+            "category": "unsupported",
+            "claim": "Unsupported first.",
+            "replacement": "",
+            "source_quote": "",
+            "reason": "Scripted Refiner behavior check."
+          }
+        ],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.   Unsupported third.",
+      "verifier_calls": [
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. Unsupported first. Unsupported second. Unsupported third.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "unsupported",
+                "claim": "Unsupported first.",
+                "replacement": "",
+                "source_quote": "",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        },
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.  Unsupported second. Unsupported third.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "unsupported",
+                "claim": "Unsupported second.",
+                "replacement": "",
+                "source_quote": "",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        },
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.   Unsupported third.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "unsupported",
+                "claim": "Unsupported third.",
+                "replacement": "",
+                "source_quote": "",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "adapter_attempts": 2,
+      "refinement_history": [
+        {
+          "round": 1,
+          "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.  Unsupported second. Unsupported third.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "unsupported",
+                "claim": "Unsupported second.",
+                "replacement": "",
+                "source_quote": "",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        },
+        {
+          "round": 2,
+          "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.   Unsupported third.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "unsupported",
+                "claim": "Unsupported third.",
+                "replacement": "",
+                "source_quote": "",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "final_verdict": {
+        "issues": [
+          {
+            "category": "unsupported",
+            "claim": "Unsupported third.",
+            "replacement": "",
+            "source_quote": "",
+            "reason": "Scripted Refiner behavior check."
+          }
+        ],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "repair_blocker": "",
+      "run_status": "needs_review",
+      "final_answer": "",
+      "readability_score": {
+        "status": "ok",
+        "word_count": 73,
+        "sentence_count": 9,
+        "flesch_kincaid_grade": 2.28,
+        "smog_grade": 6.43,
+        "medical_jargon_count": 0,
+        "medical_jargon_density": 0.0,
+        "medical_terms_found": "",
+        "is_refusal": false,
+        "passes_grade_target": true,
+        "passes_length_target": true,
+        "passes_readability": true
+      },
+      "stages": [
+        "Intake",
+        "Extractor",
+        "QuoteCheck",
+        "Simplifier",
+        "Verifier",
+        "Refiner",
+        "Readability"
+      ]
+    },
+    {
+      "case_id": "cap_clean",
+      "result": "PASS",
+      "source_report": "A patient came to the hospital with chest pain. Serial troponin tests did not show a heart attack. A nuclear stress test was done, but its result is still pending. Liver enzyme levels were elevated, and the cause is uncertain. The patient also has acid reflux. The patient will see a cardiologist in two weeks and a primary care doctor in two to four weeks. Discharge medications will depend on the stress-test result.",
+      "original_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. Unsupported first. Unsupported second.",
+      "initial_verdict": {
+        "issues": [
+          {
+            "category": "unsupported",
+            "claim": "Unsupported first.",
+            "replacement": "",
+            "source_quote": "",
+            "reason": "Scripted Refiner behavior check."
+          }
+        ],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.  ",
+      "verifier_calls": [
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result. Unsupported first. Unsupported second.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "unsupported",
+                "claim": "Unsupported first.",
+                "replacement": "",
+                "source_quote": "",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        },
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.  Unsupported second.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "unsupported",
+                "claim": "Unsupported second.",
+                "replacement": "",
+                "source_quote": "",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        },
+        {
+          "draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.  ",
+          "verdict": {
+            "issues": [],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "adapter_attempts": 2,
+      "refinement_history": [
+        {
+          "round": 1,
+          "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.  Unsupported second.",
+          "verdict": {
+            "issues": [
+              {
+                "category": "unsupported",
+                "claim": "Unsupported second.",
+                "replacement": "",
+                "source_quote": "",
+                "reason": "Scripted Refiner behavior check."
+              }
+            ],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        },
+        {
+          "round": 2,
+          "revised_draft": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.  ",
+          "verdict": {
+            "issues": [],
+            "supported_examples": [],
+            "scope": "Scripted behavior check; not a clinical judgment."
+          }
+        }
+      ],
+      "final_verdict": {
+        "issues": [],
+        "supported_examples": [],
+        "scope": "Scripted behavior check; not a clinical judgment."
+      },
+      "repair_blocker": "",
+      "run_status": "complete",
+      "final_answer": "You came to the hospital with chest pain. Your blood tests did not show a heart attack. Your stress test was done, but the result is not back yet. Your liver test levels were high. The cause is not yet known. You also have acid reflux. See your heart doctor in two weeks and your main doctor in two to four weeks. Your medicines will depend on the stress test result.  ",
+      "readability_score": {
+        "status": "ok",
+        "word_count": 71,
+        "sentence_count": 8,
+        "flesch_kincaid_grade": 2.16,
+        "smog_grade": 5.99,
+        "medical_jargon_count": 0,
+        "medical_jargon_density": 0.0,
+        "medical_terms_found": "",
+        "is_refusal": false,
+        "passes_grade_target": true,
+        "passes_length_target": true,
+        "passes_readability": true
+      },
+      "stages": [
+        "Intake",
+        "Extractor",
+        "QuoteCheck",
+        "Simplifier",
+        "Verifier",
+        "Refiner",
+        "Readability"
+      ]
+    }
+  ]
+}

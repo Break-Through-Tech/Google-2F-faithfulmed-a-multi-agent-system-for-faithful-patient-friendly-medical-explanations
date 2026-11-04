@@ -1,4 +1,9 @@
-# Zurabi's Refiner contribution
+# Refiner handoff
+
+**November 4 update:** I checked the Refiner in the integrated ADK workflow.
+See [REFINER_CHECK.md](REFINER_CHECK.md) for the results, commands, and saved
+traces. The notes below are from the original October 21 helper handoff, before
+the team integrated it.
 
 This implements the small Refiner slice in the October 15 team plan: change
 flagged text only, preserve a clean draft exactly, and return `revised_draft`.
