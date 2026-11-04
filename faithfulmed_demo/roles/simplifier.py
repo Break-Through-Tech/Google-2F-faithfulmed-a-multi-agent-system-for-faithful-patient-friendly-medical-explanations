@@ -57,7 +57,7 @@ def run_simplifier(atoms: list | str, retrieved_context: str, *, model: str = MO
             contents=prompt,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
-                temperature=0.2,
+                temperature=0,
             ),
         )
     return require_text(response)
