@@ -52,4 +52,4 @@ Use individual reflection files so teammates do not edit the same file and creat
 - Biweekly reflection from October onward: `reflections/october/YYYY-MM-DD-name.md` (period end date)
 - ADR: `adr/ADR-001-short-title.md`
 
-The example ADR in `adr/ADR-001-example.md` is a format sample only. It is not a real FaithfulMed decision.
+The example ADR in `adr/ADR-example.md` is a format sample only. It is not a real FaithfulMed decision.
