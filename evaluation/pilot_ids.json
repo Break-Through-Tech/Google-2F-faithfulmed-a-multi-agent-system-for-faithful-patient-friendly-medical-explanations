@@ -1,0 +1,43 @@
+{
+  "pilot_version": "paired-pilot-v1",
+  "frozen_set_version": "v3-medium-with-allergy-exceptions-frozen-2026-10-26",
+  "selection_note": "Hand-picked from the source review notes, before any pilot answers existed, to test the workflow on different kinds of reports. Not a random sample, so pilot results do not predict results for all 50 reports.",
+  "source_row_ids": [4998, 3938, 3808, 3606, 2964],
+  "reports": [
+    {
+      "source_row_id": 4998,
+      "specialty": "Allergy / Immunology",
+      "sample_name": "Allergy Evaluation Consult",
+      "review_decision": "accept",
+      "why_chosen": "Longest frozen report. The cause of the reaction is uncertain and allergy-test results are pending."
+    },
+    {
+      "source_row_id": 3938,
+      "specialty": "Discharge Summary",
+      "sample_name": "Discharge Summary - COPD",
+      "review_decision": "accept",
+      "why_chosen": "Has a multi-step prednisone taper, several follow-up appointments, and a cardiac finding that must not be described as negative."
+    },
+    {
+      "source_row_id": 3808,
+      "specialty": "Endocrinology",
+      "sample_name": "Acute Cystitis & Diabetes Type II",
+      "review_decision": "accept_with_caveat",
+      "why_chosen": "Generic history and checklist sections conflict with the final assessment, and the medication list must not gain an invented course length."
+    },
+    {
+      "source_row_id": 3606,
+      "specialty": "Gastroenterology",
+      "sample_name": "CT Abdomen & Pelvis - 3",
+      "review_decision": "accept_with_caveat",
+      "why_chosen": "One of the most consequential source conflicts: a left renal nodule in the body and a left adrenal nodule in the impression. Other findings are only possible, not certain."
+    },
+    {
+      "source_row_id": 2964,
+      "specialty": "Neurology",
+      "sample_name": "Carotid Ultrasound",
+      "review_decision": "accept",
+      "why_chosen": "Tests left and right sides and a qualified number: at least 50% narrowing, with CTA still to come."
+    }
+  ]
+}

@@ -38,7 +38,7 @@ def prepare(callback_context):
             repair_blocker='', error='', run_status='running',
             mode='offline-scripted' if offline else 'live', model=MODEL,
             inject_demo_error=message == '/offline-error',
-            retrieval_query=fixtures.EXAMPLE['retrieval_query'] if known else message[:1500],
+            retrieval_query=fixtures.EXAMPLE['retrieval_query'] if known else message,
             stage_modes={}).items():
         callback_context.state[key] = value
 

@@ -80,7 +80,7 @@ def run_baseline(
     *,
     collection: ChromaCollection,
     generator: TextGenerator,
-    top_k: int = 5,
+    top_k: int = 3,
     where: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return an evaluation-ready record; errors propagate rather than fabricate text.
