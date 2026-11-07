@@ -95,6 +95,8 @@ This makes a model call and refuses to replace an existing inventory. Save/reuse
 
 ## Status
 
+November 7 update: Carlin's paired runner is now merged, and the [five pilot source-only checklists](PILOT_SOURCE_CHECKLISTS.md) are prepared with exact anchors and hashes. The [support/conflict policy](SUPPORT_CONFLICT_POLICY.md) separates citation support from full-claim coverage. These additions do not establish completed calibration or change the clinical scoring formulas below. The remaining status text describes the earlier October handoff.
+
 The schema, reference cases, arithmetic, and calibration preparation are implemented. The evaluator is ready for saved pilot outputs. See [CALIBRATION.md](CALIBRATION.md) for the support-calibration scope and commands. Paired report generation and the shared retrieval rule remain parallel teammate work.
 
 The MedAESQA [scope investigation](CALIBRATION_INVESTIGATION.md) found that document reference labels must not be equated silently with short-snippet judgments. The six-case title/abstract diagnostic reached 66.7% agreement and kappa 0.33, with mixed document-level references still unresolved. This does not change the advisor's clinical-report scoring formulas or establish final calibration.

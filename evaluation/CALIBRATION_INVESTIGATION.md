@@ -84,6 +84,8 @@ These files are under ignored `data/calibration_results/`.
 
 ## Next calibration work
 
+November 7: completed the [support/conflict policy](SUPPORT_CONFLICT_POLICY.md) and [offline audit of all 80 selected cases](SUPPORT_CONFLICT_AUDIT.md). This is preparation only: no new predictions, reference replacements, or calibrated production behavior. Use that policy before assembling the next development suite.
+
 Use the documented title/abstract scope for a document-level benchmark, with a prospectively specified document-identity deduplication and reference-conflict policy. Record ambiguous groups separately; do not choose a preferred label or discard cases based on predictions. Any revised cohort must be versioned before evaluating it, preserving question-level separation.
 
 Alternatively, an explicitly snippet-level test needs references that apply to those snippets; the document labels should not silently be presented as snippet-entailment truth. Do not lower the clinical scorer's support standards to force agreement.

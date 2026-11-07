@@ -1,5 +1,7 @@
 # Verifier evidence-support calibration
 
+**November 7 update:** Before further calls, use the [support/conflict policy](SUPPORT_CONFLICT_POLICY.md) and [offline 80-case audit](SUPPORT_CONFLICT_AUDIT.md). The commands below preserve the historical v1 workflow; do not resume it as a corrected document-level benchmark. New task/schema and cohort preparation remain necessary.
+
 Version: **medaesqa-support-2026-10-27-v1**. This is the original snippet-input support pilot. The subsequent [scope investigation](CALIBRATION_INVESTIGATION.md) found that the reference labels are defined at cited-document title/abstract level. Treat v1 results as a snippet proxy, not completed document-level calibration. A medical question is not substituted for a clinical source note.
 
 ## Actual dataset and mapping
