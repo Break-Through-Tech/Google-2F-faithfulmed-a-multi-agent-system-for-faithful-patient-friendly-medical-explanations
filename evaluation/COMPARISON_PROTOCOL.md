@@ -1,5 +1,12 @@
 # Comparing baseline and ADK outputs
 
+November 8 clinical-scoring update: the versioned
+[source-ID evaluator](CLINICAL_SCORING_V2.md) avoids generated evidence quotations and
+records partial key-fact coverage separately. Use its documented command for new
+clinical scoring. The original commands and formulas below remain the v1 record;
+do not pool results from different evaluator versions or transfer scores between
+changed answers. This does not update the live Verifier's calibration status.
+
 Protocol: **advisor-2026-10-27-v1**, October 27, 2026. This implements the definitions in Samaneh's reply and supplied scoring examples.
 
 ## What stays fixed

@@ -1,0 +1,165 @@
+{
+  "version": "clinical-scoring-regressions-2026-11-08-v1",
+  "provenance": "Controlled synthetic development regression cases with source-policy expectations; not independently annotated clinical gold or MedAESQA held-out data. Expectations are never model inputs.",
+  "records": [
+    {
+      "case_id": "supported_background",
+      "system": "clinical_regression",
+      "generation_model": "fixture",
+      "output_kind": "final",
+      "run_status": "complete",
+      "source_report": "A small left pleural effusion was seen.",
+      "output": "A small amount of fluid was seen around your left lung.\nGeneral background: Fluid around the lungs can have many causes.",
+      "key_facts": [
+        {
+          "id": "K1",
+          "text": "A small left pleural effusion was seen.",
+          "source_quote": "A small left pleural effusion was seen."
+        }
+      ],
+      "retrieved_context": [
+        {
+          "id": "background",
+          "text": "Fluid around the lungs can have many causes."
+        }
+      ],
+      "expected_checks": {
+        "hallucination": false,
+        "supported_additions": 1,
+        "omissions": 0
+      }
+    },
+    {
+      "case_id": "unstated_dose_unit",
+      "system": "clinical_regression",
+      "generation_model": "fixture",
+      "output_kind": "final",
+      "run_status": "complete",
+      "source_report": "MEDICATION: Bactrim 400/80 Tab PO BID #30.",
+      "output": "Take Bactrim 400/80 mg by mouth twice daily.",
+      "key_facts": [
+        {
+          "id": "K1",
+          "text": "Bactrim is listed as 400/80 orally twice daily, quantity 30; no dose unit or course duration is stated.",
+          "source_quote": "MEDICATION: Bactrim 400/80 Tab PO BID #30."
+        }
+      ],
+      "retrieved_context": [],
+      "expected_checks": {
+        "hallucination": true,
+        "distorted_key_facts": 1
+      }
+    },
+    {
+      "case_id": "partial_combined_followup",
+      "system": "clinical_regression",
+      "generation_model": "fixture",
+      "output_kind": "final",
+      "run_status": "complete",
+      "source_report": "Follow up with cardiology in 1 week and primary care tomorrow.",
+      "output": "See cardiology in 1 week.",
+      "key_facts": [
+        {
+          "id": "K1",
+          "text": "Both appointments must be preserved: cardiology in one week and primary care tomorrow.",
+          "source_quote": "Follow up with cardiology in 1 week and primary care tomorrow."
+        }
+      ],
+      "retrieved_context": [],
+      "expected_checks": {
+        "hallucination": false,
+        "fact_not_fully_covered": "K1"
+      }
+    },
+    {
+      "case_id": "uncertainty_strengthened",
+      "system": "clinical_regression",
+      "generation_model": "fixture",
+      "output_kind": "final",
+      "run_status": "complete",
+      "source_report": "CT suggests cirrhosis.",
+      "output": "You have cirrhosis.",
+      "key_facts": [
+        {
+          "id": "K1",
+          "text": "Cirrhosis is suggested by CT, not established.",
+          "source_quote": "CT suggests cirrhosis."
+        }
+      ],
+      "retrieved_context": [],
+      "expected_checks": {
+        "hallucination": true,
+        "distorted_key_facts": 1
+      }
+    },
+    {
+      "case_id": "invented_two_nodules",
+      "system": "clinical_regression",
+      "generation_model": "fixture",
+      "output_kind": "final",
+      "run_status": "complete",
+      "source_report": "FINDINGS: A left renal nodule measures 1.9 cm.\nIMPRESSION: An indeterminate left adrenal nodule is noted.",
+      "output": "There are two nodules: one on your left kidney and one on your left adrenal gland.",
+      "key_facts": [
+        {
+          "id": "K1",
+          "text": "The sections differ on renal versus adrenal location; preserve the uncertainty, not two definite nodules.",
+          "source_quote": "FINDINGS: A left renal nodule measures 1.9 cm.\nIMPRESSION: An indeterminate left adrenal nodule is noted."
+        }
+      ],
+      "retrieved_context": [],
+      "expected_checks": {
+        "hallucination": true,
+        "fact_not_fully_covered": "K1"
+      }
+    },
+    {
+      "case_id": "prior_negative_new_diagnosis",
+      "system": "clinical_regression",
+      "generation_model": "fixture",
+      "output_kind": "final",
+      "run_status": "complete",
+      "source_report": "PAST HISTORY: No prior bladder disease.\nCURRENT ASSESSMENT: New acute cystitis.",
+      "output": "You had no bladder disease before this visit. This visit found new acute cystitis.",
+      "key_facts": [
+        {
+          "id": "K1",
+          "text": "No prior bladder disease.",
+          "source_quote": "No prior bladder disease."
+        },
+        {
+          "id": "K2",
+          "text": "New acute cystitis.",
+          "source_quote": "New acute cystitis."
+        }
+      ],
+      "retrieved_context": [],
+      "expected_checks": {
+        "hallucination": false,
+        "omissions": 0,
+        "distorted_key_facts": 0
+      }
+    },
+    {
+      "case_id": "omitted_medication_rationale",
+      "system": "clinical_regression",
+      "generation_model": "fixture",
+      "output_kind": "final",
+      "run_status": "complete",
+      "source_report": "MEDICATIONS: Atenolol.\nAtenolol complicates treatment of anaphylaxis, but it is medically necessary.",
+      "output": "You take atenolol.",
+      "key_facts": [
+        {
+          "id": "K1",
+          "text": "Atenolol complicates anaphylaxis treatment but was considered medically necessary.",
+          "source_quote": "Atenolol complicates treatment of anaphylaxis, but it is medically necessary."
+        }
+      ],
+      "retrieved_context": [],
+      "expected_checks": {
+        "hallucination": false,
+        "omissions": 1
+      }
+    }
+  ]
+}
