@@ -19,6 +19,8 @@ All 80 selected cases were matched against the dataset's citation records, inclu
 Machine-readable evidence, including every selected case and its matching reference records:
 `data/calibration_results/support_conflict_audit_2026-11-07_v1.json`.
 
+The later [case-by-case development review](DEVELOPMENT_CONFLICT_REVIEW.md) records provisional decisions for these 14 ambiguous development cases. They remain quarantined in the v2 suite.
+
 ## Six already-seen development cases: coverage concerns
 
 These are desk-review observations against the cached titles/abstracts, not replacement gold labels or fresh model results.
