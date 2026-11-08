@@ -2,6 +2,9 @@
 
 September baseline: see [the runnable demo, task specification, and retrieval handoff](baseline/README.md).
 
+Presentation UI: see [the Gradio setup and walkthrough](faithfulmed_ui/README.md).
+Run `python -m faithfulmed_ui.app` from the project root, then open http://127.0.0.1:7860.
+
 > 💡 **Note for the team:** This is just a template. Update the above title with your AI Studio Challenge Project name. Remove all guidance notes and example text in this template and populate this README with your own content. You can work on this README throughout AI Studio, and get feedback from your AI Studio Coach and Challenge Advisor before finalizing it.  
 
 ---

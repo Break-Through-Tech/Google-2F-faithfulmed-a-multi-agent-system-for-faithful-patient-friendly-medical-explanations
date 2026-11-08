@@ -1,0 +1,3 @@
+# Install from the repository root into the existing demo environment.
+-r ../faithfulmed_demo/requirements.txt
+gradio==6.28.0
