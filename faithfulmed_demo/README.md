@@ -90,9 +90,14 @@ if you want the no-API walkthrough instead.
   Omissions, paraphrased replacements, and ambiguous spans are marked for review.
   Every applied repair is rechecked; at most two rounds are allowed.
 - **Readability:** uses Alicia's `run_readability` wrapper around her scorer.
-  A passing, resolved draft becomes `final_answer`. A failing grade gets a
-  suggestion; an unresolved Verifier finding leaves `final_answer` empty and
-  shows the draft for review. This stage does not rewrite medical text.
+  A passing, resolved draft becomes `final_answer`. In live mode, a draft above
+  grade 8 can receive at most two Gemini wording rewrites. Each candidate is
+  checked by the Verifier before it can replace the previous verified draft.
+  A new finding blocks release and requests review; a rewrite that does not
+  improve readability stops the loop. If the cap is reached above grade 8,
+  `final_answer` stays empty. Existing unresolved clinical findings block rewriting.
+  `readability_history` records each candidate, before/after scores, recheck verdict,
+  and acceptance. Scripted walkthroughs remain deterministic and make no rewrite calls.
 
 `complete` means the demo finished without unresolved findings from its own check;
 it is not a clinical faithfulness certificate. Readability can still fail separately.
