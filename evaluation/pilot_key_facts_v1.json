@@ -1,0 +1,68 @@
+{
+  "inventory_version": "pilot-source-facts-2026-11-07-v1",
+  "reports": {
+    "4998": [
+      ["Perioral swelling occurred; the cause was uncertain.", "the patient had an acute event of perioral swelling, etiology uncertain, occurring on 05/03/2008"],
+      ["Keflex was suspected, not established as the cause.", "Acute allergic reaction, etiology uncertain, however, suspicious for Keflex."],
+      ["Renal failure requires dialysis.", "Renal failure requiring dialysis."],
+      ["The patient has hypertension.", "history of hypertension."],
+      ["Heparin causes thrombocytopenia in this patient.", "Heparin causing thrombocytopenia."],
+      ["No further problems were reported after discharge and treatment.", "No further problems have been noted upon his discharge and treatment, which included corticosteroid therapy and antihistamine therapy and monitoring."],
+      ["Food and environmental allergy testing was performed; results and further recommendations are still to follow.", "RAST allergy testing for both food and environmental allergies was performed, and we will get the results back to the patient with further recommendations to follow."],
+      ["Avoiding a specific food or inhalant would depend on high sensitivity in the pending testing.", "If there is any specific food or inhalant allergen that is found to be quite high on the sensitivity scale, we would probably recommend the patient to avoid the offending agent"],
+      ["The clinician recommended stopping further cephalosporin use because of the suspected reaction.", "At this point, I would recommend the patient stopping any further use of cephalosporin antibiotics, which may be the cause of his allergic reaction, and I would consider this an allergy."],
+      ["Atenolol complicates anaphylaxis treatment but was considered medically necessary; do not invent a stop instruction.", "Being on atenolol, the patient has a more difficult time treating acute anaphylaxis, but I do think this is medically necessary at this time"],
+      ["An EpiPen was prescribed for an acute or impending allergic reaction.", "An EpiPen was also prescribed in the event of acute angioedema or allergic reaction or sensation of impending allergic reaction"],
+      ["Go directly to the emergency room after EpiPen administration.", "he is aware he needs to proceed directly to the emergency room for further evaluation and treatment recommendations after administration of an EpiPen."]
+    ],
+    "3938": [
+      ["The COPD exacerbation was improving with steroids and bronchodilators.", "Chronic obstructive pulmonary disease exacerbation improving, on steroids and bronchodilators."],
+      ["CT angiography was negative for pulmonary embolism.", "CT angiography, negative for pulmonary arterial embolism."],
+      ["The nuclear scan was abnormal with a reversible defect suggestive of ischemia; EF was 55%.", "Nuclear myocardial perfusion scan, abnormal.  Reversible defect suggestive of ischemia, ejection fraction of 55%."],
+      ["Coronary disease was present, and Cardiology recommended discharge with clinic follow-up despite the abnormal scan.", "Coronary artery disease, abnormal nuclear scan, discussed with Cardiology Dr. X, who recommended to discharge the patient and follow up in the clinic."],
+      ["Type 2 diabetes is a discharge diagnosis.", "Diabetes mellitus type 2."],
+      ["Anemia remained stable; admission hemoglobin was 8.8.", "His hemoglobin on admission was 8.8, and has remained stable."],
+      ["Low potassium was replaced.", "Hypokalemia, replaced."],
+      ["Bronchitis is a discharge diagnosis.", "Bronchitis."],
+      ["Recorded allergies are lisinopril and penicillin.", "ALLERGIES: , LISINOPRIL AND PENICILLIN."],
+      ["Preserve every step of the oral daily prednisone taper, including the final two-day step.", "Prednisone tapering dose 40 mg p.o. daily for three days, then 30 mg p.o. daily for three days, then 20 mg p.o. daily for three days, then 10 mg p.o. daily for three days, and 5 mg p.o. daily for two days."],
+      ["Levaquin is 750 mg by mouth daily for five more days.", "Levaquin 750 mg p.o. daily for 5 more days."],
+      ["Protonix is 40 mg by mouth daily.", "Protonix 40 mg p.o. daily."],
+      ["Continue other current home medications.", "The patient can continue other current home medications at home."],
+      ["Cardiology follow-up is in one week.", "Recommend to follow up with Cardiology Dr. X's office in a week."],
+      ["Hematology follow-up is for anemia workup, with no interval stated.", "The patient is recommended to see Hematology Dr. Y in the office for workup of anemia."],
+      ["Primary care follow-up is tomorrow.", "Follow up with primary care physician's office tomorrow."],
+      ["Return to the emergency room for worsening breathlessness, chest pain, fever, or acute symptoms.", "If increasing shortness of breath, chest pain, fever, any acute symptoms to return to emergency room."]
+    ],
+    "3808": [
+      ["The presenting symptom is abdominal pain.", "The patient is a 45-year-old male complaining of abdominal pain."],
+      ["The assessment lists uncontrolled type 2 diabetes and acute cystitis.", "ASSESSMENT: , Diabetes type II uncontrolled.  Acute cystitis."],
+      ["The history documents longstanding treated diabetes despite the generic no-significant-history line.", "The patient also has a long-standing history of diabetes which is treated with Micronase daily.,PAST MEDICAL HISTORY: , There is no significant past medical history noted today."],
+      ["The GU checklist denies bladder disorder despite the later cystitis assessment; preserve the discrepancy rather than declaring no urinary condition.", "GU:  Patient has history of Urinary tract disorder, but does not have Bladder disorder and Kidney disorder."],
+      ["Micronase is prescribed as 2.5 mg orally each morning, quantity 30; quantity does not establish treatment duration.", "Micronase 2.5 mg Tab PO QAM #30"],
+      ["Bactrim is listed as 400/80 orally twice daily, quantity 30; do not invent a course length or unstated dose unit.", "Bactrim 400/80 Tab PO BID #30"],
+      ["The plan is an endocrinology consultation and a complete CBC.", "Endocrinology Consult, complete CBC."]
+    ],
+    "3606": [
+      ["Noncontrast technique limits assessment of the solid abdominal organs.", "Noncontrast technique limits evaluation of the solid abdominal organs."],
+      ["The abdominal wall hernia contains fat with stranding suggestive of incarcerated fat, not a confirmed bowel incarceration.", "Anterior abdominal wall hernia with mesenteric fat-containing stranding, suggestive of incarcerated fat."],
+      ["The lung-base nodular density is 1.6 cm on the left.", "There is a 1.6 cm nodular density at the left posterior sulcus."],
+      ["Follow-up of the left lower-lobe nodule is recommended in three months.", "Nodule in the left lower lobe, recommend follow up in 3 months."],
+      ["The body calls an indeterminate 1.9 cm nodule left renal; retain this location as a source conflict with the impression's left adrenal wording.", "There is a left renal nodule seen, which measures 1.9 cm with a Hounsfield unit density of approximately 29, which is indeterminate."],
+      ["The impression calls the indeterminate nodule left adrenal and suggests dedicated adrenal CT or MRI; do not silently resolve the renal/adrenal conflict.", "Indeterminate left adrenal nodule, could be further assessed with dedicated adrenal protocol CT or MRI."],
+      ["The liver is enlarged with changes suggestive of cirrhosis, not a confirmed diagnosis.", "Hepatomegaly with changes suggestive of cirrhosis."],
+      ["The spleen is enlarged.", "There is also splenomegaly observed."],
+      ["Splenic lesions are incompletely characterized and may be cysts.", "Low-attenuation lesions in the spleen may represent cyst, that are incompletely characterized on this examination."],
+      ["An 8-mm left-kidney fat-density lesion is compatible in appearance with angiomyolipoma.", "There is an 8-mm fat density lesion in the anterior inner polar region of the left kidney, compatible in appearance with angiomyolipoma."],
+      ["A 1-cm right-kidney lesion is likely a cyst but is incompletely characterized.", "There is a 1-cm low-attenuation lesion in the upper pole of the right kidney, likely representing a cyst, but incompletely characterized on this examination."],
+      ["The right-adnexal lesion may represent an ovary or a dermoid cyst; neither is certain.", "Fat density soft tissue lesion in the region of the right adnexa, this contains calcifications and may represent an ovary or possibly dermoid cyst."],
+      ["Right-hip degenerative changes suggest possible avascular necrosis.", "There are extensive degenerative changes of the right hip noted with changes suggestive of avascular necrosis."]
+    ],
+    "2964": [
+      ["There is plaque on both sides, greater on the left.", "The study demonstrates bilateral hard plaque at the bifurcation, left greater than right."],
+      ["The right internal carotid has plaque without evidence of greater than 50% narrowing; do not call it plaque-free.", "The right internal carotid artery at the bifurcation demonstrates plaque formation, but no evidence of greater than 50% stenosis."],
+      ["The impression reports at least 50% left internal carotid narrowing, not an exact 50% measurement.", "There is at least 50% stenosis of the left internal carotid artery at its bifurcation"],
+      ["A follow-up CTA is recommended; it has not already been performed in this report.", "a followup CTA is recommended for further assessment."]
+    ]
+  }
+}

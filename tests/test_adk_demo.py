@@ -75,6 +75,8 @@ class WorkflowTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn('readability_suggestion', state)
         _, clean = await self.invoke('/offline')
         self.assertEqual(clean['refinement_history'], [])
+        self.assertEqual(clean['readability_history'], [])
+        self.assertFalse(clean['faithfulness_recheck_required'])
         self.assertEqual(clean['draft'], clean['revised_draft'])
 
     async def test_failure_does_not_reuse_previous_answer(self):

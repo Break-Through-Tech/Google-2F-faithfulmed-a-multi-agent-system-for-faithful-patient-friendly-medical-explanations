@@ -13,7 +13,7 @@ from .roles.extractor import ClinicalAtoms, create_extractor, validate_source_qu
 from .roles.simplifier import run_simplifier
 from .roles.verifier import verify
 from .refiner_adapter import apply_verified_edits
-from .roles.readability import run_readability
+from .roles.readability import run_readability, rewrite_for_readability, MAX_REWRITES
 
 
 def emit(ctx, author, message, **updates):
@@ -35,6 +35,7 @@ def prepare(callback_context):
             atoms=[], retrieved_context=[], draft='', verdict={}, revised_draft='',
             final_answer='', final_verdict={}, readability_score={},
             readability_status='', suggestion=None, refinement_history=[],
+            readability_history=[], faithfulness_recheck_required=False,
             repair_blocker='', error='', run_status='running',
             mode='offline-scripted' if offline else 'live', model=MODEL,
             inject_demo_error=message == '/offline-error',
@@ -168,15 +169,55 @@ class RefinerStage(DemoStage):
 class ReadabilityStage(DemoStage):
     async def run_stage(self, ctx):
         state = ctx.session.state
-        result = await asyncio.to_thread(run_readability, state['revised_draft'])
+        text, verdict = state['revised_draft'], state['final_verdict']
+        result = await asyncio.to_thread(run_readability, text)
         unresolved = bool(state['final_verdict']['issues']) or bool(state['repair_blocker'])
+        history, blocker = [], state['repair_blocker']
+        # Readability rewrites are separate from Zurabi's exact clinical repairs.
+        # Never use wording changes to bypass unresolved clinical findings.
+        if state['mode'] != 'offline-scripted' and not unresolved:
+            for round_number in range(1, MAX_REWRITES + 1):
+                if result['readability_status'] != 'needs_simplification':
+                    break
+                candidate = await asyncio.to_thread(rewrite_for_readability, text,
+                    state['source_report'], state['atoms'], state['retrieved_context'],
+                    model=state['model'], current_score=result['readability_score'])
+                if not isinstance(candidate, str) or not candidate.strip():
+                    raise ValueError('Readability rewrite returned empty text.')
+                entry = {'round': round_number, 'input_draft': text,
+                         'before_score': result['readability_score'], 'candidate': candidate,
+                         'verdict': None, 'after_score': None, 'accepted': False}
+                history.append(entry)
+                yield emit(ctx, self.name,
+                    f'Readability rewrite {round_number}: checking faithfulness before release.',
+                    readability_history=history, faithfulness_recheck_required=True, final_answer='')
+                candidate_verdict = await judge(state, candidate)
+                candidate_result = await asyncio.to_thread(run_readability, candidate)
+                entry.update(verdict=candidate_verdict, after_score=candidate_result['readability_score'])
+                if candidate_verdict['issues']:
+                    blocker = 'Readability rewrite introduced or exposed Verifier findings; review required.'
+                    unresolved = True
+                    yield emit(ctx, self.name, blocker + '\n' + json.dumps(candidate_verdict, indent=2),
+                               readability_history=history, faithfulness_recheck_required=False)
+                    break
+                if (candidate_result['readability_status'] in ('invalid', 'needs_review')
+                        or candidate_result['readability_score'].get('flesch_kincaid_grade', float('inf'))
+                        >= result['readability_score']['flesch_kincaid_grade']):
+                    entry['stop_reason'] = 'Rewrite did not improve readability; retained the verified draft.'
+                    yield emit(ctx, self.name, entry['stop_reason'], readability_history=history,
+                               faithfulness_recheck_required=False)
+                    break
+                entry['accepted'] = True
+                text, verdict, result = candidate, candidate_verdict, candidate_result
+                yield emit(ctx, self.name, f'Readability rewrite {round_number} passed the Verifier recheck.',
+                           revised_draft=text, final_verdict=verdict, readability_history=history,
+                           faithfulness_recheck_required=False)
         status = 'needs_review' if unresolved else ('complete' if result['readability_pass'] else result['readability_status'])
-        # The initial demo reports readability failures; it does not rewrite again.
         banner = 'OFFLINE SCRIPTED WALKTHROUGH' if state['mode'] == 'offline-scripted' else 'LIVE DEMO — uncalibrated'
-        grade = result['readability_score']['flesch_kincaid_grade']
+        grade = result['readability_score'].get('flesch_kincaid_grade')
         passed = result['readability_pass']
         answer = result['final_answer'] if not unresolved else None
-        display_answer = answer or 'Draft for review:\n' + state['revised_draft']
+        display_answer = answer or 'Draft for review:\n' + text
         message = (f'{banner}\n\n{display_answer}\n\n'
                    f'Readability: grade {grade}; grade-8 check passed: {passed}. '
                    'Scorer status "ok" means it measured the text; '
@@ -185,11 +226,16 @@ class ReadabilityStage(DemoStage):
                    + ('Unresolved Verifier findings: needs review.' if unresolved else
                       'No unresolved findings in this demo check. This is not a clinical validation.'))
         updates = {'final_answer': answer or '',
+                   'revised_draft': text, 'final_verdict': verdict,
+                   'repair_blocker': blocker, 'readability_history': history,
+                   'faithfulness_recheck_required': False,
                    'readability_status': result['readability_status'],
                    'readability_score': result['readability_score'],
                    'suggestion': result['suggestion'],
                    'run_status': status,
-                   'stage_modes': {**state['stage_modes'], 'Readability': 'Alicia wrapper; no rewrite'}}
+                   'stage_modes': {**state['stage_modes'], 'Readability':
+                       'Alicia scorer; at most two live wording rewrites, each reverified'
+                       if state['mode'] != 'offline-scripted' else 'Alicia scorer; scripted walkthrough; no rewrite'}}
         yield emit(ctx, self.name, message, **updates)
 
 

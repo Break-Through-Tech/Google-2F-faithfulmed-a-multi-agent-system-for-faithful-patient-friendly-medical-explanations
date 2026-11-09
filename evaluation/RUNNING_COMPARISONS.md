@@ -2,11 +2,15 @@
 
 `evaluation/run_comparison.py` runs the single-Gemini baseline and the ADK pipeline on the same frozen reports. It saves one record per report and system, so the answers can be scored later. It calls the existing code and does not change how either system works.
 
-**Status:** the runner has been tested offline only. The live pilot has not been run yet.
+**Status:** the first five-report live pilot generated both systems' texts, but all
+five ADK outputs remained drafts above the readability target. A subsequent
+[bounded readability rewrite and rerun](READABILITY_REWRITE_PILOT.md) released four
+ADK answers and held one candidate for review. See [the original pilot run record](FIVE_REPORT_PILOT.md)
+for the earlier results and scoring limits; the new run retains its own failures.
 
 ## What it does
 
-1. Confirms the frozen reports are unchanged, using `evaluation/validate_frozen_set.py`.
+1. Confirms the frozen reports are unchanged, using `evaluation/validate_frozen_set.py`, and validates the requested report IDs.
 2. Gives both systems the full report text as the note and as the search query, with `top_k` 3 and the same Gemini index.
 3. Saves the results file after every call, so stopping partway loses at most the call in progress.
 4. On a rerun, skips finished records. Failed records run again only if you add `--retry-errors`, and earlier failures are kept in the record's `attempts` list.

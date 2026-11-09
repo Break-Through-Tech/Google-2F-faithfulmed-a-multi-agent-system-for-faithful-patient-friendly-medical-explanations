@@ -1,5 +1,12 @@
 # Comparing baseline and ADK outputs
 
+November 8 clinical-scoring update: the versioned
+[source-ID evaluator](CLINICAL_SCORING_V2.md) avoids generated evidence quotations and
+records partial key-fact coverage separately. Use its documented command for new
+clinical scoring. The original commands and formulas below remain the v1 record;
+do not pool results from different evaluator versions or transfer scores between
+changed answers. This does not update the live Verifier's calibration status.
+
 Protocol: **advisor-2026-10-27-v1**, October 27, 2026. This implements the definitions in Samaneh's reply and supplied scoring examples.
 
 ## What stays fixed
@@ -94,6 +101,8 @@ This makes a model call and refuses to replace an existing inventory. Save/reuse
 - Wilson intervals describe output flags. Claims within one answer are correlated; do not treat all claims as independent patients for a confidence interval. A five-case pilot does not establish project targets.
 
 ## Status
+
+November 7 update: Carlin's paired runner is now merged, and the [five pilot source-only checklists](PILOT_SOURCE_CHECKLISTS.md) are prepared with exact anchors and hashes. The [support/conflict policy](SUPPORT_CONFLICT_POLICY.md) separates citation support from full-claim coverage. These additions do not establish completed calibration or change the clinical scoring formulas below. The remaining status text describes the earlier October handoff.
 
 The schema, reference cases, arithmetic, and calibration preparation are implemented. The evaluator is ready for saved pilot outputs. See [CALIBRATION.md](CALIBRATION.md) for the support-calibration scope and commands. Paired report generation and the shared retrieval rule remain parallel teammate work.
 

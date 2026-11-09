@@ -1,5 +1,9 @@
 # Verifier evidence-support calibration
 
+**November 8 update:** Use the [support/conflict policy](SUPPORT_CONFLICT_POLICY.md) and [offline 80-case audit](SUPPORT_CONFLICT_AUDIT.md). The commands below preserve the historical v1 workflow; do not resume it as a corrected document-level benchmark. The experimental development judges and their limitations are documented separately.
+
+The [document-support development suite](DOCUMENT_SUPPORT_V2.md) has full title/abstract context for all 40 development cases: 26 structurally eligible and 14 reference-ambiguous cases. Several versioned development runs have been completed. The [latest v5 run](DOCUMENT_SUPPORT_V5_RUN.md) scored all 26 eligible cases at **50% agreement and kappa 0.00**; the [failure investigation](DOCUMENT_SUPPORT_V5_INVESTIGATION.md) identifies task-rule problems and unresolved reference-scope issues. Targets remain unmet. All 40 held-out cases remain unscored. The separate [clinical scoring improvements](CLINICAL_SCORING_V2_RUN.md) do not establish calibration of the live Verifier or change these MedAESQA results.
+
 Version: **medaesqa-support-2026-10-27-v1**. This is the original snippet-input support pilot. The subsequent [scope investigation](CALIBRATION_INVESTIGATION.md) found that the reference labels are defined at cited-document title/abstract level. Treat v1 results as a snippet proxy, not completed document-level calibration. A medical question is not substituted for a clinical source note.
 
 ## Actual dataset and mapping
