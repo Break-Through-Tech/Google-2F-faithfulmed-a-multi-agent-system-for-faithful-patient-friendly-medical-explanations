@@ -8,6 +8,7 @@ from google.adk.events import Event, EventActions
 from google.genai import types
 
 from .config import MODEL
+from . import execution_trace as execution
 from . import fixtures
 from .roles.extractor import ClinicalAtoms, create_extractor, validate_source_quotes
 from .roles.simplifier import run_simplifier
@@ -40,18 +41,23 @@ def prepare(callback_context):
             mode='offline-scripted' if offline else 'live', model=MODEL,
             inject_demo_error=message == '/offline-error',
             retrieval_query=fixtures.EXAMPLE['retrieval_query'] if known else message,
-            stage_modes={}).items():
+            stage_modes={}, execution_trace=[]).items():
         callback_context.state[key] = value
 
 
 class DemoStage(BaseAgent):
     async def _run_async_impl(self, ctx):
         if ctx.session.state.get('run_status') == 'failed':
+            yield execution.skip(ctx,self.name,self.name,'stage','An earlier stage failed')
             return
+        token=execution.start(ctx,self.name,self.name,'stage')
+        yield execution.event(ctx)
         try:
             async for event in self.run_stage(ctx):
                 yield event
         except Exception as exc:
+            execution.fail_open_calls(ctx,self.name,exc)
+            yield execution.finish(ctx,token,'failed',error=exc)
             # Never send raw service exceptions (which can contain request details/keys) to the UI.
             code = getattr(exc, 'code', None)
             suffix = f' (service code {code})' if isinstance(code, int) else ''
@@ -59,6 +65,8 @@ class DemoStage(BaseAgent):
                        'Check the API key/quota, model access, and Gemini index setup. '
                        'No final answer was produced. Use /offline for the scripted walkthrough.')
             yield emit(ctx, self.name, message, run_status='failed', error=message, final_answer='')
+        else:
+            yield execution.finish(ctx,token)
 
 
 class IntakeStage(DemoStage):
@@ -80,13 +88,17 @@ class ExtractorStage(DemoStage):
                    stage_modes={'Extractor': mode})
         if offline:
             atoms = ClinicalAtoms.model_validate(fixtures.ATOMS)
+            yield execution.skip(ctx,self.name,'ClinicalExtractor / Gemini','model','Scripted facts; no model call')
         else:
+            token=execution.start(ctx,self.name,'ClinicalExtractor / Gemini','model',{'report':state['source_report'],'model':state['model']})
+            yield execution.event(ctx)
             async for event in self.sub_agents[0].run_async(ctx):
                 if event.error_code:
                     raise ValueError('Extractor model error.')
                 yield event
             raw = state['atoms']
             atoms = ClinicalAtoms.model_validate_json(raw) if isinstance(raw, str) else ClinicalAtoms.model_validate(raw)
+            yield execution.finish(ctx,token,output=atoms.model_dump())
         if not atoms.root:
             raise ValueError('No clinical facts extracted.')
         yield emit(ctx, self.name, 'Source-linked atoms:\n' + atoms.model_dump_json(indent=2),
@@ -99,7 +111,9 @@ class QuoteCheckStage(DemoStage):
     async def run_stage(self, ctx):
         state = ctx.session.state
         atoms = ClinicalAtoms.model_validate(state['atoms'])
-        validate_source_quotes(state['source_report'], atoms.root)
+        box={}
+        async for e in execution.call(ctx,self.name,'validate_source_quotes','local',validate_source_quotes,box,
+                state['source_report'],atoms.root,inputs={'fact_count':len(atoms.root)}):yield e
         yield emit(ctx, self.name, f'All {len(atoms.root)} source quotes found in the note.')
 
 
@@ -110,16 +124,23 @@ class SimplifierStage(DemoStage):
             context = fixtures.CONTEXT
             draft = fixtures.DRAFT + (' ' + fixtures.BAD_CLAIM if state['inject_demo_error'] else '')
             mode = 'scripted draft and cited fixture; no model call or vector search'
+            yield execution.skip(ctx,self.name,'MedlinePlus search','retrieval','Scripted reference passage')
+            yield execution.skip(ctx,self.name,'run_simplifier / Gemini','model','Scripted draft')
         else:
             from retrieval.gemini_chroma import search
-            context = await asyncio.to_thread(search, state['retrieval_query'])
+            box={}
+            async for e in execution.call(ctx,self.name,'gemini_chroma.search','retrieval',search,box,
+                    state['retrieval_query'],inputs={'query':state['retrieval_query']}):yield e
+            context=box['result']
             if not context or not any(row['text'].strip() for row in context):
                 raise ValueError('No usable retrieval context.')
             mode = 'live Gemini draft with Gemini/Chroma retrieval'
             yield emit(ctx, self.name, 'Retrieved MedlinePlus passages:\n' + json.dumps(context, indent=2),
                        retrieved_context=context)
-            draft = await asyncio.to_thread(run_simplifier, state['atoms'], json.dumps(context),
-                                            model=state['model'], source_report=state['source_report'])
+            async for e in execution.call(ctx,self.name,'run_simplifier / Gemini','model',run_simplifier,box,
+                    state['atoms'],json.dumps(context),model=state['model'],source_report=state['source_report'],
+                    inputs={'fact_count':len(state['atoms']),'passage_count':len(context),'model':state['model']}):yield e
+            draft=box['result']
         yield emit(ctx, self.name, f'Simplifier — {mode}\n\n{draft}\n\nContext:\n' + json.dumps(context, indent=2),
                    draft=draft, retrieved_context=context,
                    stage_modes={**state['stage_modes'], 'Simplifier': mode})
@@ -135,7 +156,10 @@ async def judge(state, text):
 class VerifierStage(DemoStage):
     async def run_stage(self, ctx):
         state = ctx.session.state
-        verdict = await judge(state, state['draft'])
+        box={}
+        async for e in execution.call(ctx,self.name,'Verifier judgment','scripted' if state['mode']=='offline-scripted' else 'model',
+                judge,box,state,state['draft'],inputs={'draft':state['draft']}):yield e
+        verdict=box['result']
         mode = 'scripted fixture check' if state['mode'] == 'offline-scripted' else 'live Gemini judgment; uncalibrated'
         yield emit(ctx, self.name, f'Verifier — {mode}\n\n' + json.dumps(verdict, indent=2),
                    verdict=verdict, stage_modes={**state['stage_modes'], 'Verifier': mode})
@@ -148,13 +172,19 @@ class RefinerStage(DemoStage):
         # At most two targeted repair rounds. Every changed draft is rechecked.
         for round_number in range(1, 3):
             if not verdict['issues']:
+                if not history:yield execution.skip(ctx,self.name,'apply_verified_edits','local','No verifier findings; no edits needed')
                 break
             try:
-                text = apply_verified_edits(text, verdict, state['source_report'])
+                box={}
+                async for e in execution.call(ctx,self.name,f'apply_verified_edits / round {round_number}','local',
+                        apply_verified_edits,box,text,verdict,state['source_report'],inputs={'draft':text,'findings':verdict['issues']}):yield e
+                text=box['result']
             except ValueError as exc:
                 blocker = str(exc)
                 break
-            verdict = await judge(state, text)
+            async for e in execution.call(ctx,self.name,f'Verifier recheck / repair {round_number}',
+                    'scripted' if state['mode']=='offline-scripted' else 'model',judge,box,state,text,inputs={'draft':text}):yield e
+            verdict=box['result']
             history.append({'round': round_number, 'revised_draft': text, 'verdict': verdict})
             yield emit(ctx, self.name, f'Repair {round_number}; recheck:\n' + json.dumps(verdict, indent=2),
                        refinement_history=history)
@@ -170,7 +200,9 @@ class ReadabilityStage(DemoStage):
     async def run_stage(self, ctx):
         state = ctx.session.state
         text, verdict = state['revised_draft'], state['final_verdict']
-        result = await asyncio.to_thread(run_readability, text)
+        box={}
+        async for e in execution.call(ctx,self.name,'run_readability','local',run_readability,box,text,inputs={'text':text}):yield e
+        result=box['result']
         unresolved = bool(state['final_verdict']['issues']) or bool(state['repair_blocker'])
         history, blocker = [], state['repair_blocker']
         # Readability rewrites are separate from Zurabi's exact clinical repairs.
@@ -179,9 +211,10 @@ class ReadabilityStage(DemoStage):
             for round_number in range(1, MAX_REWRITES + 1):
                 if result['readability_status'] != 'needs_simplification':
                     break
-                candidate = await asyncio.to_thread(rewrite_for_readability, text,
+                async for e in execution.call(ctx,self.name,f'Readability rewrite / round {round_number}','model',rewrite_for_readability,box,text,
                     state['source_report'], state['atoms'], state['retrieved_context'],
-                    model=state['model'], current_score=result['readability_score'])
+                    model=state['model'], current_score=result['readability_score'],inputs={'draft':text,'score':result['readability_score']}):yield e
+                candidate=box['result']
                 if not isinstance(candidate, str) or not candidate.strip():
                     raise ValueError('Readability rewrite returned empty text.')
                 entry = {'round': round_number, 'input_draft': text,
@@ -191,8 +224,12 @@ class ReadabilityStage(DemoStage):
                 yield emit(ctx, self.name,
                     f'Readability rewrite {round_number}: checking faithfulness before release.',
                     readability_history=history, faithfulness_recheck_required=True, final_answer='')
-                candidate_verdict = await judge(state, candidate)
-                candidate_result = await asyncio.to_thread(run_readability, candidate)
+                async for e in execution.call(ctx,self.name,f'Verifier recheck / wording {round_number}','model',judge,box,state,candidate,
+                        inputs={'candidate':candidate}):yield e
+                candidate_verdict=box['result']
+                async for e in execution.call(ctx,self.name,f'run_readability / round {round_number}','local',run_readability,box,candidate,
+                        inputs={'text':candidate}):yield e
+                candidate_result=box['result']
                 entry.update(verdict=candidate_verdict, after_score=candidate_result['readability_score'])
                 if candidate_verdict['issues']:
                     blocker = 'Readability rewrite introduced or exposed Verifier findings; review required.'
@@ -212,6 +249,10 @@ class ReadabilityStage(DemoStage):
                 yield emit(ctx, self.name, f'Readability rewrite {round_number} passed the Verifier recheck.',
                            revised_draft=text, final_verdict=verdict, readability_history=history,
                            faithfulness_recheck_required=False)
+        if not history:
+            reason=('Scripted walkthrough; no rewrite' if state['mode']=='offline-scripted' else
+                    'Unresolved clinical findings' if unresolved else 'No rewrite required by readability check')
+            yield execution.skip(ctx,self.name,'Readability rewrite','model',reason)
         status = 'needs_review' if unresolved else ('complete' if result['readability_pass'] else result['readability_status'])
         banner = 'OFFLINE SCRIPTED WALKTHROUGH' if state['mode'] == 'offline-scripted' else 'LIVE DEMO — uncalibrated'
         grade = result['readability_score'].get('flesch_kincaid_grade')

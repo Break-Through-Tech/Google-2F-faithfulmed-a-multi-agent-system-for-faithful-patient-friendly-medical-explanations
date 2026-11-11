@@ -41,16 +41,25 @@ changes the frozen reports. Source caveats appear below the example selector.
 
 ## Presenting the demo
 
-1. Select **Scripted repair walkthrough** for a repeatable, no-API example. It
+1. Open **Demo settings** and select **Scripted repair walkthrough** for a repeatable, no-API example. It
    uses the fixed chest-pain report and demonstrates removal of an intentionally
    unsupported claim and a subsequent Verifier check.
 2. Select **Live Gemini**, choose a report, and click **Simplify report** to run
    the real pipeline. Each click makes a fresh, isolated ADK session.
-3. Follow the seven steps. **Sources & facts** shows the evidence; **Checks &
-   repairs** shows the initial findings, remaining findings, and number of edits.
+3. Start in **User view** to show the explanation and medical background sources.
+   Switch to **Engineering view** to show the seven workflow steps, execution
+   timeline, extracted facts, readability, and **Checks & repairs**.
 4. Explain the outcome: **Explanation ready** means this run's checks finished
    without unresolved findings. **Draft needs review** or **Draft needs simpler
    wording** preserves the draft and the reason. A stopped run has no final answer.
+
+Both tabs display the same run. Switching tabs does not call Gemini again.
+In **Engineering view**, expand a timeline entry to inspect its recorded inputs,
+outputs, elapsed time, and status. The labels distinguish Gemini model calls,
+retrieval functions, local Python checks/edits, and scripted fixtures. A skipped
+operation includes its reason; repair and readability rechecks appear separately.
+The timeline records actual execution rather than treating every workflow step
+as a separate model call. The saved-state panel contains the underlying trace.
 
 The scripted modes always use the fixed synthetic note and disable custom input.
 They do not silently replace failed live calls. Live mode uses the focused demo
@@ -78,6 +87,8 @@ Restart the UI server to load this updated workflow.
 - `presentation.py`: displays existing state fields without changing scoring.
 - `examples.py`: loads optional frozen examples and source caveats.
 - `style.css`: local styles; no externally hosted fonts or assets.
+- `../faithfulmed_demo/execution_trace.py`: records workflow and operation events
+  for both the ADK run and the Gradio engineering timeline.
 
 The page queues one run at a time to limit overlapping Gemini requests. It
 disables report controls during execution, clears prior results on each run,
@@ -91,6 +102,12 @@ Run the offline checks:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p test_ui.py -v
+```
+
+For the execution timeline and related pipeline checks:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/test_engineering_view.py tests/test_ui.py tests/test_adk_demo.py tests/test_readability_rewrite.py -q
 ```
 
 These cover actual offline ADK execution, bounded repair/recheck, isolated

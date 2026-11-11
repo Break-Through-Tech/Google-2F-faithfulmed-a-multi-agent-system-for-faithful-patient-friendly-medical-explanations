@@ -45,3 +45,23 @@ and the Simplifier uses temperature 0. The UI setup guide was updated accordingl
 
 The UI remains local and uncommitted. A screenshot of the synced scripted run
 is saved under ignored `data/ui_checks/after_team_sync_2026-11-07.png`.
+
+## November 11: user and engineering views
+
+Added two views backed by the same ADK run. User view shows the explanation and
+background sources. Engineering view shows stage progress and expandable execution
+entries for model calls, retrieval, local checks/edits, and scripted fixtures.
+
+- **34 tests passed**, plus two subtests, across engineering-view, UI, ADK-demo,
+  and readability-rewrite checks. These checks cover isolated runs, intermediate
+  running events, repair/recheck traces, escaped HTML, sanitized failures, skipped
+  operations, and interrupted operations.
+- An Edge browser scripted repair walkthrough completed all seven stages and
+  displayed the targeted edit and separate Verifier recheck in the timeline.
+- Switching tabs displayed the same result; the user view hid the engineering
+  timeline. The layout had no horizontal page overflow at 390 px wide.
+- No live Gemini calls were made for this verification. Live rewrite behavior
+  was covered with mocked service calls, not a new live-model smoke run.
+
+Local screenshots are saved as `data/ui_engineering_desktop.png`,
+`data/ui_user_desktop.png`, and `data/ui_engineering_mobile.png`.

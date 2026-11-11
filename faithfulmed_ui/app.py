@@ -10,7 +10,7 @@ from faithfulmed_demo.fixtures import SOURCE
 from .examples import BUILTIN, load_examples
 from .pipeline import LIVE, MODES, Snapshot, stream_run
 from .presentation import (answer_markdown, checks_markdown, facts_rows, metrics_html,
-                           progress_html, sources_html, status_html, trace_state)
+                           progress_html, sources_html, status_html, trace_state, engineering_html)
 
 CSS = Path(__file__).with_name("style.css").read_text(encoding="utf-8")
 
@@ -37,8 +37,9 @@ def build_ui():
         with gr.Row(equal_height=False, elem_id="workspace"):
             with gr.Column(scale=5, min_width=320, elem_id="input-panel"):
                 gr.Markdown("## 1. Choose a report\nPaste a sample report, or explore one of the examples below.")
-                mode = gr.Radio(choices=list(MODES), value=LIVE, label="Run mode", elem_id="run-mode")
-                mode_note = gr.Markdown("Uses Gemini and your local MedlinePlus index. Use public or synthetic reports for this demo.", elem_classes="muted")
+                with gr.Accordion('Demo settings',open=False):
+                    mode = gr.Radio(choices=list(MODES), value=LIVE, label="Run mode", elem_id="run-mode")
+                    mode_note = gr.Markdown("Uses Gemini and your local MedlinePlus index. Use public or synthetic reports for this demo.", elem_classes="muted")
                 example = gr.Dropdown(choices=list(examples), value=BUILTIN, label="Load an example", filterable=True)
                 example_note = gr.Markdown(examples[BUILTIN]["note"], elem_classes="muted")
                 report = gr.Textbox(value=SOURCE, label="Medical report", lines=13, max_lines=20,
@@ -48,30 +49,34 @@ def build_ui():
             with gr.Column(scale=7, min_width=320, elem_id="results-panel"):
                 gr.Markdown("## 2. Read the explanation\nFollow the checks, then explore the result and its supporting evidence.")
                 status = gr.HTML('<div class="result-status idle"><span class="status-dot"></span><div><strong>Ready when you are</strong><p>Choose a report and select Simplify report.</p></div></div>')
-                progress = gr.HTML(progress_html(idle))
-                metrics = gr.HTML(metrics_html(idle))
                 with gr.Tabs():
-                    with gr.Tab("Explanation"):
+                    with gr.Tab("User view"):
                         answer = gr.Markdown("Your explanation will appear here when the checks finish.",
                                              elem_id="explanation", buttons=["copy"], sanitize_html=True)
-                    with gr.Tab("Sources & facts"):
-                        sources = gr.HTML(sources_html({}))
+                        with gr.Accordion('Medical background sources',open=False):
+                            sources = gr.HTML(sources_html({}))
+                        gr.Markdown('Check pending results and follow-up instructions in your explanation. If the result needs review, use the original report and ask your care team for clarification.',elem_classes='muted')
+                    with gr.Tab("Engineering view"):
+                        gr.Markdown('### Execution timeline\nActual workflow steps and calls from this run. Expand an entry for inputs and outputs. Local functions, Gemini calls, and scripted data are labeled separately.')
+                        progress = gr.HTML(progress_html(idle))
+                        timeline = gr.HTML(engineering_html({}))
+                        metrics = gr.HTML(metrics_html(idle))
                         gr.Markdown("### Facts from the original report")
                         facts = gr.Dataframe(headers=["Fact", "Assertion", "Exact source quote"],
                                              datatype=["str", "str", "str"], value=[], interactive=False, wrap=True)
-                    with gr.Tab("Checks & repairs"):
+                        gr.Markdown('### Checks and repairs')
                         checks = gr.Markdown(checks_markdown({}), sanitize_html=True)
                         with gr.Accordion("Inspect the saved workflow fields", open=False):
                             trace = gr.JSON(value={}, label="Current run")
                 gr.Markdown("Research prototype. Automated checks are still being calibrated; this demo does not establish clinical accuracy.", elem_classes="result-footnote")
         gr.HTML('<footer class="page-footer"><span>FaithfulMed · Google 2F / Break Through Tech</span><span>From source report to a clearer explanation.</span></footer>')
 
-        view_components = [status, progress, metrics, answer, sources, facts, checks, trace]
+        view_components = [status, progress, metrics, answer, sources, facts, checks, trace, timeline]
 
         def reset_outputs():
             return ('<div class="result-status idle"><span class="status-dot"></span><div><strong>Ready when you are</strong><p>Run the pipeline to check the selected report.</p></div></div>',
                     progress_html(idle), metrics_html(idle), "Your explanation will appear here when the checks finish.",
-                    sources_html({}), [], checks_markdown({}), {})
+                    sources_html({}), [], checks_markdown({}), {}, engineering_html({}))
 
         def select_example(choice):
             item = examples.get(choice)
@@ -103,7 +108,7 @@ def build_ui():
                 unlocked = view.finished
                 live = selected_mode == LIVE
                 yield (status_html(view), progress_html(view), metrics_html(view), answer_markdown(view),
-                       sources_html(view.state), facts_rows(view.state), checks_markdown(view.state), trace_state(view.state),
+                       sources_html(view.state), facts_rows(view.state), checks_markdown(view.state), trace_state(view.state), engineering_html(view.state),
                        gr.Button(interactive=unlocked, value="Run again →" if unlocked else "Processing report…"),
                        gr.Radio(interactive=unlocked), gr.Dropdown(interactive=unlocked and live),
                        gr.Textbox(interactive=unlocked and live))

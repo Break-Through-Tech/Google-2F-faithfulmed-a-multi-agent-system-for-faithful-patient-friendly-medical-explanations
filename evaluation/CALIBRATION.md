@@ -1,74 +1,149 @@
-# Verifier evidence-support calibration
+# Citation calibration and report-evaluator status
 
-**November 8 update:** Use the [support/conflict policy](SUPPORT_CONFLICT_POLICY.md) and [offline 80-case audit](SUPPORT_CONFLICT_AUDIT.md). The commands below preserve the historical v1 workflow; do not resume it as a corrected document-level benchmark. The experimental development judges and their limitations are documented separately.
+Updated November 11, 2026. Consolidated findings; intermediate experiment scripts
+and detailed investigations remain local.
 
-The [document-support development suite](DOCUMENT_SUPPORT_V2.md) has full title/abstract context for all 40 development cases: 26 structurally eligible and 14 reference-ambiguous cases. Several versioned development runs have been completed. The [latest v5 run](DOCUMENT_SUPPORT_V5_RUN.md) scored all 26 eligible cases at **50% agreement and kappa 0.00**; the [failure investigation](DOCUMENT_SUPPORT_V5_INVESTIGATION.md) identifies task-rule problems and unresolved reference-scope issues. Targets remain unmet. All 40 held-out cases remain unscored. The separate [clinical scoring improvements](CLINICAL_SCORING_V2_RUN.md) do not establish calibration of the live Verifier or change these MedAESQA results.
+## Current held-out result
 
-Version: **medaesqa-support-2026-10-27-v1**. This is the original snippet-input support pilot. The subsequent [scope investigation](CALIBRATION_INVESTIGATION.md) found that the reference labels are defined at cited-document title/abstract level. Treat v1 results as a snippet proxy, not completed document-level calibration. A medical question is not substituted for a clinical source note.
+The unchanged original citation judge scored **23/31 agreement (74.2%), Cohen's
+kappa 0.498**, with zero failed or pending assessments. Targets of **80% agreement
+and kappa 0.6** remain unmet.
 
-## Actual dataset and mapping
+| Reference / prediction | Supporting | Not supporting |
+|---|---:|---:|
+| Supporting | 13 | 7 |
+| Not supporting | 1 | 10 |
 
-Input: `data/MedAESQA_data/medaesqa_v1.json`. Its 40 questions have `machine_generated_answers`, `answer_sentences`, and `citation_assessment` records; citations provide `evidence_support` and `evidence_relation`.
+Before predictions, the existing document-level policy quarantined eight conflicting
+reference entries and excluded one repeated document/assertion from the original 40.
+All 31 eligible entries had PMID-matched titles/abstracts. Their reference classes
+were 20 supporting and 11 not supporting. No exclusions depended on predictions.
 
-| Relation | Binary target | Treatment |
-| --- | --- | --- |
-| supporting | True | Include with nonblank excerpt. |
-| neutral | False | Include with nonblank excerpt. |
-| contradicting | False | Include with nonblank excerpt. |
-| not relevant | False in principle | All 1,551 local records lack excerpts; exclude from this text task. |
-| invalid citation | Separate validity task | Exclude all 409 records; a PMID alone cannot establish validity/support. |
+The descriptive case-level Wilson 95% agreement interval is 56.8% to 86.3%; it does
+not adjust for correlated cases within questions. This small diagnostic sample is
+not a deployment-prevalence estimate or clinical validation of the whole system.
 
-The 9,611 citation records contain 6,490 supporting, 972 neutral, 189 contradicting, 1,551 not-relevant, and 409 invalid-citation relations. Preparation excludes 110 records from duplicate pairs with conflicting binary references and collapses 714 further repeated records. Repetition across machine answers must not inflate agreement.
+[Compact frozen results](results/original_judge_heldout_v1.json) preserve all 40
+selected IDs, labels, exclusions, 31 predictions/reasons/quotes, source hashes,
+question splits, prompt/schema and provenance fingerprints. Full abstracts and raw
+artifacts remain under ignored `data/calibration_results/`.
 
-This does not measure whole-answer accuracy, clinical-note omissions, or every live Verifier behavior. A sentence can cite several papers: one pair asks whether one excerpt supports the assertion for which it is cited. The checker shares evidence/uncertainty rules with the final-output scorer but uses this task-specific input shape.
+## Task and labeling boundaries
 
-## Fixed suite
+The original prompt is `PROMPT` in [calibrate_verifier.py](calibrate_verifier.py),
+prefixed by `EVIDENCE_RULES` in [scoring.py](scoring.py). It assesses citation support
+for an assertion. A citation may support a substantive part without proving the
+whole sentence. Question relevance, citation validity, citation support and complete
+factual coverage are separate judgments. Missing evidence is not contradiction.
+Preserve negation, uncertainty, population, quantities, comparators and causal scope.
 
-Dataset SHA-256: `a062742c1678b4379121ad030a06bda574afd376f331df41575938dd9849c383`.
+Supporting maps to binary true; neutral/contradicting/not-relevant map to false.
+Invalid citations are a separate task and excluded. No reference labels enter the
+judge payload. Conflicting document-level binary references are quarantined rather
+than resolved using model predictions.
 
-- Seed 42 assigns 20 questions to development and 20 to held-out evaluation. No question is in both.
-- Duplicate identity uses question, sentence with numeric citation markers removed, and excerpt with whitespace normalized. Conflicting binary references are excluded.
-- Default sample: 20 supported and 20 non-supported pairs per split: **40 development and 40 held-out cases**. This deterministic balanced sample is diagnostic, not a prevalence estimate.
-- Eligible unique development pairs: 2,818 supported/539 non-supported; held-out: 2,923/547. The suite records selected IDs, groups, exclusions, and source hash.
-- Only question, sentence, and excerpt reach the judge. Reference labels, expected scores, original answer-model names, and record IDs stay out of the prompt.
-- Use development cases for prompt checks; hold settings fixed before evaluating held-out cases.
+The [MedAESQA paper, page 5](https://d-nb.info/1374626414/34) defines document/assertion
+relations but does not explicitly resolve every compound sentence's intended scope.
+[BioACE section 4.2.3](https://pmc.ncbi.nlm.nih.gov/articles/PMC13119346/) describes
+any-supported-nugget attribution with contradiction priority, while its displayed
+Appendix A4 prompt requires support for each nugget. Do not claim an unambiguous
+universal partial-support rule or assume either party is correct in every disagreement.
 
-## Commands
+## Frozen protocol and reproduction
 
-Prepare without an API request:
+- Original seed-42 split: 20 development and 20 held-out questions, with no overlap.
+  Preserve all 40 selected held-out entries; no resampling or replacement labels.
+- Apply existing `support-conflict-2026-11-07-v1` policy before predictions:
+  quarantine binary conflicts, invalid/unmapped relations and punctuation neighbors;
+  deduplicate document/assertion identity. Retain every exclusion reason.
+- Fetch only numeric PMIDs from public PubMed. Check identity/content hashes and
+  freeze the cache and inputs before calls. Missing abstracts are unavailable
+  coverage, never snippet fallbacks. Current sources are not verified annotation-time
+  snapshots.
+- Freeze model `gemini-3.8-flash`, temperature zero, original prompt/schema and judge.
+  Prompt digest: `0eded17cd2bfeb37c5d79e4a765b77b000cf50478a91e1091adbe5800c151bfb`.
+- Send only question, sentence and complete title/abstract. No reference labels,
+  grouping output, preceding-answer context or whole-support sidecars.
+- One attempt per eligible source-ready case. Checkpoint progress; resume only
+  unattempted cases. No label-based or quote-failure retries. Stop on access/quota errors.
+- Report agreement/kappa/confusion counts on valid predictions, plus failures,
+  unavailable/pending cases, class balance and correct/all eligible. A target claim
+  requires a completed evaluation with all eligible sources available.
+
+[original_judge_heldout.py](original_judge_heldout.py) uses the unchanged original
+judge and existing tracked preparation helpers. Requires the original local MedAESQA
+dataset and configured Gemini key. Never commit `.env`.
 
 ```powershell
-.\.venv\Scripts\python.exe -m evaluation.calibrate_verifier prepare --output data/calibration_results/medaesqa_support_v1.json
+.\.venv\Scripts\python.exe -m evaluation.original_judge_heldout select
+.\.venv\Scripts\python.exe -m evaluation.original_judge_heldout prepare
+.\.venv\Scripts\python.exe -m evaluation.original_judge_heldout run
+.\.venv\Scripts\python.exe -m evaluation.original_judge_heldout report
 ```
 
-The suite is already prepared locally. The command refuses to replace it; a deliberate reselection needs a new path/version.
+Artifacts use `data/calibration_results/original_judge_heldout_*_v1.json`. Existing
+frozen inputs cannot be replaced with different settings, and recorded attempts are
+not repeated. The report command needs full local artifacts; the committed compact
+record supports result inspection and score verification without them. Reproduction
+can vary even at temperature zero and is not fresh independent validation.
 
-Run or continue a bounded development pilot (the first six cases are already completed):
+**This held-out set has now been evaluated.** If its disagreements guide revisions,
+it becomes development evidence for those revisions. Preserve this score and use
+fresh independent cases to confirm later improvement. This does not calibrate every
+live ADK/Gradio Verifier behavior or trigger a runtime configuration change.
+
+## Experimental findings retained
+
+| Development experiment | Agreement | Kappa | Finding |
+|---|---:|---:|---|
+| Original six cases, snippets | 3/6 | 0.000 | Input scope mismatched document-level labels. |
+| Same six, title/abstract | 4/6 | 0.333 | More context helped; conflicts remained. |
+| V5 document cohort | 13/26 | 0.000 | Partial support/inference remained problematic. |
+| V6 | 15/26 | 0.123 | Citation/whole-coverage separation did not settle scope. |
+| V7 | 16/26 | 0.217 | Small gain; evidence IDs did not solve semantic errors. |
+| Original prompt, same 26 | 19/26 | 0.420 | Stronger observed baseline, not proof of better reasoning. |
+| Original plus clause reminder | 18/26 | 0.350 | One gain, two losses; not adopted. |
+| Original repeated during V8 | 17/26 | 0.282 | Two decisions changed despite unchanged settings. |
+
+These are repeatedly used development cases, not independent confirmations. The
+six-case and 26-case scores use different cohorts and are not directly paired.
+
+V8 added evidence-ID validation and separate whole-sentence assessment. Dedicated
+extraction fixed a bundled therapy list but mishandled OR/AND scope. Later overlapping
+groups passed nine synthetic extraction checks after a local inherited-condition
+validator repair. Reassessment completed 18 of 26 cases, blocked seven and had one
+validation error. The adapter rebundled independent AND claims, causing coverage
+warnings; some blocks were overly literal token checks rather than lost medical facts.
+**Grouping/adapter work is paused and not adopted.** No evidence-judgment accuracy
+gain was established. Older experiments remain local rather than being published as
+multiple competing current implementations.
+
+## Separate report-evaluator fixes
+
+[clinical_scoring_v2.py](clinical_scoring_v2.py), version
+`clinical-source-ids-2026-11-11-v4`, clarifies these boundaries:
+
+- Ordinary headings/nonclinical disclaimers are not biomedical claims. Factual clauses
+  in a disclaimer still require assessment.
+- Unsupported medication doses, units, routes, frequencies or durations are clinically
+  meaningful under the project's conservative source-only rubric. This policy does
+  not establish actual patient harm or permit outside drug knowledge.
+- Naming a medication does not preserve a missing rationale, warning or follow-up.
+  Partial coverage requires a substantive part of the fixed fact, not a shared name.
+- Support failure and clinical significance are separate decisions requiring reasons.
+
+On eight unchanged controlled synthetic examples, checks improved **6/8 to 8/8**.
+The [versioned fixtures](examples/clinical_scoring_regressions_v3.json) preserve
+source/output texts and expectations: background additions, invented dose units,
+combined follow-up, strengthened uncertainty, invented findings, historical/current
+diagnoses, omitted medication rationale and nonclinical disclaimers. This is a
+recorded development regression result, not held-out medical accuracy or live-agent
+calibration. Full generated assessments remain local.
 
 ```powershell
-.\.venv\Scripts\python.exe -m evaluation.calibrate_verifier run --suite data/calibration_results/medaesqa_support_v1.json --output data/calibration_results/development_v1.json --split development --limit 6
+.\.venv\Scripts\python.exe -m pytest tests/test_clinical_scoring_v2.py tests/test_original_judge_heldout.py tests/test_calibration.py -q
 ```
 
-Rerun to continue unfinished cases. Use `--retry-errors` to retry failures while retaining attempt history. Only the latest attempt per case enters the summary. Changed model/prompt/suite requires a new output path. The ignored root `.env` already supplies the key configuration.
-
-After development and fixing settings, evaluate held-out cases:
-
-```powershell
-.\.venv\Scripts\python.exe -m evaluation.calibrate_verifier run --suite data/calibration_results/medaesqa_support_v1.json --output data/calibration_results/heldout_v1.json --split heldout --limit 40
-```
-
-## Results and current status
-
-Reports include correct/scored counts, agreement, Cohen's kappa, confusion counts, class counts, mismatches/reasons, pending/failed cases, API-attempt count, and an agreement Wilson interval. Kappa is `null` when chance agreement is 1. The partial-result target flag applies only to scored cases; a completed held-out run is needed for the planned target check.
-
-Targets: agreement ≥80% and kappa ≥0.6. Keep actual results and coverage visible. Balanced-sample agreement is not a raw-prevalence estimate.
-
-Suite preparation and offline regression checks are completed. After explicit authorization, the first **six development pairs** were sent to Gemini and all returned valid predictions: **3/6 agreement (50%), kappa 0.00**. The judge predicted non-support for all six. No reference labels or prompt settings were changed after this result. See [the pilot record](CALIBRATION_PILOT.md) for the disagreements and next checks.
-
-There are 34 development pairs remaining and **all 40 held-out pairs remain unscored**. The initial six-case pilot is completed; the full calibration is not. Inspect the evidence/label alignment before expanding the run or changing the judge prompt.
-
-## Scope investigation completed
-
-Using full cited titles/abstracts for the same six cases, with model, prompt, and labels fixed, produced **4/6 agreement (66.7%), kappa 0.33**. It resolved all three original false negatives, but two selected neutral labels still disagreed with the judge. Both are in document/normalized-sentence groups containing conflicting reference labels. The audit flags these groups without relabeling or excluding them.
-
-The context diagnostic remains a development experiment. [The investigation record](CALIBRATION_INVESTIGATION.md) documents sources, paired results, cache provenance, and the required document-level reference policy before a larger calibration run. No held-out prediction was made.
+For a separately authorized live rerun, the report scorer accepts
+`--input evaluation/examples/clinical_scoring_regressions_v3.json --output <new-path>`.
+Keep model judgments separate from the fixture expectations when checking results.

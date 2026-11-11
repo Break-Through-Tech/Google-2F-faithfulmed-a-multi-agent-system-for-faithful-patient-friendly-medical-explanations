@@ -172,6 +172,22 @@ def test_valid_initial_result_is_revalidated_and_reused(tmp_path):
     assert result['records'][0]['reused_previous_valid_assessment'] is True
 
 
+def test_previous_prompt_result_is_not_reused_after_boundary_change(tmp_path):
+    from unittest.mock import patch
+    from evaluation.clinical_scoring_v2 import run
+    job=advisor_jobs()[0];answer=resolve(job,anchored_reference(job))
+    with patch('evaluation.clinical_scoring_v2.assess',return_value=answer):
+        initial=run([job],tmp_path/'old.json','fixture')
+    initial['records'][0]['scoring_version']='clinical-source-ids-2026-11-11-v3'
+    preserved=copy.deepcopy(initial)
+    with patch('evaluation.clinical_scoring_v2.assess',return_value=answer) as model:
+        result=run([job],tmp_path/'new.json','fixture',initial)
+    model.assert_called_once()
+    assert initial==preserved
+    assert result['records'][0]['previous_result']==initial['records'][0]
+    assert not result['records'][0].get('reused_previous_valid_assessment')
+
+
 def test_report_presence_correction_can_preserve_nonaddition_with_real_report_evidence():
     import json
     from unittest.mock import patch
