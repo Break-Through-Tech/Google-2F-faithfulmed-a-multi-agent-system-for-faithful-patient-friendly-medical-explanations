@@ -1,6 +1,7 @@
 """Human-readable views of ADK state; no model calls or changed scoring rules."""
 
 from html import escape
+import json
 from urllib.parse import urlparse
 
 from .pipeline import Snapshot, STAGES
@@ -33,7 +34,7 @@ def result_status(view: Snapshot):
         return "running", prefix + "Working on your report", "Each step appears below as the pipeline progresses."
     issues = state.get("final_verdict", {}).get("issues", [])
     if state.get("run_status") == "complete" and state.get("final_answer") and not issues and not state.get("repair_blocker"):
-        return "complete", prefix + "Explanation ready", "No unresolved findings in this run. The Verifier is still being calibrated."
+        return "complete", prefix + "Explanation ready", "Automated checks found no outstanding issues in this run."
     if state.get("run_status") == "needs_simplification":
         return "review", prefix + "Draft needs simpler wording", state.get("suggestion") or "The draft did not meet the readability target."
     return "review", prefix + "Draft needs review", state.get("repair_blocker") or state.get("suggestion") or "Review the outstanding findings before using this explanation."
@@ -41,6 +42,7 @@ def result_status(view: Snapshot):
 
 def status_html(view: Snapshot) -> str:
     kind, title, detail = result_status(view)
+    if kind=='error':detail='The report could not be processed. See the engineering view for details.'
     return (f'<div class="result-status {kind}" role="status"><span class="status-dot"></span>'
             f'<div><strong>{escape(title)}</strong><p>{escape(detail)}</p></div></div>')
 
@@ -143,5 +145,27 @@ def trace_state(state: dict) -> dict:
     keys = ("source_report", "mode", "model", "run_status", "atoms", "retrieval_query", "retrieved_context",
             "draft", "verdict", "revised_draft", "final_verdict", "refinement_history", "repair_blocker",
             "final_answer", "readability_status", "readability_score", "readability_history",
-            "faithfulness_recheck_required", "suggestion", "stage_modes", "error")
+            "faithfulness_recheck_required", "suggestion", "stage_modes", "error", "execution_trace")
     return {key: state[key] for key in keys if key in state}
+
+
+def engineering_html(state: dict) -> str:
+    rows=state.get('execution_trace',[])
+    if not rows:return '<p class="empty-note">Run a report to see actual steps and calls here.</p>'
+    labels={'stage':'Workflow step','model':'Gemini model call','retrieval':'Retrieval function',
+            'local':'Local Python check/edit','scripted':'Scripted fixture'}
+    parts=['<div class="execution-timeline" aria-label="Execution history">']
+    for row in rows:
+        duration=row.get('duration_ms')
+        timing=f'{duration/1000:.2f} s' if isinstance(duration,(float,int)) else 'In progress'
+        kind=labels.get(row.get('kind'),'Operation')
+        details={k:row[k] for k in ('started_utc','inputs','output','error_type','service_code') if k in row}
+        body=escape(json.dumps(details,ensure_ascii=False,indent=2))
+        status=escape(str(row.get('status','unknown')))
+        parts.append(f'<details class="execution-entry {"execution-stage" if row.get("kind")=="stage" else ""}">'
+            f'<summary><strong>{escape(str(row.get("name","Operation")))}</strong>'
+            f'<span>{escape(str(row.get("stage","")))} · {kind}</span>'
+            f'<span class="execution-status">{status} · {timing}</span></summary>'
+            f'<pre>{body}</pre></details>')
+    parts.append('</div>')
+    return ''.join(parts)

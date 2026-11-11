@@ -11,6 +11,7 @@ from google.genai import types
 
 from faithfulmed_demo import fixtures
 from faithfulmed_demo.agent import build_agent
+from faithfulmed_demo.execution_trace import interrupt
 
 STAGES = ("Intake", "Extractor", "QuoteCheck", "Simplifier", "Verifier", "Refiner", "Readability")
 LIVE = "Live Gemini"
@@ -85,6 +86,10 @@ async def stream_run(report: str, mode: str, *, timeout: float = 600):
                 delta = dict(event.actions.state_delta or {}) if event.actions else {}
                 view.state.update(copy.deepcopy(delta))
                 author = "Extractor" if event.author == "ClinicalExtractor" else event.author
+                if author=='WorkflowTrace':
+                    rows=view.state.get('execution_trace',[])
+                    running=[r for r in rows if r['kind']=='stage' and r['status']=='running']
+                    if running:view.active=running[-1]['stage']
                 if author in STAGES:
                     view.active = author
                 done = completed_stage(event.author, delta)
@@ -114,5 +119,6 @@ async def stream_run(report: str, mode: str, *, timeout: float = 600):
             await runner.close()
     if view.error:
         view.state.update(run_status="failed", final_answer="")
+        interrupt(view.state)
     view.finished = True
     yield copy.deepcopy(view)
