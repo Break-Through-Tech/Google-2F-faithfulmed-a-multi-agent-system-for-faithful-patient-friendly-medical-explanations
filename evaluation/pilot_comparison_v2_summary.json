@@ -1,8 +1,74 @@
 {
-  "run_digest": "d54e338d378e8e0effbfff1a3133109c1b17e6d074e01b05c6ffba9a6a9f3b16",
   "scoring_version": "clinical-source-ids-2026-11-11-v4",
-  "validation_policy": "streaming-180s-bounded-compact-consistency-v4",
-  "judge_model": "gemini-3.8-flash",
+  "status_counts": {
+    "scored": 10
+  },
+  "summary_by_system": [
+    {
+      "system": "baseline",
+      "attempted_outputs": 5,
+      "scored_final_outputs": 5,
+      "status_counts": {
+        "scored": 5
+      },
+      "scored_drafts": 0,
+      "unscored_outputs": 0,
+      "claims_supported": 176,
+      "claims_total": 177,
+      "faithfulness_micro": 0.9943502824858758,
+      "faithfulness_macro": 0.99375,
+      "hallucinated_outputs": 0,
+      "hallucination_rate": 0.0,
+      "hallucination_wilson_95": [
+        0.0,
+        0.43448246478317476
+      ],
+      "missing_key_facts": 0,
+      "key_facts_total": 53,
+      "omission_fraction": 0.0,
+      "outputs_with_omissions": 0,
+      "additions": 4,
+      "supported_additions": 3,
+      "unsupported_additions": 1,
+      "distorted_claims": 0,
+      "readability_scored_outputs": 5,
+      "readability_passed_outputs": 4,
+      "readability_pass_rate": 0.8,
+      "partial_key_facts": 1
+    },
+    {
+      "system": "adk",
+      "attempted_outputs": 5,
+      "scored_final_outputs": 4,
+      "status_counts": {
+        "scored": 5
+      },
+      "scored_drafts": 1,
+      "unscored_outputs": 0,
+      "claims_supported": 129,
+      "claims_total": 133,
+      "faithfulness_micro": 0.9699248120300752,
+      "faithfulness_macro": 0.9671052631578947,
+      "hallucinated_outputs": 0,
+      "hallucination_rate": 0.0,
+      "hallucination_wilson_95": [
+        0.0,
+        0.4898908364545973
+      ],
+      "missing_key_facts": 1,
+      "key_facts_total": 40,
+      "omission_fraction": 0.025,
+      "outputs_with_omissions": 1,
+      "additions": 26,
+      "supported_additions": 22,
+      "unsupported_additions": 4,
+      "distorted_claims": 0,
+      "readability_scored_outputs": 4,
+      "readability_passed_outputs": 4,
+      "readability_pass_rate": 1.0,
+      "partial_key_facts": 3
+    }
+  ],
   "records": [
     {
       "case_id": "source-row-4998",
@@ -25597,74 +25663,5 @@
       },
       "evaluation_seconds": 43.27
     }
-  ],
-  "summary_by_system": [
-    {
-      "system": "baseline",
-      "attempted_outputs": 5,
-      "scored_final_outputs": 5,
-      "status_counts": {
-        "scored": 5
-      },
-      "scored_drafts": 0,
-      "unscored_outputs": 0,
-      "claims_supported": 176,
-      "claims_total": 177,
-      "faithfulness_micro": 0.9943502824858758,
-      "faithfulness_macro": 0.99375,
-      "hallucinated_outputs": 0,
-      "hallucination_rate": 0.0,
-      "hallucination_wilson_95": [
-        0.0,
-        0.43448246478317476
-      ],
-      "missing_key_facts": 0,
-      "key_facts_total": 53,
-      "omission_fraction": 0.0,
-      "outputs_with_omissions": 0,
-      "additions": 4,
-      "supported_additions": 3,
-      "unsupported_additions": 1,
-      "distorted_claims": 0,
-      "readability_scored_outputs": 5,
-      "readability_passed_outputs": 4,
-      "readability_pass_rate": 0.8,
-      "partial_key_facts": 1
-    },
-    {
-      "system": "adk",
-      "attempted_outputs": 5,
-      "scored_final_outputs": 4,
-      "status_counts": {
-        "scored": 5
-      },
-      "scored_drafts": 1,
-      "unscored_outputs": 0,
-      "claims_supported": 129,
-      "claims_total": 133,
-      "faithfulness_micro": 0.9699248120300752,
-      "faithfulness_macro": 0.9671052631578947,
-      "hallucinated_outputs": 0,
-      "hallucination_rate": 0.0,
-      "hallucination_wilson_95": [
-        0.0,
-        0.4898908364545973
-      ],
-      "missing_key_facts": 1,
-      "key_facts_total": 40,
-      "omission_fraction": 0.025,
-      "outputs_with_omissions": 1,
-      "additions": 26,
-      "supported_additions": 22,
-      "unsupported_additions": 4,
-      "distorted_claims": 0,
-      "readability_scored_outputs": 4,
-      "readability_passed_outputs": 4,
-      "readability_pass_rate": 1.0,
-      "partial_key_facts": 3
-    }
-  ],
-  "status_counts": {
-    "scored": 10
-  }
+  ]
 }
