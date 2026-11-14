@@ -2,12 +2,98 @@
 
 from html import escape
 import json
+import re
 from urllib.parse import urlparse
 
 from .pipeline import Snapshot, STAGES
 
 LABELS = ("Receive report", "Extract facts", "Check quotes", "Write explanation",
           "Verify", "Refine", "Check readability")
+_SENTENCE_END = re.compile(r"(?<=[.!?])(?=\s|$)")
+_WORD = re.compile(r"[a-z0-9]+")
+
+
+def _medlineplus_url(value: object) -> str | None:
+    url = str(value or "")
+    parsed = urlparse(url)
+    if parsed.scheme in ("https", "http") and parsed.hostname in (
+            "medlineplus.gov", "www.medlineplus.gov"):
+        return url
+    return None
+
+
+def _source_records(state: dict) -> tuple[list[dict], list[dict]]:
+    """Return report quotes and usable MedlinePlus pages for attribution."""
+    report_quotes = []
+    seen_quotes = set()
+    for atom in state.get("atoms") or []:
+        quote = str(atom.get("source_quote") or "").strip()
+        if quote and quote not in seen_quotes:
+            seen_quotes.add(quote)
+            report_quotes.append({"quote": quote, "href": f"#report-quote-{len(report_quotes)}"})
+
+    pages = []
+    seen_urls = set()
+    for row in state.get("retrieved_context") or []:
+        metadata = row.get("metadata") or {}
+        url = _medlineplus_url(metadata.get("source_url"))
+        if url and url not in seen_urls:
+            seen_urls.add(url)
+            pages.append({
+                "url": url,
+                "title": str(metadata.get("title") or metadata.get("term") or "MedlinePlus passage"),
+            })
+    return report_quotes, pages
+
+
+def _tokens(text: str) -> set[str]:
+    return set(_WORD.findall(text.lower()))
+
+
+def _attribution_href(sentence: str, report_quotes: list[dict], pages: list[dict]) -> str | None:
+    sentence_tokens = _tokens(sentence)
+    best_quote = None
+    best_score = 0.0
+    for item in report_quotes:
+        quote_tokens = _tokens(item["quote"])
+        if not sentence_tokens or not quote_tokens:
+            continue
+        score = len(sentence_tokens & quote_tokens) / len(sentence_tokens)
+        if score > best_score:
+            best_score, best_quote = score, item
+    if best_quote and best_score >= 0.2:
+        return best_quote["href"]
+    return pages[0]["url"] if pages else (report_quotes[0]["href"] if report_quotes else None)
+
+
+def _escape_markdown_text(text: str) -> str:
+    return re.sub(r"([\\`*_[\]()])", r"\\\1", text)
+
+
+def attributed_markdown(text: str, state: dict) -> str:
+    """Link every prose sentence to a report quote or MedlinePlus page."""
+    report_quotes, pages = _source_records(state)
+    if not text or not (report_quotes or pages):
+        return text
+    lines = []
+    for line in text.splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            lines.append(line)
+            continue
+        parts = _SENTENCE_END.split(line)
+        linked = []
+        for part in parts:
+            if not part:
+                continue
+            match = re.match(r"(\s*)(.*?)(\s*)$", part, flags=re.DOTALL)
+            leading, sentence, trailing = match.groups()
+            href = _attribution_href(sentence, report_quotes, pages)
+            if href:
+                linked.append(f"{leading}[{_escape_markdown_text(sentence)}]({href}){trailing}")
+            else:
+                linked.append(part)
+        lines.append("".join(linked))
+    return "\n".join(lines)
 
 
 def progress_html(view: Snapshot) -> str:
@@ -50,10 +136,11 @@ def status_html(view: Snapshot) -> str:
 def answer_markdown(view: Snapshot) -> str:
     kind, _, _ = result_status(view)
     if kind == "complete":
-        return view.state["final_answer"]
+        return attributed_markdown(view.state["final_answer"], view.state)
     if kind == "review":
         draft = view.state.get("revised_draft") or view.state.get("draft")
-        return "### Draft for review\n\n" + draft if draft else "No explanation is available for this run."
+        return ("### Draft for review\n\n" + attributed_markdown(draft, view.state)
+                if draft else "No explanation is available for this run.")
     if kind == "error":
         return "No final explanation was produced. Check the status message above."
     return "Your explanation will appear here when the checks finish."
@@ -78,20 +165,29 @@ def metrics_html(view: Snapshot) -> str:
 
 
 def sources_html(state: dict) -> str:
+    report_quotes, pages = _source_records(state)
     rows = state.get("retrieved_context") or []
-    if not rows:
+    if not report_quotes and not rows:
         return '<p class="empty-note">Retrieved medical references will appear here.</p>'
     cards = []
+    if report_quotes:
+        cards.append('<p class="source-label">Report evidence · exact source quotes</p>')
+        for item in report_quotes:
+            cards.append(
+                f'<article id="report-quote-{report_quotes.index(item)}" class="source-card">'
+                f'<h4>Original report quote</h4><p>{escape(item["quote"])}</p></article>')
     for row in rows:
         metadata = row.get("metadata") or {}
         title = escape(str(metadata.get("title") or metadata.get("term") or "MedlinePlus passage"))
-        url = str(metadata.get("source_url") or "")
-        parsed = urlparse(url)
-        if parsed.scheme in ("https", "http") and parsed.hostname in ("medlineplus.gov", "www.medlineplus.gov"):
+        url = _medlineplus_url(metadata.get("source_url"))
+        if url:
             title = f'<a href="{escape(url, quote=True)}" target="_blank" rel="noopener noreferrer">{title} ↗</a>'
         cards.append(f'<article class="source-card"><h4>{title}</h4><p>{escape(str(row.get("text", "")))}</p></article>')
     label = "Scripted reference passage" if state.get("mode") == "offline-scripted" else "Retrieved reference passages"
-    return f'<p class="source-label">{label} · general medical background</p>' + "".join(cards)
+    if pages:
+        cards.insert(1 if report_quotes else 0,
+                     f'<p class="source-label">{label} · general medical background</p>')
+    return "".join(cards)
 
 
 def facts_rows(state: dict) -> list:

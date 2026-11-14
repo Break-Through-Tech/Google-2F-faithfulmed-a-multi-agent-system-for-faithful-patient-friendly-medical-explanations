@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../Downloads/medlineplus_gemini_embedding_2_768_v1"
+		}
+	],
+	"settings": {}
+}
