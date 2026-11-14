@@ -47,6 +47,9 @@ changes the frozen reports. Source caveats appear below the example selector.
 2. Select **Live Gemini**, choose a report, and click **Simplify report** to run
    the real pipeline. Each click makes a fresh, isolated ADK session.
 3. Start in **User view** to show the explanation and medical background sources.
+Each explanation sentence links to its best matching exact report quote, or to
+the validated MedlinePlus page used as general background. Report quotes are
+shown as anchored evidence cards in the sources panel.
    Switch to **Engineering view** to show the seven workflow steps, execution
    timeline, extracted facts, readability, and **Checks & repairs**.
 4. Explain the outcome: **Explanation ready** means this run's checks finished
