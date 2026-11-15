@@ -29,10 +29,13 @@ def prepare(callback_context):
     known = offline or message == '/demo'
     if message.startswith('/') and not known:
         return types.Content(parts=[types.Part(text='Use /demo, /offline, /offline-error, or paste a synthetic note.')])
+    # The UI and comparison runner supply each report in the current message.
+    # Session state may describe a previous report and must never supply new input.
     if not message:
         return types.Content(parts=[types.Part(text='Enter /demo or paste a synthetic note.')])
-    # Reset all per-note state on EVERY turn; never reuse a previous patient's data.
-    for key, value in dict(source_report=fixtures.SOURCE if known else message,
+    source_text = fixtures.SOURCE if known else message
+    # Reset all per-note state on EVERY turn; populate source_report reliably.
+    for key, value in dict(source_report=source_text,
             atoms=[], retrieved_context=[], draft='', verdict={}, revised_draft='',
             final_answer='', final_verdict={}, readability_score={},
             readability_status='', suggestion=None, refinement_history=[],
@@ -40,7 +43,7 @@ def prepare(callback_context):
             repair_blocker='', error='', run_status='running',
             mode='offline-scripted' if offline else 'live', model=MODEL,
             inject_demo_error=message == '/offline-error',
-            retrieval_query=fixtures.EXAMPLE['retrieval_query'] if known else message,
+            retrieval_query=fixtures.EXAMPLE['retrieval_query'] if known else source_text,
             stage_modes={}, execution_trace=[]).items():
         callback_context.state[key] = value
 
