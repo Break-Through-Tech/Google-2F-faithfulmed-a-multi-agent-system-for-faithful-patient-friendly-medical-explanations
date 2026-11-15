@@ -27,23 +27,14 @@ def prepare(callback_context):
     message = ''.join(part.text or '' for part in callback_context.user_content.parts).strip()
     offline = message in ('/offline', '/offline-error')
     known = offline or message == '/demo'
-    
     if message.startswith('/') and not known:
         return types.Content(parts=[types.Part(text='Use /demo, /offline, /offline-error, or paste a synthetic note.')])
-    
-    # Check if report text was supplied via state (e.g., by run_comparison)
-    existing_report = (
-        callback_context.state.get('source_report') or 
-        callback_context.state.get('note') or 
-        callback_context.state.get('source_text')
-    )
-    
-    source_text = fixtures.SOURCE if known else (message if message else existing_report)
-    
-    if not source_text:
+    # The UI and comparison runner supply each report in the current message.
+    # Session state may describe a previous report and must never supply new input.
+    if not message:
         return types.Content(parts=[types.Part(text='Enter /demo or paste a synthetic note.')])
-        
-    # Reset all per-note state on EVERY turn; populate source_report reliably
+    source_text = fixtures.SOURCE if known else message
+    # Reset all per-note state on EVERY turn; populate source_report reliably.
     for key, value in dict(source_report=source_text,
             atoms=[], retrieved_context=[], draft='', verdict={}, revised_draft='',
             final_answer='', final_verdict={}, readability_score={},
