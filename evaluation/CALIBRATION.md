@@ -1,9 +1,36 @@
 # Citation calibration and report-evaluator status
 
-Updated November 11, 2026. Consolidated findings; intermediate experiment scripts
+Updated November 15, 2026. Consolidated findings; intermediate experiment scripts
 and detailed investigations remain local.
 
-## Current held-out result
+## Latest candidate and results
+
+The current citation-only candidate uses whitespace-safe source-quote validation
+and is frozen as `citation-judge-frozen-2026-11-15-v1`. Its configuration, policy,
+verification commands, and limitations are consolidated below. This does not
+switch the live report Verifier or establish its clinical accuracy.
+
+| Measurement | Valid assessments | Reference matches / valid | Kappa on valid | Failed | Correct / all 31 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Original held-out run | 31/31 | 23/31 (74.2%) | 0.498 | 0 | 23/31 |
+| Citation-only development run | 29/31 | 24/29 (82.8%) | 0.652 | 2 | 24/31 |
+| Full reliability repeat, before/after its one technical retry | 30/31 | 25/30 (83.3%) | 0.661 | 1 | 25/31 |
+| Whitespace-only offline replay of all first responses | 31/31 | 26/31 (83.9%) | 0.668 | 0 | 26/31 |
+
+The last row is a retrospective validation replay, not a new model run or fresh
+held-out result. The same 31 cases had already been inspected. The model's
+decisions did not change during replay: one quote became valid when its source
+line breaks were restored. Five reference disagreements and a severity-qualifier
+reasoning concern remain. Independent validation is still required.
+
+[Compact current results](results/citation_judge_summary_2026-11-15.json) retain
+case identities, unchanged references, decisions/failures across these runs,
+source/response hashes, restored-quote locations, aggregate metrics, and provenance.
+Raw responses and full abstracts remain local under ignored
+`data/calibration_results/`; individual intermediate reports are not required to
+understand this status.
+
+## Original held-out result
 
 The unchanged original citation judge scored **23/31 agreement (74.2%), Cohen's
 kappa 0.498**, with zero failed or pending assessments. Targets of **80% agreement
@@ -49,7 +76,7 @@ any-supported-nugget attribution with contradiction priority, while its displaye
 Appendix A4 prompt requires support for each nugget. Do not claim an unambiguous
 universal partial-support rule or assume either party is correct in every disagreement.
 
-## Frozen protocol and reproduction
+## Original held-out protocol and reproduction
 
 - Original seed-42 split: 20 development and 20 held-out questions, with no overlap.
   Preserve all 40 selected held-out entries; no resampling or replacement labels.
@@ -93,6 +120,129 @@ fresh independent cases to confirm later improvement. This does not calibrate ev
 live ADK/Gradio Verifier behavior or trigger a runtime configuration change.
 
 ## Experimental findings retained
+
+### November 15: configuration frozen for independent validation
+
+The [citation judge and retry policy are frozen](#frozen-candidate-and-retry-policy) as
+`citation-judge-frozen-2026-11-15-v1`. The machine-readable manifest records the
+prompt, schema, model/settings, whitespace validator, source snapshots/hashes,
+runtime versions, and bounded technical-retry rules. A verification helper rejects
+drift and requires a separately frozen cohort before model calls. No independent
+cohort has been selected and no new API run has started. The next step is exposure,
+duplicate, and reference-conflict auditing before freezing the validation sample.
+
+### November 15: whitespace-only source quote recovery
+
+A [separate validation implementation](citation_quote_validation.py) restores original
+source text only when whitespace normalization gives one unique contiguous span.
+It rejects altered content, token fragments, and ambiguous locations. Replaying
+all 31 captured first responses, with no new model calls, produced **26/31 valid
+reference matches (83.9%), kappa 0.668**, zero failed assessments. One invalid
+response became valid; the other decisions and all earlier scored runs stayed
+unchanged. This is improved evidence-location coverage on reviewed data, not a
+new held-out score or a demonstrated improvement in the model's reasoning.
+
+### November 15: predeclared full-cohort reliability repeat
+
+The [31-case repeat](citation_reliability.py) froze the citation-only settings
+before calls and allowed at most one technical retry per failed case, with SDK
+automatic retries disabled. First-attempt and post-retry scores were identical:
+**25/30 valid matches (83.3%), kappa 0.661**, one unresolved failure, no pending
+cases. Across all 31 attempted pairs, 25 matched the reference (80.6%). There
+were 32 calls: every case was attempted first, then the one eligible failure
+was retried once. No valid disagreement was retried.
+
+The remaining failure collapsed source newlines into spaces on both attempts.
+The 29 shared valid decisions from the earlier citation-only run were unchanged;
+the additional reference match came from better coverage, not altered judgments.
+All prior artifacts and scores remain preserved. This is reviewed-case reliability
+evidence, not fresh held-out validation, and does not calibrate the live Verifier.
+
+### November 11: focused citation-only follow-up
+
+The [citation-attribution experiment](citation_attribution.py) separates the
+single-document citation label from whole-sentence coverage. The live report
+Verifier and report evaluator were not changed. On the 31 now-reviewed cases,
+the revision achieved **24/29 valid matches (82.8%), kappa 0.652**, with two
+quote-validation failures. The contemporaneous original achieved 23/30,
+kappa 0.541, with one failure. On the same 29 valid paired cases, the original
+scored 22/29, kappa 0.529, versus 24/29, kappa 0.652 for the revision: two gains,
+zero losses. Across all 31 attempts the revision had 24 correct matches (77.4%).
+
+This is a development improvement on valid paired cases, **not completed
+held-out calibration**. One improved reference match still drops a severity
+qualifier in its explanation. Failed assessments and that reasoning concern
+prevent promoting it as a reliable live configuration. The original frozen
+23/31, kappa 0.498 result remains unchanged. See the
+[compact current results](results/citation_judge_summary_2026-11-15.json) for
+case-level decisions and failures.
+
+November 12: two separate quote-diagnostic calls
+both passed unchanged exact-quote validation. This did not reproduce or explain
+the lost invalid responses. Capture was added for future failures; the scored
+run, its two failures, and all published metrics remain unchanged.
+
+## Frozen candidate and retry policy
+
+The [frozen manifest](frozen/citation_judge_2026-11-15_v1.json) records the exact
+prompt, schema, request settings, validator version, installed runtime versions,
+and canonical source hashes/snapshots for nine relevant files. Its fingerprint is
+`7d62257ab926bd5fd17b78e6ce47d4108706f2a8e2ce2cff069bb235b67d297b`.
+It contains no API key or evaluation reference labels.
+
+- **Citation task:** one complete substantive supported claim suffices unless a
+  claim is contradicted. Preserve necessary qualifiers; missing evidence is not
+  contradiction. Whole-sentence coverage is separate from this citation label.
+- **Request:** `gemini-3.8-flash`, temperature zero, the JSON schema in
+  [citation_attribution.py](citation_attribution.py), and a 60-second timeout.
+  Send only question, sentence, and the cited document's cached title/abstract.
+  Do not supply reference labels, external knowledge, or a snippet fallback.
+- **Quote validation:** [citation_quote_validation.py](citation_quote_validation.py)
+  collapses whitespace only to locate a unique contiguous source span, restores
+  its original text, and records offsets and hashes. It rejects changed words,
+  punctuation, numbers, negation, ambiguous matches, and token fragments. It
+  never fuzzy-matches or joins passages across an ellipsis. Original response
+  consistency checks still apply, and model decisions/reasons stay unchanged.
+- **Retry budget:** at most two attempts per case, with SDK automatic retries
+  disabled. Attempt every case once before retrying eligible technical failures.
+  Allow one identical-call retry for invalid output or a listed transient
+  connection/server error, including ambiguous/malformed quotes. Never retry a
+  valid disagreement. Send no preferred answer or correction feedback.
+- **Stops:** HTTP 400/401/403/404/429 stop the run. Blocked/refused outputs and
+  unclassified errors do not automatically retry. An uncertain interrupted
+  request cannot be silently repeated. A retryable error category does not
+  bypass the two-attempt budget.
+- **Reporting:** retain every attempt/response/failure, select the first valid
+  attempt, and report first-attempt and post-retry metrics separately. Include
+  valid coverage and correct/all-attempt denominators. Never assign a preferred
+  binary label to a failed assessment. Targets remain agreement >=80% and
+  kappa >=0.6, with coverage and sample independence reported explicitly.
+
+[freeze_citation_judge.py](freeze_citation_judge.py) checks the manifest fingerprint,
+code, prompt, schema, settings, and runtime. It tolerates Git CRLF/LF differences
+only; intentional changes need a new freeze version. Repeating `freeze` verifies
+the existing file rather than replacing it. Model-provider updates behind the
+model identifier can still cause variation.
+
+Use `evaluation.freeze_citation_judge.judge(..., cohort_manifest=...)` for a future
+bound sample and its `retry_allowed` helper for the declared attempt budget. The
+entry point requires a separately frozen cohort bound to this configuration,
+including sampling/exclusion provenance and per-case input/reference hashes.
+Those hashes detect later edits; they do not themselves prove sample independence.
+No independent sample or new held-out score is included in this commit. Unused-case
+auditing and sample preparation remain separate work.
+
+```powershell
+.\.venv\Scripts\python.exe -m evaluation.freeze_citation_judge verify
+.\.venv\Scripts\python.exe -m pytest tests/test_citation_attribution.py tests/test_citation_quote_validation.py tests/test_citation_reliability.py tests/test_freeze_citation_judge.py -q
+```
+
+The frozen runtime is Python 3.12.4, Google GenAI SDK 2.25.0, and Pydantic 2.13.5.
+The verification/test commands need no API calls or ignored run artifacts. Full
+historical-run reproduction or replay needs the local data and captured responses;
+the compact records allow score inspection without distributing those raw files.
+
+## Earlier development experiments
 
 | Development experiment | Agreement | Kappa | Finding |
 |---|---:|---:|---|

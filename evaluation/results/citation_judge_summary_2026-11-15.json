@@ -1,0 +1,1584 @@
+{
+  "version": "citation-judge-compact-results-2026-11-15-v1",
+  "scope": "Citation support only; not whole-report accuracy or live-agent calibration",
+  "frozen_configuration": {
+    "path": "evaluation/frozen/citation_judge_2026-11-15_v1.json",
+    "fingerprint": "7d62257ab926bd5fd17b78e6ce47d4108706f2a8e2ce2cff069bb235b67d297b"
+  },
+  "case_count": 31,
+  "case_ids_digest": "1c867d0658207f18ca9c05de8faf1f7515edc47f28d2b9b18b7f0666516fa37d",
+  "measurements": {
+    "original_heldout": {
+      "selected_cases": 31,
+      "attempted_cases": 31,
+      "scored_cases": 31,
+      "failed_cases": 0,
+      "pending_cases": 0,
+      "correct": 23,
+      "agreement": 0.7419354838709677,
+      "cohen_kappa": 0.49797570850202433,
+      "confusion_counts": {
+        "reference_True_predicted_False": 7,
+        "reference_True_predicted_True": 13,
+        "reference_False_predicted_False": 10,
+        "reference_False_predicted_True": 1
+      },
+      "reference_support_counts": {
+        "supported": 20,
+        "not_supported": 11
+      },
+      "complete": true
+    },
+    "contemporaneous_original": {
+      "selected_cases": 31,
+      "attempted_cases": 31,
+      "scored_cases": 30,
+      "failed_cases": 1,
+      "pending_cases": 0,
+      "correct": 23,
+      "agreement": 0.7666666666666667,
+      "cohen_kappa": 0.5414847161572053,
+      "confusion_counts": {
+        "reference_True_predicted_False": 6,
+        "reference_True_predicted_True": 13,
+        "reference_False_predicted_False": 10,
+        "reference_False_predicted_True": 1
+      },
+      "reference_support_counts": {
+        "supported": 19,
+        "not_supported": 11
+      },
+      "complete": false
+    },
+    "citation_revision": {
+      "selected_cases": 31,
+      "attempted_cases": 31,
+      "scored_cases": 29,
+      "failed_cases": 2,
+      "pending_cases": 0,
+      "correct": 24,
+      "agreement": 0.8275862068965517,
+      "cohen_kappa": 0.6522781774580335,
+      "confusion_counts": {
+        "reference_True_predicted_False": 4,
+        "reference_True_predicted_True": 14,
+        "reference_False_predicted_False": 10,
+        "reference_False_predicted_True": 1
+      },
+      "reference_support_counts": {
+        "supported": 18,
+        "not_supported": 11
+      },
+      "complete": false
+    },
+    "paired_original": {
+      "selected_cases": 29,
+      "attempted_cases": 29,
+      "scored_cases": 29,
+      "failed_cases": 0,
+      "pending_cases": 0,
+      "correct": 22,
+      "agreement": 0.7586206896551724,
+      "cohen_kappa": 0.5290023201856148,
+      "confusion_counts": {
+        "reference_True_predicted_False": 6,
+        "reference_True_predicted_True": 12,
+        "reference_False_predicted_False": 10,
+        "reference_False_predicted_True": 1
+      },
+      "reference_support_counts": {
+        "supported": 18,
+        "not_supported": 11
+      },
+      "complete": true
+    },
+    "paired_revision": {
+      "selected_cases": 29,
+      "attempted_cases": 29,
+      "scored_cases": 29,
+      "failed_cases": 0,
+      "pending_cases": 0,
+      "correct": 24,
+      "agreement": 0.8275862068965517,
+      "cohen_kappa": 0.6522781774580335,
+      "confusion_counts": {
+        "reference_True_predicted_False": 4,
+        "reference_True_predicted_True": 14,
+        "reference_False_predicted_False": 10,
+        "reference_False_predicted_True": 1
+      },
+      "reference_support_counts": {
+        "supported": 18,
+        "not_supported": 11
+      },
+      "complete": true
+    },
+    "reliability_first": {
+      "selected_cases": 31,
+      "attempted_cases": 31,
+      "scored_cases": 30,
+      "failed_cases": 1,
+      "pending_cases": 0,
+      "correct": 25,
+      "agreement": 0.8333333333333334,
+      "cohen_kappa": 0.660633484162896,
+      "confusion_counts": {
+        "reference_True_predicted_False": 4,
+        "reference_True_predicted_True": 15,
+        "reference_False_predicted_False": 10,
+        "reference_False_predicted_True": 1
+      },
+      "reference_support_counts": {
+        "supported": 19,
+        "not_supported": 11
+      },
+      "complete": false
+    },
+    "reliability_post_retry": {
+      "selected_cases": 31,
+      "attempted_cases": 31,
+      "scored_cases": 30,
+      "failed_cases": 1,
+      "pending_cases": 0,
+      "correct": 25,
+      "agreement": 0.8333333333333334,
+      "cohen_kappa": 0.660633484162896,
+      "confusion_counts": {
+        "reference_True_predicted_False": 4,
+        "reference_True_predicted_True": 15,
+        "reference_False_predicted_False": 10,
+        "reference_False_predicted_True": 1
+      },
+      "reference_support_counts": {
+        "supported": 19,
+        "not_supported": 11
+      },
+      "complete": false
+    },
+    "whitespace_replay": {
+      "selected_cases": 31,
+      "attempted_cases": 31,
+      "scored_cases": 31,
+      "failed_cases": 0,
+      "pending_cases": 0,
+      "correct": 26,
+      "agreement": 0.8387096774193549,
+      "cohen_kappa": 0.6680942184154176,
+      "confusion_counts": {
+        "reference_True_predicted_False": 4,
+        "reference_True_predicted_True": 16,
+        "reference_False_predicted_False": 10,
+        "reference_False_predicted_True": 1
+      },
+      "reference_support_counts": {
+        "supported": 20,
+        "not_supported": 11
+      },
+      "complete": true
+    }
+  },
+  "counts": {
+    "paired_valid_cases": 29,
+    "revised_only_matches": 2,
+    "original_only_matches": 0,
+    "reliability_logical_calls": 32,
+    "reliability_retried_cases": 1,
+    "reliability_recovered_cases": 0,
+    "replay_new_model_calls": 0
+  },
+  "provenance": {
+    "source_artifact_sha256": {
+      "data/calibration_results/original_judge_heldout_suite_v1.json": "a81c7ef442c69bf1706a9422f49b16b770c95b04d31b8210f4fa4ae4a206dd48",
+      "data/calibration_results/original_judge_heldout_run_v1.json": "0bf9e063e2330c6d20f8a510c2f6860b7eb100d553de2cf3cbe946f4ee1d9143",
+      "data/calibration_results/citation_attribution_v1_1.json": "c2ab060a8a74d49da8123962a7decfeb0e083527ebf0faf95fd0a43e7ff6b476",
+      "data/calibration_results/citation_attribution_v1_1_comparison.json": "844862aee91e11582f045dc5e22275ef70b09aa82dd5aaa441cbc5a92f14b054",
+      "data/calibration_results/citation_reliability_2026-11-15_protocol.json": "d546d431f1440d0fb0075fd3cbe9dd5e9bd3493cdf5d855f9aff042b4ef2b4f0",
+      "data/calibration_results/citation_reliability_2026-11-15_run.json": "08c7299a44ce1fbd7d908cbe3eca2d03cf744ec4ae3977db4f031462cb95e9ca",
+      "data/calibration_results/citation_reliability_2026-11-15_summary.json": "8d03e63bacbd488d4643697e4b235d0a0357bc0b373baee8ea46bbba917b95b7",
+      "data/calibration_results/citation_whitespace_replay_2026-11-15_v1_1.json": "fd3b2bcc9cbe404b79aa5c1215b74c0ea47468a83717fdecf0d0f94f95d951ad"
+    },
+    "original_prompt_sha256": "0eded17cd2bfeb37c5d79e4a765b77b000cf50478a91e1091adbe5800c151bfb",
+    "citation_prompt_sha256": "5f713aad2af2ea292d792abb5bda0191ca4a3940e7c5325098eade6f263e105e",
+    "reliability_protocol_fingerprint": "8de8f4083f10636556e4f227332790efb5bc51f7327aa7af806225b599cb19d1",
+    "replay_signature": "376ef6162c7e7bbadec1a72e98240bc6b6647db98e42492c587876d00f5a59bb"
+  },
+  "limitations": [
+    "Only original_heldout was measured before that set was inspected; later measurements are development/reviewed-case results.",
+    "Whitespace replay revalidates every saved first response without changing model decisions, not a fresh model run.",
+    "The severity-qualifier reasoning concern remains; label agreement is not proof of sound reasoning.",
+    "Full abstracts/raw responses remain local; this file permits score verification, not independent semantic adjudication.",
+    "Unused-case audit and future cohort selection are outside this results record."
+  ],
+  "records": [
+    {
+      "case_id": "110a0a3ed2b4a004c8ad33a2bf03a71497edb60dad0c82904c32e96b777b2892",
+      "question_id": "149",
+      "cited_pmid": "33880169",
+      "statement": "Additionally, MRI can show cranial migration, foraminal obstruction, and is crucial for evaluating sequestered lumbar disc herniation .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "8fc1edb9967813745cc557026a4b5f81ccb99fbe94ff8c72ffd0acb42e238613",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "ee5153834eae467727de7ce281422d4d0266e5c5e17a9a5a2ee20b0e7bfc181f"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document discusses MRI findings and diagnostic value in lumbar disc herniation, but does not mention cranial migration, foraminal obstruction, or the evaluation of sequestered lumbar disc herniation.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "78a42198eb8622c73747700edce060954058a07c6ae9b5b453ac70774f939863",
+      "question_id": "136",
+      "cited_pmid": "35876779",
+      "statement": "If these methods fail, intermediate interventions like platelet-rich plasma injections, extracorporeal shockwave therapy, or ultrasound-guided procedures may be considered .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "964ae662a829693fddb956b820c452d61eda7bb66c170fa3b30bcaf370f0dea1",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "aa3814aa5bb368880ea748230c02e1918191c12eb4376697cc2e2b0ae285e8d6"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document directly confirms that if initial nonoperative methods fail, intermediate interventions including extracorporeal shockwave therapy, platelet-rich plasma injections, and ultrasound-guided procedures (such as percutaneous tenotomy) can be attempted.",
+        "supported_assertion": "If nonoperative management fails, intermediate interventions such as extracorporeal shockwave therapy, platelet-rich plasma injections, and ultrasound-guided procedures can be attempted.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 556,
+            "end": 767,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "bd3ec8431a5abb3fbb4d8fd345ed7e3e2a32876113320ad61b58a815937f65c4",
+            "restored_quote_sha256": "bd3ec8431a5abb3fbb4d8fd345ed7e3e2a32876113320ad61b58a815937f65c4"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "fd9ce63e9fec9fcc9d77307575404b92f46969a34f98f7ff652bd1b3ff61ce0e",
+      "question_id": "121",
+      "cited_pmid": "28840638",
+      "statement": "Additionally, activities such as focusing on positive characteristics, art/music therapies, and engaging with nature and/or physical activity have been shown to reduce stress and enhance well-being .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "3a273366cef3756eec765be5a954c14f8c19b585906238004e246f3786feddbe",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "ef0d349c481b9fd6962e8518d9cc6b513575cd52a8a5ec03caaee85205fa129d"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document supports the claim that physical activity is useful for stress reduction, while leaving other listed activities (focusing on positive characteristics, art/music therapies, nature) unaddressed.",
+        "supported_assertion": "Physical activity has stress-relieving potential and contributes to stress reduction.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 104,
+            "end": 174,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "e6b1b04d57b229b212a96fc53df5c7bf04fc090af427f84895a5dec3c99c9aa1",
+            "restored_quote_sha256": "e6b1b04d57b229b212a96fc53df5c7bf04fc090af427f84895a5dec3c99c9aa1"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "a44b1a706ecca29219e2af2fbe132a8dd6e3c362f2c95e3e249eb9ac8cd223fc",
+      "question_id": "153",
+      "cited_pmid": "16533277",
+      "statement": "The decision to transfuse should be based on a comprehensive consideration of the patient's overall clinical condition, anemia tolerance, differences in donor RBC physiology, relative risks of anemia and transfusion, and individual pathology and physiology, rather than relying solely on hemoglobin thresholds or laboratory values .",
+      "reference_relation": "contradicting",
+      "reference_support": false,
+      "evidence_sha256": "097e68233724c8f3f90f975fd9720b0c9cb38f222441006d01871414bbba85cb",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "6ef7dd47a614caecd3045f6433ccd625716e3bfbfe9239c551c3bdb6edd86dc8"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The provided text discusses the limitations of hematocrit in measuring blood volume or guiding transfusions in hypovolemic patients, but it does not make the specific normative claim that transfusion decisions should be based on the listed clinical considerations (such as donor RBC physiology, anemia tolerance, or risks) rather than laboratory thresholds alone.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "0f7c95e618807d2ae20f0e59b41e05eb00a1e28e62457657f3fe562e23157b04",
+      "question_id": "123",
+      "cited_pmid": "16930007",
+      "statement": "The identification of FBN1 mutations is crucial for the diagnosis of MFS, and molecular analysis of the gene can help reduce diagnostic uncertainty in patients with suspected MFS or related disorders .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "a4210486cc6e5d697a8ddf99d0864c0122df473e257345b8ab4af7ec7a70fd7c",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "df1c6c92dd219c9386d9bb3125413d0189b76fa68f92cd348ba770994e9ed16d"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document confirms that Marfan syndrome results from FBN1 mutations and that when diagnosis is hampered by variable presentation, molecular analysis of the FBN1 gene is helpful to identify at-risk individuals.",
+        "supported_assertion": "Molecular analysis of the FBN1 gene is helpful when clinical manifestations or phenotypic variability hamper diagnosis (reducing diagnostic uncertainty).",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 396,
+            "end": 645,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "7045986ba84dafd451c6f7e192d53ad46705d668f58f45c686233b16c1652bf9",
+            "restored_quote_sha256": "7045986ba84dafd451c6f7e192d53ad46705d668f58f45c686233b16c1652bf9"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "cb86cbd4622473e6c5793720b28d8efeff1ec5e0e83baabf1db9cf24c16a5683",
+      "question_id": "153",
+      "cited_pmid": "19503631",
+      "statement": "However, the decision to transfuse should be based on the patient's overall clinical condition, symptoms, and other laboratory values, not just the Hct level alone .",
+      "reference_relation": "neutral",
+      "reference_support": false,
+      "evidence_sha256": "7956fac75bfd99930e63da9552aeb4816809ffbce57d2aecabe01d10b2c325f8",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "9435691cd23788689724e280e8cec4008567e1e5e0113ed05d0f0a0db918d6aa"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document observes how ICU physicians currently make transfusion decisions (noting they are predominantly based on hemoglobin levels rather than patient characteristics), but it does not make normative claims or recommendations about what the decision to transfuse should be based on.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "92a4f725704902ba7084919c3a8671e062fac7668d87bb76e2fa1662e03157e4",
+      "question_id": "130",
+      "cited_pmid": "25911850",
+      "statement": "Furthermore, oxidative stress has been linked to insulin resistance, a common feature of PCOS, and may contribute to the development of cardiovascular disease and other metabolic complications .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "a8b7bd0a9361d08fbd7fc384458913a1a6f9b690fffd7b0b18d220a9d1ea6dbd",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "80e4cd95750961196196bbbc8de7689329a0ec34595c1298cbb6aa0dd43e25f1"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document investigates oxidative stress in women with PCOS, but it does not make or evaluate claims regarding insulin resistance, cardiovascular disease, or metabolic complications.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "8d416b641d804cba7d3d7d2f922e58e97879ea5dd8a775cb399c22e20116f9f0",
+      "question_id": "149",
+      "cited_pmid": "16579004",
+      "statement": "It is widely employed in the diagnosis of lumbar spine disorders, such as lumbar spinal stenosis or lumbar disc herniation .",
+      "reference_relation": "neutral",
+      "reference_support": false,
+      "evidence_sha256": "2b45963b6a2897493a0ea4f1c00858794e2cd4ff5d14c724478e80c546f6df67",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "27a56fdf3bf08aa3cd29de1aebf18641f354828ec127317f4555b719256868e7"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document investigates full versus limited protocol MRI for diagnosing lumbar disc herniation, but it does not state that MRI is widely employed or mention lumbar spinal stenosis.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "381fb583683cd78bd8186b5ff934dd57e13d23c59be0c4707021f0f85061d220",
+      "question_id": "149",
+      "cited_pmid": "33011722",
+      "statement": "Magnetic resonance imaging (MRI) is the best test to rule out a lumbar disc herniation .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "d18df82714c9ec3500669639bf83649f9a61a4fe027e2604356d5d46de84b432",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "3db05dec8e419682ba253411db7736a7cc37d36983916cbd8fa621b6724191cd"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document notes that MRI was used to confirm a diagnosis of lumbar disc herniation in a case report, but it does not evaluate or assert whether MRI is the best test to rule out lumbar disc herniation.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "e8a1c0fc6965a8dd7faab7b2b9d6529d30e06a93f9d16640a48b43894b5c51e7",
+      "question_id": "116",
+      "cited_pmid": "33659106",
+      "statement": "Weight loss is a critical factor, as obesity is a significant risk factor for OSA, and reducing body weight can alleviate symptoms .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "0a7fed459ebf8fee805c46ec4634768ef1bd336e178f42293a8c879e8b20b523",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "6a49ce071365c1b7adcf41fae0115dde62842fd8c24cc707051e099951058f9e"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document supports the assertion that reducing weight is a beneficial lifestyle modification for individuals with OSA. It does not explicitly mention that obesity is a significant risk factor for OSA, but this unsupported portion does not negate citation support.",
+        "supported_assertion": "reducing weight can alleviate symptoms / benefit individuals with obstructive sleep apnea",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 522,
+            "end": 763,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "3523103574a2ff57f4202b80e24db97a9a22101413a01d10b284196b4eb5a335",
+            "restored_quote_sha256": "3523103574a2ff57f4202b80e24db97a9a22101413a01d10b284196b4eb5a335"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "f622513e49e24d26379d460ff6e145ed2c5215d3e53755664124f81af2356cc8",
+      "question_id": "143",
+      "cited_pmid": "22133668",
+      "statement": "Engaging in social support networks can also enhance coping mechanisms, leading to better adaptation and reduced anxiety .",
+      "reference_relation": "neutral",
+      "reference_support": false,
+      "evidence_sha256": "007bc2c87c1d36f80bc6f139de3d2156a5a91d1bd7cbd8e0daa47dc677da50b1",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "34529455b8fc71378d69196a366491d95385075e00d4038347648950b695225d"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document mentions that further work is needed to evaluate alternative management strategies such as counselling and organisation support on quality of life, but it does not evaluate or substantiate claims regarding social support networks enhancing coping mechanisms or reducing anxiety.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "35fc097b16761f13e1009800626446be30724f116ac37b780dc0e9b1fd232356",
+      "question_id": "116",
+      "cited_pmid": "22014867",
+      "statement": "Dietary modifications have shown promise in managing OSA, as one case study demonstrated resolution of OSA after 3 months of dietary changes .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "0cc51ac441bdfdde1509d506f58b546b726c9b5cca205f12a7721d34201d8dc8",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "error",
+        "failure_code": "service_or_response_failure",
+        "error_type": "ValueError"
+      },
+      "citation_revision": {
+        "status": "error",
+        "failure_code": "quote_not_in_document",
+        "error_type": "DecisionValidationError"
+      },
+      "reliability_attempts": [
+        {
+          "status": "error",
+          "failure_code": "quote_not_in_document",
+          "error_type": "DecisionValidationError",
+          "number": 1,
+          "raw_response_sha256": "eb26f9f917a2c3b27e1fb36c6c3d111a93b664e00dc5fef7e5545e30e3a1c982"
+        },
+        {
+          "status": "error",
+          "failure_code": "quote_not_in_document",
+          "error_type": "DecisionValidationError",
+          "number": 2,
+          "raw_response_sha256": "0ea2f36ed3ed55b56eb2c7937de19d9e49b36ec08f37d445d4dfbf42ab557e46"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document describes a case study where dietary modifications for 3 months led to resolution of OSAS and no longer needing a CPAP device, and concludes that dietary modifications may be an effective management tool.",
+        "supported_assertion": "Dietary modifications have shown promise in managing OSA, as demonstrated by a case study showing resolution of OSA after 3 months of dietary changes.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 493,
+            "end": 851,
+            "match_kind": "whitespace_only",
+            "supplied_quote_sha256": "ca522217bec073fe3f877e2d83cd27479465c34f3a84f4d31521bfbe116ac5a4",
+            "restored_quote_sha256": "09c45202a8e069ce46f405445f3cea6ea0e35b4f8465326b058d9dfb34a0f1fd"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "5e39f1e1ce31e02cdbd56f55017b2c41c31d7bd100c00333477a62283da52565",
+      "question_id": "132",
+      "cited_pmid": "21824858",
+      "statement": "In adults, vitamin D deficiency can exacerbate osteopenia and osteoporosis, cause osteomalacia, and increase the risk of fractures and muscle weakness .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "b0d06ad0a605a2035577d7a7f79b873548eed3cf25efc42400560b0ce3b6fbff",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "b7b8703b74432101a47be72310ca65a8e1461dbb134e2399aacdd0ff0118cf0b"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document directly states that vitamin D deficiency in adults can exacerbate osteopenia and osteoporosis, cause osteomalacia and muscle weakness, and increase fracture risk, supporting the entire sentence.",
+        "supported_assertion": "In adults, vitamin D deficiency can exacerbate osteopenia and osteoporosis, cause osteomalacia and muscle weakness, and increase the risk of fractures.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 1101,
+            "end": 1250,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "da44dddfdb07042ea554450a7e5848e891c89bd83f55b76b2453e98b4d998929",
+            "restored_quote_sha256": "da44dddfdb07042ea554450a7e5848e891c89bd83f55b76b2453e98b4d998929"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "8e78024236c18203ac6d86893aa55684490270127194a945a803a040c0c1702b",
+      "question_id": "143",
+      "cited_pmid": "18414253",
+      "statement": "Living with Huntington's disease requires a comprehensive approach to manage its effects on daily life .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "fe5de7b0d81222d544efafabb3a4b8bb77789b0e08dbd50f0e6c7ea18ca7fc95",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "ff19aab0749a6abcfe5fa85b1f7a699bf5b3e8906201e79a642b9f919612f642"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document supports the assertion that managing Huntington's disease requires a comprehensive multidisciplinary approach involving both health and social care.",
+        "supported_assertion": "Living with Huntington's disease involves a comprehensive management approach across health and social care.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 741,
+            "end": 950,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "ee1c62d16c1f12b55ede82c411fb59230cb5593d1585ba9ed74d8262748da015",
+            "restored_quote_sha256": "ee1c62d16c1f12b55ede82c411fb59230cb5593d1585ba9ed74d8262748da015"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "978cc6fa5b1d2a81decdd29b794b8bbe9cc54c6f94a144291615fa9db372e329",
+      "question_id": "153",
+      "cited_pmid": "23537850",
+      "statement": "However, the decision to transfuse should be based on the patient's overall clinical condition, symptoms, and other laboratory values, not just the Hct level alone .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "1bb9b409e983012aa14fb667036a592631f14a14192b88fac3c0557cb25073f6",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "4ffb58665faab4fb1a33ecc26183a13a607850b3cd39d5297457550e722e9920"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document investigates mortality across different hematocrit levels and concludes that blood transfusions should be used judiciously, but it does not make any specific claim regarding basing transfusion decisions on the patient's overall clinical condition, symptoms, or other laboratory values.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "b117536d04cd2c711de5e20ef1f259f7a2ff0c703f7b998943ae71d2474d8d1a",
+      "question_id": "121",
+      "cited_pmid": "24049209",
+      "statement": "However, the association of cortisol and mindfulness has yet to be rigorously evaluated, and findings are inconclusive .",
+      "reference_relation": "contradicting",
+      "reference_support": false,
+      "evidence_sha256": "652f665be2065610acbfe8ce182498be079ceda215b63fa5a196bd090ea092f4",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "bb2abebd45b5a4ed43dc34cc29ab34627434f5d318574971fee56677518db480"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The provided document evaluates the effects of yoga on depression and cortisol levels, but does not discuss mindfulness or the conclusiveness of research on cortisol and mindfulness.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "0d3cb54aee3fb59e6d4277b4d79fcadad3244b89e775dd034f2a7023d63e93d7",
+      "question_id": "117",
+      "cited_pmid": "17290219",
+      "statement": "Mutations in RUNX2 can cause cleidocranial dysplasia, a skeletal disorder characterized by the absence or underdevelopment of the collarbone and other skeletal abnormalities .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "af3a5621cc34ffca1ab04139bc84f0f838c88a3a0e4adaef18f49f3c35554291",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "b40f0be0a6b44d145f45623c66d73ce952ecf2cf0f552bff0294e8a33a212d2c"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document supports that RUNX2 mutations cause the skeletal disorder cleidocranial dysplasia. The specific clinical features (absence or underdevelopment of the collarbone and other skeletal abnormalities) are not mentioned in the text.",
+        "supported_assertion": "Mutations in RUNX2 can cause cleidocranial dysplasia, a skeletal disorder.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 483,
+            "end": 570,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "56ab4199653f78560c74f65126f184661ecfeb38462396216866ca880705fe5a",
+            "restored_quote_sha256": "56ab4199653f78560c74f65126f184661ecfeb38462396216866ca880705fe5a"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "a651805db99a2a132983d162061a24cff2f06b07f794375f07ea76649aeeb3f0",
+      "question_id": "122",
+      "cited_pmid": "30969986",
+      "statement": "T wave abnormalities can be classified into different types, including T wave inversion, flattening, and biphasic T waves .",
+      "reference_relation": "neutral",
+      "reference_support": false,
+      "evidence_sha256": "a2eb890d002d54418fd38da210bf83435c41a4b911d3c3eff074e49d174fbbd8",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "d006848cba802c41603e036c70129cb2a0fc684c5ba1b956291c1b1f368e15ed"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document investigates T wave alternans (TWA) and its body surface distribution, but it does not mention or classify T wave abnormalities into inversion, flattening, or biphasic T waves.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "bac0f8c2e137f6d1bc949426834f0e3c2fa9c94a5336002db4c4501730d5d9e5",
+      "question_id": "116",
+      "cited_pmid": "33659106",
+      "statement": "Weight reduction can benefit people with sleep apnea, particularly those who are obese .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "0a7fed459ebf8fee805c46ec4634768ef1bd336e178f42293a8c879e8b20b523",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "ab61886e874825066729965d95febc5b376e8cfa27e9bf23e4254c5e91a702f8"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document supports the claim that weight reduction can benefit individuals with obstructive sleep apnea, but it does not specifically mention that this benefits those who are obese in particular.",
+        "supported_assertion": "Weight reduction can benefit people with sleep apnea",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 522,
+            "end": 763,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "3523103574a2ff57f4202b80e24db97a9a22101413a01d10b284196b4eb5a335",
+            "restored_quote_sha256": "3523103574a2ff57f4202b80e24db97a9a22101413a01d10b284196b4eb5a335"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "f73ad02a8ad9083bb22435cbe88db6db411797c905aba512291e5872f0ad2568",
+      "question_id": "133",
+      "cited_pmid": "24678485",
+      "statement": "Although ovarian reserve shows some recovery six months after surgery, the reduction in markers of ovarian reserve can persist .",
+      "reference_relation": "contradicting",
+      "reference_support": false,
+      "evidence_sha256": "573577d042b132705fd27e50b2c60efe152b770fdc6b6a946ec3b131a777d5b3",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "09a998917563bedc88f38090b58eaabc2631d40555aea2a64558c0796c3d0c32"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document investigates ovarian reserve markers only up to three months postoperatively, showing a decrease in AMH at three months. It does not evaluate outcomes or recovery at six months or demonstrate whether the reduction persists long-term.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "13e8c9e7d6c5180381ae7c021fd6ccb4de570c5296aa379653b23aaa726f99f0",
+      "question_id": "133",
+      "cited_pmid": "30308307",
+      "statement": "The risk of complications is higher for women with a higher body mass index, a greater number of previous open abdominal surgeries, or severe adhesions .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "39523583831c2c030d4f0cec3e635a655c56fcaefc3d69dc4ed1284418d4c1a1",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "1765b48871fcb6ac92670c966c6af6567d4845b8e5ea70226cf0e7caaaa85abc"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document supports the assertion by showing that patients with higher BMI, more prior open abdominal surgeries, or severe adhesions had a higher risk of intraoperative complications during laparoscopic oophorectomy.",
+        "supported_assertion": "The risk of complications is higher for women with a higher body mass index, a greater number of previous open abdominal surgeries, or severe adhesions.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 1489,
+            "end": 1682,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "e5810061bd34c3bf09b8fbd3577f5b470497bafcec2110df26c4356daa960794",
+            "restored_quote_sha256": "e5810061bd34c3bf09b8fbd3577f5b470497bafcec2110df26c4356daa960794"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "10837eff3c02b0e9be36f567288aadcbe2ac0486f0c1d7e5d07dca4b6486ce59",
+      "question_id": "122",
+      "cited_pmid": "33183921",
+      "statement": "T wave abnormalities can be classified into different types, such as T wave inversion, T wave flattening, and T wave alternans .",
+      "reference_relation": "neutral",
+      "reference_support": false,
+      "evidence_sha256": "e3d55d4c34ae695c595288f7cc20e743c0354226b5838a11fd815b30639dd8df",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "b24f9fe1b0e0ec332ce13fa63e97c52c0898b1e8039621a033443d9769c49022"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document discusses T-wave inversions and other specific T-wave patterns in clinical cases, but it does not establish any classification system of T wave abnormalities or mention T wave flattening or T wave alternans.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "cbef5c7d9ddce08c35a5c0da873d3ec9ba61a5ffb9e1f292bad828a3feaf931a",
+      "question_id": "136",
+      "cited_pmid": "35876779",
+      "statement": "For severe elbow pain, the initial treatment should be conservative, including rest, nonsteroidal anti-inflammatory drugs, physical therapy, cortisone injections, and local modalities .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "964ae662a829693fddb956b820c452d61eda7bb66c170fa3b30bcaf370f0dea1",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "49d542e9500777caf001dd3e87f3580b8abe6974e63b79d8e23b6f1edcf24c81"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document supports that nonoperative modalities such as rest, therapy, and injections are mainstay treatments for elbow pain, though it does not explicitly specify nonsteroidal anti-inflammatory drugs or distinguish 'severe' pain for the initial conservative approach.",
+        "supported_assertion": "Treatment for elbow pain can include nonoperative/conservative modalities such as rest, therapy, and injections.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 436,
+            "end": 555,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "065970d89c9cedc66e5ecc2102ea2048973b0348896497cce30e62f60f717845",
+            "restored_quote_sha256": "065970d89c9cedc66e5ecc2102ea2048973b0348896497cce30e62f60f717845"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "cf26de60b72085fdef7a86aa3f6bb6b801d3f8199830c717b0c6149a0f24c247",
+      "question_id": "123",
+      "cited_pmid": "37628614",
+      "statement": "These symptoms are typically milder and occur later in life compared to those with biallelic variants .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "9eaef4de75adc415ee77e019eafe0f7ed10feb97c845ebb4d3e025ba7573b0ad",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "9110426e507c58964071c7a7c31da9f5f70582960eac0f803eb0db3344cad5a9"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document explicitly states that symptoms in heterozygotes are usually milder and occur later in life compared to those with biallelic variants.",
+        "supported_assertion": "Symptoms are typically milder and occur later in life compared to those with biallelic variants.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 535,
+            "end": 637,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "82092557982d8f2f85ff1d0da58ad7026bea26a9d0f027a5a03332781b1c181c",
+            "restored_quote_sha256": "82092557982d8f2f85ff1d0da58ad7026bea26a9d0f027a5a03332781b1c181c"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "1ec6f8b896c939afb04b9e568f54037fc69aae612392d0aa0daff3fcd6d5baac",
+      "question_id": "133",
+      "cited_pmid": "24210233",
+      "statement": "Cystectomy, which involves removing the cyst while preserving ovarian tissue, is considered a fertility-sparing option .",
+      "reference_relation": "neutral",
+      "reference_support": false,
+      "evidence_sha256": "1133652860d0725d0e5024990ae80a018b5d149b666bf22a48d39cadbaff8007",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "2f71553f7dc84aab8fc4e64db2e4f601c1f466abb6d2cfe7c37fbd0ed616589f"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document supports the assertion that cystectomy (kystectomy) is a fertility-sparing surgical choice over oophorectomy in patients wishing to preserve fertility. The explicit definition of cystectomy as removing the cyst while preserving ovarian tissue is not directly stated in the text, but the primary claim is supported.",
+        "supported_assertion": "Cystectomy is considered a fertility-sparing surgical option compared to oophorectomy for managing benign ovarian cysts.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 290,
+            "end": 532,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "f78d21bb448fd15bd34d75139fa855220d39ba1d4de5f20d49202778edd34d05",
+            "restored_quote_sha256": "f78d21bb448fd15bd34d75139fa855220d39ba1d4de5f20d49202778edd34d05"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "455317eb61a84aee6b70711967f1c8a56356cbd8baaf7eed759959d5df43792f",
+      "question_id": "154",
+      "cited_pmid": "22319896",
+      "statement": "Additionally, slow and deep breathing exercises, such as those used in yoga, can help reduce dead space ventilation and renew air throughout the lungs, improving pulmonary function .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "11dc918e722ad3dbb9da16e85c36a41e1f4a1710f04b935bc767731524a90c90",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "error",
+        "failure_code": "quote_not_in_document",
+        "error_type": "DecisionValidationError"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "bd94e02c07ccd65dc0ea8d141eb455720c3012687da142098553c4cf20358da1"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document explicitly states that slow and deep breathing, as part of Pranayama, reduces dead space ventilation and renews air throughout the lungs, and concludes that deep breathing exercises are beneficial for lung functions.",
+        "supported_assertion": "Slow and deep breathing exercises, such as those used in Pranayama (yoga), can reduce dead space ventilation, renew air throughout the lungs, and improve pulmonary functions.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 183,
+            "end": 314,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "e5bdec4aa0265cf3c51eb032899e0513083ae0f4bf672e56bfdd7962976d977c",
+            "restored_quote_sha256": "e5bdec4aa0265cf3c51eb032899e0513083ae0f4bf672e56bfdd7962976d977c"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "8ed9ec644440ab5563f10e2bb5d7605fe8879af1c2977dd4c17339a12b78d63d",
+      "question_id": "147",
+      "cited_pmid": "34251531",
+      "statement": "Furthermore, anti-inflammatory and immunomodulatory therapies, such as canakinumab, are being investigated as potential treatments for atherosclerosis .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "c28defc30b585062dbb62008ddce1f54deffe06ae183e96f73a0d9fd01377d1a",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "2919e28cec2fa08cc37d63f4d4ac8a10678ecad8c9843de3295fe975268aab90"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document supports the general assertion that anti-inflammatory and immunomodulatory drugs are being studied and tested as potential therapies for atherosclerosis, although canakinumab specifically is not named in the text.",
+        "supported_assertion": "Anti-inflammatory and immunomodulatory therapies are being investigated as potential treatments for atherosclerosis.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 555,
+            "end": 920,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "806de7055baf6ca0a113e719768bbf7de2682169c699f9be3aafcce1481eb7a5",
+            "restored_quote_sha256": "806de7055baf6ca0a113e719768bbf7de2682169c699f9be3aafcce1481eb7a5"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "5975ec2d3cd9b401f15ead3470d6b69d3bab4e4692f572b1432c5aa9e4d73c17",
+      "question_id": "124",
+      "cited_pmid": "30001355",
+      "statement": "CAD without angina is often diagnosed through medical imaging tests such as coronary angiography, which shows the presence of plaque buildup in the coronary arteries, but the patient does not experience typical angina symptoms .",
+      "reference_relation": "neutral",
+      "reference_support": false,
+      "evidence_sha256": "0e22d4aaf41ca8b364ef0a53a16b4d95294e323571e543e3be44539d930ced00",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "56f8b9c0ecd82349638f6103b5458873f7f01249c2ce32683cc2511d39587182"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document mentions that patients with stable CAD without angina frequently underwent coronary angiography and diagnostic imaging procedures (84.9%), but it does not establish how CAD without angina is diagnosed, what coronary angiography shows (plaque buildup), or explicitly define the condition.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "8a081a3526000993fbc9d4e57890e334a2466a5d67a88bbed70a7cef81b8ac67",
+      "question_id": "117",
+      "cited_pmid": "20872798",
+      "statement": "Most RUNX2 mutations result in loss-of-function mutations, leading to CCD, an autosomal dominant disorder .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "788d7dd9f2b1eb488a8b46206a6c19a8dd2b4c81b5155f2c31ec8bffef52f0c6",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "b7be11f551f567418347ade6004b8525d6c200d6d1104a5798063669b9a5560a"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document supports the claim that CCD is an autosomal dominant disorder caused by a lack of function of the RUNX2 gene. It does not specifically confirm whether 'most' RUNX2 mutations result in loss-of-function, but this unestablished detail does not negate support for the substantive claim.",
+        "supported_assertion": "Cleidocranial dysplasia (CCD) is an autosomal-dominant disorder caused by a lack of function of the RUNX2 gene.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 130,
+            "end": 264,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "332a4ef8e940223793a863eeb18642d14b9ed1d09c90b76f4e7e1cd7b675b179",
+            "restored_quote_sha256": "332a4ef8e940223793a863eeb18642d14b9ed1d09c90b76f4e7e1cd7b675b179"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "edb176730f007419d8bf58fd9ec10c08a7c43987444885ec97228780196567f0",
+      "question_id": "155",
+      "cited_pmid": "34120417",
+      "statement": "The specific duration of treatment will be determined by your surgeon based on your individual needs and the type of surgery performed .",
+      "reference_relation": "neutral",
+      "reference_support": false,
+      "evidence_sha256": "d01553b9cd1ba4e2bc7e14337bd0d994dc30216b99a4e18d7a2a15ceb003d450",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": false
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": false,
+          "relation": "neutral",
+          "number": 1,
+          "raw_response_sha256": "f6aeacb6d7f969d93dcc0cc669b53b6e419099d6530c9a1f1282af4649bfcd66"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": false,
+        "relation": "neutral",
+        "reason": "The document investigates specific post-cataract surgery eye drop regimens of 2 to 4 weeks in a clinical trial, but does not state or address that the specific duration of treatment is determined by a surgeon based on individual needs and surgery type.",
+        "supported_assertion": "",
+        "quote_locations": []
+      }
+    },
+    {
+      "case_id": "db942a8c931e9e821821db0ae497477f75b2ffd32bc1386a0dcbbcfbcd94209b",
+      "question_id": "123",
+      "cited_pmid": "28098115",
+      "statement": "Marfan syndrome is caused by a deficiency of fibrillin-1, leading to defects in the microfibrillar protein architecture within the cardiovascular, musculoskeletal, ocular, and dermal systems .",
+      "reference_relation": "supporting",
+      "reference_support": true,
+      "evidence_sha256": "856920a569ad64b1d7a92bf42128f49eefa45519ebea79231b0a7fa96cfe9ca9",
+      "original_heldout": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "contemporaneous_original": {
+        "status": "ok",
+        "supports_sentence": true
+      },
+      "citation_revision": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports"
+      },
+      "reliability_attempts": [
+        {
+          "status": "ok",
+          "supports_sentence": true,
+          "relation": "supports",
+          "number": 1,
+          "raw_response_sha256": "952e42f50ef1e324e96c8d627973c3ce481e88d0f3610faecc132b9b2d472eb4"
+        }
+      ],
+      "whitespace_replay": {
+        "status": "ok",
+        "supports_sentence": true,
+        "relation": "supports",
+        "reason": "The document explicitly confirms that Marfan syndrome is caused by a deficiency of fibrillin-1 and involves the cardiovascular, skeletal, and ocular systems. Involvement of the dermal system is an unestablished remainder in this document.",
+        "supported_assertion": "Marfan syndrome is caused by a deficiency of the microfibrillar protein fibrillin-1, involving cardiovascular, skeletal (musculoskeletal), and ocular systems.",
+        "quote_locations": [
+          {
+            "field": "evidence_quote",
+            "start": 248,
+            "end": 419,
+            "match_kind": "exact",
+            "supplied_quote_sha256": "f85592057fc383521ea96ad8df453f51d3607abd3f725c600403230332983ce3",
+            "restored_quote_sha256": "f85592057fc383521ea96ad8df453f51d3607abd3f725c600403230332983ce3"
+          }
+        ]
+      }
+    }
+  ]
+}
