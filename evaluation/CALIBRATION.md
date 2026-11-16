@@ -1,9 +1,264 @@
 # Citation calibration and report-evaluator status
 
-Updated November 15, 2026. Consolidated findings; intermediate experiment scripts
+Updated November 16, 2026. Consolidated findings; intermediate experiment scripts
 and detailed investigations remain local.
 
-## Latest candidate and results
+## Final reported result
+
+**Citation-support agreement: 25/31 (80.65%); Cohen's kappa: 0.609.** This is
+the project's final reported retrospective citation-evaluator comparison. Both
+numerical goals (80% agreement and kappa 0.60) were met on this sample, with no
+technical failures or retries. The original evaluator scored 23/31 (74.2%), kappa
+0.498, on the same cases: two additional reference matches and no losses.
+
+The available-data constraint was question-level independence. After the last
+four reserved question groups were evaluated, no unexposed held-out question
+groups remained under the existing split and recorded-exposure rules. Additional
+raw pairs still existed, but they did not provide another untouched question-level
+validation sample. We finalized using the existing MedAESQA collection, preserving
+the original independent result and clearly separating subsequent development
+and retrospective results. This score evaluates citation support, not the full
+medical-report Verifier, omissions, or clinical accuracy.
+
+Only the final implementation and compact evidence are needed from GitHub:
+
+- [Portable final evaluator](citation_evaluator.py), including `judge(case)` and
+  the bounded retry-policy helper. Only question, sentence and evidence are sent
+  to the model; the existing contiguous-source validator remains unchanged.
+- [Locked final prompt and settings](frozen/citation_evaluator_final_2026-11-16.json).
+  The full prompt is in `specification.prompt`; its fingerprint, schema, model,
+  transport settings, retry policy and dependency hashes are included.
+- [Final case-level results](results/citation_evaluator_final_2026-11-16.json).
+  Includes the 31-case original/improved comparison, the separate 32-case
+  development comparison, ablation outcomes, original labels, decisions, reasons,
+  quote locations, source/response hashes, coverage, confusion counts and gains/losses.
+
+Verify every published score offline, without an API key or raw data downloads:
+
+```powershell
+.\.venv\Scripts\python.exe -m evaluation.citation_evaluator verify
+.\.venv\Scripts\python.exe -m pytest tests/test_citation_evaluator.py -q
+```
+
+The seven portable evaluator checks passed. Raw responses, full abstracts,
+exposure inventories, intermediate scripts and detailed reports remain local;
+they are not required to recompute the published metrics. The experimental
+script names below describe that local archive, rather than additional files
+needed to use the final evaluator. The live ADK/Gradio Verifier was not switched
+by finalizing these citation-evaluation results.
+
+## Comparison and investigation record
+
+### November 16: locked improved candidate on the earlier 31-case batch
+
+**Retrospective result: 25/31 agreement (80.65%), Cohen's kappa 0.609, zero
+technical failures and zero retries.** All 31 assessments were valid on the first
+attempt. Both numerical targets were met on this retrospective comparison.
+
+| Evaluator | Matches / cases | Agreement | Kappa | Failed |
+| --- | ---: | ---: | ---: | ---: |
+| Preserved original baseline | 23/31 | 74.2% | 0.498 | 0 |
+| Locked improved candidate | 25/31 | 80.65% | 0.609 | 0 |
+
+This uses the exact combined prompt previously tested on the 32-case development
+sample: population preservation, descriptive-versus-associational inference, and
+one contiguous exact source witness. The earlier 31 case IDs, original references,
+cached full title/abstract inputs, schema, model, temperature, and bounded retry
+policy were fixed before calls. No earlier response was substituted into this run.
+
+Two original disagreements changed to reference matches, with **no losses**:
+question 116 / PMID 33659106 (weight loss and obstructive sleep apnea), and
+question 147 / PMID 34251531 (investigational anti-inflammatory therapies for
+atherosclerosis). Six reference disagreements remain. Confusion counts are 15
+supporting matches, 10 non-supporting matches, five false negatives and one false
+positive relative to the original labels.
+
+The older cases had already been inspected during prior work. This is a
+retrospective comparison, not fresh independent held-out validation. The original
+74.2%, kappa 0.498 result and the newer 32-case results remain preserved. Because
+the comparison uses a historical baseline, the two gains cannot be attributed
+solely to the newest clarifications rather than model variation or earlier
+prompt changes. No runtime Verifier configuration was switched.
+
+Protocol, complete raw responses, and summary are local under
+`data/calibration_results/retrospective_31_2026-11-16_v1/` as `protocol.json`,
+`run.json`, and `summary.json`. The run digest is
+`b1d2cde6187e649d75881c6fd69abbfd588d77af50e70c4a18611c1d7b554fa0`.
+Agreement/kappa were independently recomputed; all 31 source/reference bindings,
+quote offsets, original artifacts and the locked candidate were verified.
+An offline reporting adapter removed a redundant legacy `case_id` field inside
+historical attempts for the paired summary; no decision or label changed. The
+portable verification command above recomputes the published comparison without
+needing that local adapter or making model calls.
+
+### Development improvement after inspecting the 32 cases
+
+**The combined development candidate reached 26/32 agreement (81.25%), kappa
+0.625, with zero technical failures and no retries.** The preserved fresh run
+remains 24/32 (75.0%), kappa 0.500. These are now inspected development cases:
+the new result meets the numerical targets on this sample, but is not a new
+held-out calibration result and does not switch the live report Verifier.
+
+Two prompt clarifications were first tested independently: preserve the population
+of a clinical outcome, and distinguish descriptive subgroup observations from
+association or causation. Each passed six artificial boundary checks, as did the
+unchanged control. Those checks establish expected boundary behavior, not an
+independent human-labeled accuracy gain.
+
+| Development arm | Matches / valid assessments | Agreement on valid | Kappa | Unresolved failures | Matches / all 32 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Repeated unchanged control | 23/31 | 74.2% | 0.485 | 1 | 23/32 |
+| Population clarification alone | 24/31 | 77.4% | 0.549 | 1 | 24/32 |
+| Inference clarification alone | 24/31 | 77.4% | 0.547 | 1 | 24/32 |
+| Combined clarifications and explicit contiguous-quote instruction | 26/32 | 81.25% | 0.625 | 0 | 26/32 |
+
+Do not mistake the population-only percentage for a clear improvement: on its
+30 shared valid pairs with the control, it had one gain and one loss, with both
+scoring 23/30, kappa 0.533. Inference-only had two gains and one loss on 31 shared
+valid cases: 24/31, kappa 0.547, versus control 23/31, kappa 0.485. It was a modest
+development gain rather than a regression-free fix.
+
+The remaining output failures included joined, noncontiguous quotations and an
+invented Unicode sequence. They were retained as invalid; neither the validator
+nor old responses were repaired to manufacture a score. The subsequent combined
+candidate explicitly asks for one complete supported assertion with a short,
+contiguous, exact source witness. It retains the same schema, whitespace-only
+validator, full inputs, original references, model, temperature, and retry policy.
+No answer-context expansion or whole-sentence-support requirement was introduced.
+
+Before cohort calls, this adaptive combined experiment froze its prompt and a
+16-case artificial boundary gate, covering both clarifications and quote/dose
+integrity. All 16 passed, then all 32 development cases returned valid first
+responses. Combining rules and formatting means the overall improvement cannot
+be attributed to just one change. Model variation and this sample's four question
+clusters remain limitations.
+
+Compared with the preserved 32-case run, there were **three gains and one loss**:
+the mouse age/healing claim (118/35602595), descriptive thyroid-adherence inference
+(135/30636753), and antihypertensive causal inference (135/21041167) changed to
+match their references. The survival-efficacy claim (145/25022950) changed from
+support to neutral, creating a new reference disagreement: the model now requires
+stronger evidence of improved survival from a noncomparative phase-II study.
+That disagreement is retained, not relabeled or hidden.
+
+Final confusion counts: 12 supporting matches, 14 non-supporting matches, two
+false positives relative to the references, and four false negatives. Previously,
+there were five false positives and three false negatives. Thus the gain includes
+a tradeoff toward more conservative support decisions. On the 31 shared valid
+pairs with the repeated control, the combined candidate scored 25/31, kappa 0.611,
+versus 23/31, kappa 0.485. This paired comparison also had three gains and one loss.
+
+The experimental prompts are in `citation_scope_development.py` and
+`citation_scope_combined.py`; their versioned protocols, every response, attempts,
+first/post-retry summaries, and gain/loss identities are preserved locally in
+`data/calibration_results/citation_scope_development_2026-11-15_v1/` and
+`data/calibration_results/citation_scope_combined_2026-11-15_v1/`.
+The combined run digest is
+`8c115ca2977de3ef29c5b168deb570f38f14589f1b27b7a07640e9389475517d`.
+The scores were independently recomputed, all source quote offsets and original
+case/reference bindings checked, and the frozen baseline verified unchanged.
+Eight local request-isolation/validation checks passed. A transient Windows
+checkpoint-replacement error was handled by retrying only local storage; the
+failed write occurred before the next API call, and completed calls were not repeated.
+
+Keep the combined version as the preferred **development candidate**, not a
+replacement for the frozen independent result. Six reference disagreements remain.
+Any later independent evaluation needs a new reserved sample; do not claim this
+retuned sample is still untouched. No Git commit/push or runtime promotion was made.
+
+### Fresh fixed 32-case evaluation completed November 15
+
+**Final agreement: 24/32 (75.0%); Cohen's kappa: 0.500. The 80% agreement and
+0.60 kappa targets were not met.** No settings, references, or cases were changed
+after seeing these outcomes.
+
+| Pass | Valid assessments | Matches / valid | Agreement on valid | Kappa | Failed | Matches / all selected |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| First attempt | 30/32 | 23/30 | 76.7% | 0.533 | 2 | 23/32 (71.9%) |
+| After predefined technical retries | 32/32 | 24/32 | 75.0% | 0.500 | 0 | 24/32 (75.0%) |
+
+There were 34 model calls: all 32 first attempts, then one identical-call retry
+for each of two `quote_not_in_document` failures. Both retries became valid;
+one matched its reference and one did not. No valid disagreements were retried.
+Final counts: 13 supporting matches, 11 non-supporting matches, five predicted
+support/reference non-support disagreements, and three in the opposite direction.
+All responses, including invalid first responses, are saved. Eight disagreements remain.
+
+The summary and complete attempts are respectively
+`data/calibration_results/unused_validation_summary_2026-11-15_v1.json` and
+`data/calibration_results/unused_validation_run_2026-11-15_v1.json`.
+The run digest is `eaaed1d637e0859bf363831c9a3867c66f24d653f938aa7ef3639fb95ec1e713`.
+All 32 bindings, 34 captured responses, retry eligibility/order, and independently
+recomputed agreement/kappa were verified. All 24 preparation/execution checks passed.
+
+This is a different sample from the reviewed 31-case replay (83.9%, kappa 0.668),
+so the difference is not a paired code-regression measurement. Technical coverage
+is complete, but the live whole-report Verifier remains uncalibrated. The descriptive
+case-level agreement Wilson interval is 57.9%-86.7%, without adjustment for four
+question clusters. Future tuning on these disagreements makes this sample
+development data for that revision; another run on it is not fresh validation.
+
+### Offline inspection of the eight disagreements
+
+Checked each saved judgment against the full cached abstract, its original
+dataset annotations, and preceding answer sentences where needed to identify
+missing context. No model calls, prompt changes, reference changes, or score
+changes were made. These interpretations are diagnostic, not replacement gold labels.
+
+| Question / PMID | What the inspection found | Recommended handling |
+| --- | --- | --- |
+| 131 / 33273813 | Similar-to-placebo adverse events are not identical to saying the preceding high-dose effects are clinically insignificant. The payload also omits the antecedent of “these effects.” | Context/paraphrase boundary; do not automatically flip it. |
+| 118 / 25165705 | A treated alkali-burn experiment reports healing in 48 hours; this does not establish typical untreated healing of most minor injuries. | The model's conservative decision is defensible; preserve the reference disagreement. |
+| 118 / 30059040 | A mouse abrasion abstract directly describes re-epithelialization. The model supports the regeneration component; human applicability and remaining wording are separate questions. | Partial-support/population boundary, not a clear quote or extraction error. |
+| 118 / 35602595 | The model generalizes an age-related healing result observed in mice to a patient-facing claim without retaining species. | First development candidate: population preservation, with supported-mechanism controls. |
+| 135 / 30636753 | The model treats uncontrolled TSH in many non-adherent patients as an association, despite the abstract reporting no statistically significant association with adherence. | First development candidate: descriptive observations versus association/causation. Nonsignificance is not proof of no effect or an automatic contradiction. |
+| 135 / 21041167 | Blood pressure fell after supervised antihypertensives, but the model calls this confirmation of a causal nonadherence claim. | Reasoning is overstated; the binary label remains debatable under “can lead” wording. |
+| 145 / 32489011 | Cardiac side effects are mentioned; myocarditis is not. The model supports the broad category under the current illustrative-example rule. | General-category versus essential-specific-example boundary; do not silently require complete coverage. |
+| 131 / 23392793 | The source recommends LABA plus ICS in asthma but does not name formoterol. An earlier answer sentence supplied the LABA/formoterol bridge, omitted from the payload. | Test context separately. Generated answer context can clarify meaning but is not independently verified evidence; retain asthma/COPD restrictions. |
+
+No conflicting duplicate binary references were found in these eight cases.
+Semantic ambiguity here is different from two annotations explicitly disagreeing
+on the same pair. Also checked two correctly matched controls: PMID 14985101 has
+a supporting mouse-mechanism reference, and PMID 31598519 supports one component
+while other listed factors remain unaddressed. Consequently, blanket rejection
+of animal studies or every partially supported sentence would risk regressions.
+
+The detailed local review, original annotation excerpts, saved reasons, source
+quotes, and diagnostic answer context are in
+`data/calibration_results/unused_validation_disagreement_review_2026-11-15_v1.json`.
+Every quoted source span and case/reference identity was checked against the
+preserved artifacts. Next: test population preservation and descriptive-versus-
+associational evidence as separate development changes, including positive
+controls. Handle answer-context input in a separate experiment. None of these
+findings guarantees a label flip or a higher score; retain all original results.
+
+**Independent evaluation sample prepared November 15:** 32 previously unused
+statement-document pairs, with 16 supporting and 16 non-supporting references
+across four original held-out question groups. All 32 PMID-matched titles and
+complete available PubMed abstracts were retrieved and verified. No repeated
+documents or normalized statements are included. Selection was fixed before
+source retrieval; no cases were replaced. Its completed run is recorded above.
+
+The separate local cohort manifest,
+`evaluation/frozen/unused_validation_cohort_2026-11-15_v1.json`, binds every payload
+and original reference to the frozen evaluator fingerprint. The published final
+case-level results retain the case identities, references and payload/source hashes.
+Its cohort fingerprint is
+`f3698e1674e1183cb76a9b9bad4b2a1bd3e70641a3273fca52a32ba65a35cbb6`.
+This is a balanced diagnostic sample from four clustered topics, rather than a
+deployment prevalence sample or 32 independent topics. Unused status is relative
+to the recorded exposure audit; unrecorded external use cannot be certified.
+Current PubMed abstracts are not guaranteed to reproduce annotation-time text.
+
+Selection, raw PubMed XML, parsed sources, and the ready-to-run suite are kept
+locally under `data/calibration_results/unused_validation_*_2026-11-15_v1.*`.
+Preparation is reproducible with `python -m evaluation.prepare_unused_cohort`
+and its `select`, `fetch`, and `freeze` actions. These actions never call Gemini
+and refuse to replace differing frozen artifacts. A future run must use this
+cohort with the frozen configuration and its existing bounded retry policy,
+retain every selected case, and report first-attempt and post-retry results
+separately. The configuration manifest's `not_selected` field records the earlier
+configuration-freeze stage; this later, separate cohort supplies the dataset binding.
 
 The current citation-only candidate uses whitespace-safe source-quote validation
 and is frozen as `citation-judge-frozen-2026-11-15-v1`. Its configuration, policy,
@@ -127,9 +382,9 @@ The [citation judge and retry policy are frozen](#frozen-candidate-and-retry-pol
 `citation-judge-frozen-2026-11-15-v1`. The machine-readable manifest records the
 prompt, schema, model/settings, whitespace validator, source snapshots/hashes,
 runtime versions, and bounded technical-retry rules. A verification helper rejects
-drift and requires a separately frozen cohort before model calls. No independent
-cohort has been selected and no new API run has started. The next step is exposure,
-duplicate, and reference-conflict auditing before freezing the validation sample.
+drift and requires a separately frozen cohort before model calls. At configuration
+freeze, no independent cohort had been selected. The later 32-case selection,
+source verification, and completed evaluation are recorded above.
 
 ### November 15: whitespace-only source quote recovery
 
@@ -229,8 +484,8 @@ bound sample and its `retry_allowed` helper for the declared attempt budget. The
 entry point requires a separately frozen cohort bound to this configuration,
 including sampling/exclusion provenance and per-case input/reference hashes.
 Those hashes detect later edits; they do not themselves prove sample independence.
-No independent sample or new held-out score is included in this commit. Unused-case
-auditing and sample preparation remain separate work.
+The original configuration-freeze commit contained no independent sample. The
+separate cohort and its completed evaluation are now recorded above.
 
 ```powershell
 .\.venv\Scripts\python.exe -m evaluation.freeze_citation_judge verify
