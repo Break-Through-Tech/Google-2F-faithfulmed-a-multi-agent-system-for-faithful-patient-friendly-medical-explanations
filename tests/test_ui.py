@@ -9,7 +9,8 @@ from unittest.mock import AsyncMock, patch
 from faithfulmed_demo import fixtures
 from faithfulmed_ui.examples import BUILTIN, load_examples
 from faithfulmed_ui.pipeline import LIVE, OFFLINE, REPAIR, Snapshot, request_message, stream_run
-from faithfulmed_ui.presentation import answer_markdown, result_status, sources_html, trace_state
+from faithfulmed_ui.presentation import (answer_markdown, attributed_markdown, result_status,
+                                         sources_html, trace_state)
 
 
 class PresentationTests(unittest.TestCase):
@@ -38,6 +39,23 @@ class PresentationTests(unittest.TestCase):
         self.assertNotIn('<img ', html)
         self.assertNotIn('href=', html)
         self.assertIn('&lt;script&gt;', html)
+
+    def test_exact_report_wording_links_without_assigning_background_to_unmatched_text(self):
+        state = {
+            'source_report': 'The stress test result is pending.',
+            'atoms': [{'source_quote': 'The stress test result is pending.'}],
+            'retrieved_context': [{'text': 'background',
+                'metadata': {'title': 'Chest Pain',
+                             'source_url': 'https://medlineplus.gov/chestpain.html'}}],
+        }
+        answer = attributed_markdown(
+            'The stress test result is pending.\nChest pain can have many causes.', state)
+        self.assertIn('The stress test result is pending. [Report quote 1 (exact wording)](#report-quote-0)', answer)
+        self.assertTrue(answer.endswith('Chest pain can have many causes.'))
+        self.assertNotIn('chestpain.html', answer)
+        evidence = sources_html(state)
+        self.assertIn('id="report-quote-0"', evidence)
+        self.assertIn('The stress test result is pending.', evidence)
 
     def test_absent_dataset_keeps_synthetic_demo_available(self):
         with tempfile.TemporaryDirectory() as directory:

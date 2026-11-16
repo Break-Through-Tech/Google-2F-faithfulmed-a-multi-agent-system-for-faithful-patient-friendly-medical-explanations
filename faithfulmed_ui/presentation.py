@@ -2,12 +2,98 @@
 
 from html import escape
 import json
+import re
 from urllib.parse import urlparse
 
 from .pipeline import Snapshot, STAGES
 
 LABELS = ("Receive report", "Extract facts", "Check quotes", "Write explanation",
           "Verify", "Refine", "Check readability")
+_SENTENCE_END = re.compile(r"(?<=[.!?])(?=\s|$)")
+
+
+def _medlineplus_url(value: object) -> str | None:
+    url = str(value or "").strip()
+    # Keep link destinations safe in both HTML and Markdown. Reject malformed
+    # URLs rather than letting one bad source stop presentation of the result.
+    if not url or re.search(r'[\s<>"\\()\x00-\x1f\x7f]', url):
+        return None
+    try:
+        parsed = urlparse(url)
+        if (parsed.scheme in ("https", "http") and parsed.hostname in (
+                "medlineplus.gov", "www.medlineplus.gov")
+                and parsed.username is None and parsed.password is None
+                and parsed.port is None):
+            return url
+    except ValueError:
+        pass
+    return None
+
+
+def _source_records(state: dict) -> tuple[list[dict], list[dict]]:
+    """Keep only quotes actually in this report and usable background URLs."""
+    report_quotes = []
+    seen_quotes = set()
+    report = state.get("source_report") or ""
+    for atom in state.get("atoms") or []:
+        quote = str(atom.get("source_quote") or "").strip()
+        if quote and quote in report and quote not in seen_quotes:
+            seen_quotes.add(quote)
+            report_quotes.append({"quote": quote, "href": f"#report-quote-{len(report_quotes)}",
+                                  "number": len(report_quotes) + 1})
+
+    pages = []
+    seen_urls = set()
+    for row in state.get("retrieved_context") or []:
+        metadata = row.get("metadata") or {}
+        url = _medlineplus_url(metadata.get("source_url"))
+        if url and url not in seen_urls:
+            seen_urls.add(url)
+            pages.append({
+                "url": url,
+                "title": str(metadata.get("title") or metadata.get("term") or "MedlinePlus passage"),
+            })
+    return report_quotes, pages
+
+
+def _report_wording_match(text: str, report_quotes: list[dict]) -> dict | None:
+    """A navigation shortcut for complete exact wording, not an entailment score."""
+    for item in report_quotes:
+        sentences = [part.strip() for part in _SENTENCE_END.split(item["quote"])]
+        if text == item["quote"] or text in sentences:
+            return item
+    return None
+
+
+def attributed_markdown(text: str, state: dict) -> str:
+    """Append exact-wording shortcuts; never invent an evidence association.
+
+    Preserve the original Markdown. Paraphrases and unmatched blocks stay
+    unlinked. Retrieved background pages are listed separately in Sources.
+    """
+    report_quotes, _ = _source_records(state)
+    if not text or not report_quotes:
+        return text
+    lines = []
+    in_code = False
+    for line in text.splitlines():
+        if line.lstrip().startswith(("```", "~~~")):
+            in_code = not in_code
+        if in_code or not line.strip() or line.lstrip().startswith(("#", "```", "~~~")):
+            lines.append(line)
+            continue
+        plain = re.sub(r'^\s*(?:[-+*]|\d+[.)])\s+', '', line).strip()
+        plain = re.sub(r'^\*\*[^*\n]+:\*\*\s*', '', plain)
+        # Bold/emphasis may surround exact source wording; do not rewrite its
+        # words, negate it, drop qualifiers, or match only part of a claim.
+        plain = plain.replace('**', '').replace('__', '')
+        item = _report_wording_match(plain, report_quotes)
+        if item:
+            # The link is a separate marker, leaving bullets, headings and bold
+            # labels intact. No nearest-source or first-source fallback exists.
+            line = line.rstrip() + f" [Report quote {item['number']} (exact wording)]({item['href']})"
+        lines.append(line)
+    return "\n".join(lines)
 
 
 def progress_html(view: Snapshot) -> str:
@@ -50,10 +136,11 @@ def status_html(view: Snapshot) -> str:
 def answer_markdown(view: Snapshot) -> str:
     kind, _, _ = result_status(view)
     if kind == "complete":
-        return view.state["final_answer"]
+        return attributed_markdown(view.state["final_answer"], view.state)
     if kind == "review":
         draft = view.state.get("revised_draft") or view.state.get("draft")
-        return "### Draft for review\n\n" + draft if draft else "No explanation is available for this run."
+        return ("### Draft for review\n\n" + attributed_markdown(draft, view.state)
+                if draft else "No explanation is available for this run.")
     if kind == "error":
         return "No final explanation was produced. Check the status message above."
     return "Your explanation will appear here when the checks finish."
@@ -78,20 +165,30 @@ def metrics_html(view: Snapshot) -> str:
 
 
 def sources_html(state: dict) -> str:
+    report_quotes, pages = _source_records(state)
     rows = state.get("retrieved_context") or []
-    if not rows:
+    if not report_quotes and not rows:
         return '<p class="empty-note">Retrieved medical references will appear here.</p>'
     cards = []
+    if report_quotes:
+        cards.append('<p class="source-label">Original report quotes · exact wording, not independent clinical validation</p>')
+        for index, item in enumerate(report_quotes):
+            cards.append(
+                f'<article id="report-quote-{index}" class="source-card">'
+                f'<h4>Report quote {item["number"]}</h4><p>{escape(item["quote"])}</p></article>')
+    background = []
     for row in rows:
         metadata = row.get("metadata") or {}
         title = escape(str(metadata.get("title") or metadata.get("term") or "MedlinePlus passage"))
-        url = str(metadata.get("source_url") or "")
-        parsed = urlparse(url)
-        if parsed.scheme in ("https", "http") and parsed.hostname in ("medlineplus.gov", "www.medlineplus.gov"):
+        url = _medlineplus_url(metadata.get("source_url"))
+        if url:
             title = f'<a href="{escape(url, quote=True)}" target="_blank" rel="noopener noreferrer">{title} ↗</a>'
-        cards.append(f'<article class="source-card"><h4>{title}</h4><p>{escape(str(row.get("text", "")))}</p></article>')
+        background.append(f'<article class="source-card"><h4>{title}</h4><p>{escape(str(row.get("text", "")))}</p></article>')
     label = "Scripted reference passage" if state.get("mode") == "offline-scripted" else "Retrieved reference passages"
-    return f'<p class="source-label">{label} · general medical background</p>' + "".join(cards)
+    if background:
+        cards.append(f'<p class="source-label">{label} · general medical background; retrieval alone does not establish sentence support</p>')
+        cards.extend(background)
+    return "".join(cards)
 
 
 def facts_rows(state: dict) -> list:
