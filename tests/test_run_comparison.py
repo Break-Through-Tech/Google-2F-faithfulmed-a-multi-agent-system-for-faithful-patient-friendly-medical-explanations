@@ -240,6 +240,49 @@ class OfflineRunTests(RunnerTestCase):
         self.assertEqual(set(self.run_cli("--limit", "1")), {"baseline", "adk"})
 
 
+class VariantRunTests(RunnerTestCase):
+    """Ablation variants (issue #34) apply to ADK only and never change normal runs."""
+
+    def test_no_readability_runs_only_adk_and_records_the_variant(self):
+        records = self.run_cli("--variant", "no_readability")
+        self.assertEqual(set(records), {"adk"})
+        record = records["adk"]
+        self.assertEqual(record["variant"], "no_readability")
+        self.assertEqual(record["settings"]["variant"], "no_readability")
+        self.assertEqual((record["status"], record["output_text"]), ("complete", rc.SCRIPTED_ANSWER))
+        trace = json.loads((self.output.parent / record["trace_path"]).read_text(encoding="utf-8"))
+        self.assertEqual(trace["state"]["readability_status"], "not_run")
+        self.assertEqual(trace["state"]["variant"], "no_readability")
+
+    def test_default_output_name_includes_the_variant(self):
+        ids = self.folder / "ids.json"
+        ids.write_text(json.dumps({"pilot_version": "test-pilot"}), encoding="utf-8")
+        self.assertEqual(rc.default_output(ids, True, "no_readability").name, "test-pilot-no_readability-offline.json")
+        self.assertEqual(rc.default_output(ids, False, "no_readability").name, "test-pilot-no_readability.json")
+        self.assertEqual(rc.default_output(ids, False).name, "test-pilot.json")
+
+    def test_baseline_with_a_variant_is_refused(self):
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
+            self.run_cli("--systems", "baseline", "--variant", "no_readability")
+        self.assertFalse(self.output.exists())
+
+    def test_default_run_keeps_its_settings(self):
+        records = self.run_cli()
+        for record in records.values():
+            self.assertNotIn("variant", record["settings"])
+        self.assertEqual((records["adk"]["variant"], records["baseline"]["variant"]), ("full", None))
+
+    def test_state_from_another_variant_is_an_error(self):
+        fields = rc.adk_fields(live_state(variant="full"), expected_note=REPORT, expected_query=REPORT,
+                               variant="no_readability")
+        self.assertEqual((fields["status"], fields["output_kind"]), ("error", None))
+        self.assertIn("variant", fields["error"]["message"])
+
+    def test_runner_variants_match_the_agent(self):
+        from faithfulmed_demo.agent import VARIANTS
+        self.assertEqual(rc.VARIANTS, VARIANTS)
+
+
 class LiveLogicTests(RunnerTestCase):
     def test_both_systems_get_the_full_report_and_top_k_three(self):
         client = FakeClient()

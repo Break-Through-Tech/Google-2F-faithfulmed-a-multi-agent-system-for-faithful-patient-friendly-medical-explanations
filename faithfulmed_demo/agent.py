@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import os
 
 from google.adk.agents import BaseAgent, SequentialAgent
 from google.adk.events import Event, EventActions
@@ -23,8 +24,27 @@ def emit(ctx, author, message, **updates):
                  actions=EventActions(state_delta=updates))
 
 
-def prepare(callback_context):
-    message = ''.join(part.text or '' for part in callback_context.user_content.parts).strip()
+# Pipeline variants for the ablation comparison (issue #34). Each one drops one stage.
+VARIANTS = ('full', 'no_readability')
+
+
+def check_variant(variant):
+    if variant not in VARIANTS:
+        raise ValueError(f'Unknown pipeline variant {variant!r}. Use one of: {", ".join(VARIANTS)}.')
+    return variant
+
+
+def prepare_for(variant):
+    """ADK passes only callback_context, so this wrapper supplies the variant."""
+    check_variant(variant)
+
+    def callback(callback_context):
+        return prepare(callback_context, variant)
+    return callback
+
+
+def prepare(callback_context, variant='full'):
+    message =''.join(part.text or '' for part in callback_context.user_content.parts).strip()
     offline = message in ('/offline', '/offline-error')
     known = offline or message == '/demo'
     if message.startswith('/') and not known:
@@ -44,7 +64,7 @@ def prepare(callback_context):
             mode='offline-scripted' if offline else 'live', model=MODEL,
             inject_demo_error=message == '/offline-error',
             retrieval_query=fixtures.EXAMPLE['retrieval_query'] if known else source_text,
-            stage_modes={}, execution_trace=[]).items():
+            stage_modes={}, execution_trace=[], variant=variant).items():
         callback_context.state[key] = value
 
 
@@ -283,17 +303,47 @@ class ReadabilityStage(DemoStage):
         yield emit(ctx, self.name, message, **updates)
 
 
-def build_agent():
+class SkippedReadabilityStage(DemoStage):
+    """no_readability variant: release the Verifier-cleared draft unchanged.
+
+    Keeps ReadabilityStage's release gate, so unresolved findings still need review.
+    """
+
+    async def run_stage(self, ctx):
+        state = ctx.session.state
+        text = state['revised_draft']
+        reason = 'no_readability variant; readability stage not run'
+        yield execution.skip(ctx, self.name, 'run_readability', 'local', reason)
+        yield execution.skip(ctx, self.name, 'Readability rewrite', 'model', reason)
+        unresolved = bool(state['final_verdict']['issues']) or bool(state['repair_blocker'])
+        banner = 'OFFLINE SCRIPTED WALKTHROUGH' if state['mode'] == 'offline-scripted' else 'LIVE DEMO — uncalibrated'
+        message = (f'{banner}\n\n' + ('Draft for review:\n' + text if unresolved else text) + '\n\n'
+                   'Readability: not run (no_readability variant).\n'
+                   + ('Unresolved Verifier findings: needs review.' if unresolved else
+                      'No unresolved findings in this demo check. This is not a clinical validation.'))
+        yield emit(ctx, self.name, message,
+                   final_answer='' if unresolved else text,
+                   run_status='needs_review' if unresolved else 'complete',
+                   readability_status='not_run', readability_score={'status': 'not_run'},
+                   suggestion=None, readability_history=[], faithfulness_recheck_required=False,
+                   stage_modes={**state['stage_modes'], 'Readability': 'not run (no_readability variant)'})
+
+
+def build_agent(variant='full'):
+    check_variant(variant)
     extractor = create_extractor(MODEL)
     extractor.name = 'ClinicalExtractor'
     extractor.include_contents = 'none'
+    # Keep the stage name 'Readability' so the seven-stage order and trace stay the same.
+    readability = (SkippedReadabilityStage if variant == 'no_readability' else ReadabilityStage)(name='Readability')
     return SequentialAgent(name='FaithfulMed', description='Seven-stage clinical explanation demo. Start with /offline-error or /demo.',
-        before_agent_callback=prepare,
+        before_agent_callback=prepare_for(variant),
         sub_agents=[IntakeStage(name='Intake'),
                     ExtractorStage(name='Extractor', sub_agents=[extractor]),
                     QuoteCheckStage(name='QuoteCheck'),
                     SimplifierStage(name='Simplifier'), VerifierStage(name='Verifier'),
-                    RefinerStage(name='Refiner'), ReadabilityStage(name='Readability')])
+                    RefinerStage(name='Refiner'), readability])
 
 
-root_agent = build_agent()
+# Read here rather than in config.py: the frozen citation evaluator fingerprints config.py.
+root_agent = build_agent(os.environ.get('FAITHFULMED_VARIANT', 'full'))
