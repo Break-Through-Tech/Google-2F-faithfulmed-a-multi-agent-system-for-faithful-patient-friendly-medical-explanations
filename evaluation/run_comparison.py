@@ -38,6 +38,9 @@ SCRIPTED_CHUNK = {"id": "offline-scripted-chunk-1", "text": "Scripted background
 TOP_K = 3
 QUERY_RULE = "full-report-text"
 SYSTEMS = ("baseline", "adk")
+# Must match faithfulmed_demo.agent.VARIANTS (a test checks this). It is copied because
+# importing the agent here would load ADK before check_adk_settings sets the model.
+VARIANTS = ("full", "no_readability")
 RETRYABLE = {"error", "failed", "no_context"}
 DRAFT_STATUSES = {"needs_review", "needs_simplification"}
 # The same access and quota errors that stop evaluation/score_outputs.py.
@@ -57,6 +60,8 @@ class Backend:
     index: dict
     usage: Any = None
     check_model: bool = False
+    # The ADK pipeline variant. The baseline ignores it.
+    variant: str = "full"
 
 
 class UsageClient:
@@ -132,9 +137,9 @@ class OfflineGenerator:
         return SCRIPTED_ANSWER
 
 
-def offline_backend():
+def offline_backend(variant="full"):
     return Backend(OFFLINE_MODE, OFFLINE_MODEL, OfflineCollection(), OfflineGenerator(),
-                   {"collection": OFFLINE_MODE})
+                   {"collection": OFFLINE_MODE}, variant=variant)
 
 
 def scripted_atoms(report):
@@ -196,12 +201,13 @@ def check_adk_settings(model):
         raise ValueError(f"ADK is already loaded with {agent.MODEL}, not {model}. Use a new process.")
 
 
-def live_backend(client, model, index_target, index):
+def live_backend(client, model, index_target, index, variant="full"):
     from retrieval.gemini_chroma import GeminiEmbedder, GeminiTextQueryCollection
 
     usage = UsageClient(client)
     return Backend("live", model, GeminiTextQueryCollection(index_target, GeminiEmbedder(client)),
-                   GeminiGenerator(usage, model=model), index, usage=usage, check_model=True)
+                   GeminiGenerator(usage, model=model), index, usage=usage, check_model=True,
+                   variant=variant)
 
 
 def describe_error(exc):
@@ -236,7 +242,7 @@ def run_baseline_attempt(backend, text):
     return fields
 
 
-def adk_fields(state, *, expected_note, expected_query, model=None):
+def adk_fields(state, *, expected_note, expected_query, model=None, variant="full"):
     """Turn final ADK state into record fields. A draft is never presented as a final answer."""
     status = state.get("run_status")
     fields = {"retrieval_query": state.get("retrieval_query", ""), "output_text": "", "output_kind": None,
@@ -251,6 +257,9 @@ def adk_fields(state, *, expected_note, expected_query, model=None):
         return problem("ADK did not receive the expected note and query.")
     if model and state.get("model") != model:
         return problem(f"ADK ran with {state.get('model')} instead of {model}.")
+    # State saved before variants existed has no 'variant' key; that was the full pipeline.
+    if state.get("variant", "full") != variant:
+        return problem(f"ADK ran the {state.get('variant')!r} variant instead of {variant!r}.")
     if status == "failed":
         return {**fields, "status": "failed",
                 "error": {"message": state.get("error") or "ADK stopped without an error message."}}
@@ -267,7 +276,7 @@ def adk_fields(state, *, expected_note, expected_query, model=None):
     return problem(f"ADK ended with unexpected run_status {status!r}.")
 
 
-async def invoke_adk(message, session_id, events, scripted=False):
+async def invoke_adk(message, session_id, events, scripted=False, variant="full"):
     """The Runner pattern from smoke.py, without its SystemExit and with one session per record."""
     from google.adk.runners import Runner
     from google.adk.sessions import InMemorySessionService
@@ -278,7 +287,7 @@ async def invoke_adk(message, session_id, events, scripted=False):
     app, user = "faithfulmed_demo", "comparison"
     sessions = InMemorySessionService()
     await sessions.create_session(app_name=app, user_id=user, session_id=session_id)
-    agent = build_agent()
+    agent = build_agent(variant)
     if scripted:
         use_scripted_extractor(agent, message)
     runner = Runner(agent=agent, app_name=app, session_service=sessions)
@@ -310,9 +319,9 @@ def run_adk_attempt(backend, text, session_id):
                 "error": {"message": "The report starts with '/', which ADK reads as a command."}}, None
     try:
         with scripted_adk_calls() if scripted else nullcontext():
-            state = asyncio.run(invoke_adk(text, session_id, events, scripted=scripted))
+            state = asyncio.run(invoke_adk(text, session_id, events, scripted=scripted, variant=backend.variant))
         fields = adk_fields(state, expected_note=text, expected_query=text,
-                            model=backend.model if backend.check_model else None)
+                            model=backend.model if backend.check_model else None, variant=backend.variant)
     except Exception as exc:
         fields = {**failure, "error": describe_error(exc)}
     fields["token_usage"] = adk_token_usage(events)
@@ -341,7 +350,12 @@ def build_settings(backend, plan, system):
     shared = {"mode": backend.mode, "frozen_set_version": plan["frozen_set_version"],
               "pilot_version": plan["pilot_version"], "query_rule": QUERY_RULE, "top_k": TOP_K,
               "retrieval_index": backend.index}
-    return {**shared, "prompt_version": prompt_version(system)}, digest(shared)
+    settings = {**shared, "prompt_version": prompt_version(system)}
+    # Only for a non-full variant, so the settings and record keys of normal runs stay the same.
+    # Kept out of `shared` so retrieval stays comparable with the baseline.
+    if system == "adk" and backend.variant != "full":
+        settings["variant"] = backend.variant
+    return settings, digest(shared)
 
 
 def attempt_once(backend, plan, system, row_id, output, previous):
@@ -351,6 +365,7 @@ def attempt_once(backend, plan, system, row_id, output, previous):
     text = plan["reports"][row_id]
     record = {"record_key": record_key(row_id, system, backend.model, settings_digest),
               "source_row_id": row_id, "case_id": f"source-row-{row_id}", "system": system,
+              "variant": backend.variant if system == "adk" else None,
               "generation_model": backend.model, "frozen_set_version": plan["frozen_set_version"],
               "pilot_version": plan["pilot_version"], "prompt_version": settings["prompt_version"],
               "mode": backend.mode, "settings": settings, "settings_digest": settings_digest,
@@ -501,13 +516,14 @@ def export_scoring_input(results_path, key_facts_directory, output, *, directory
     print(f"Saved {len(jobs)} scoring inputs to {output}")
 
 
-def default_output(ids_path, offline):
+def default_output(ids_path, offline, variant="full"):
     plan = json.loads(Path(ids_path).read_text(encoding="utf-8"))
+    name = plan["pilot_version"] + ("" if variant == "full" else f"-{variant}")
     suffix = "-offline" if offline else ""
-    return RESULTS_DIRECTORY / f"{plan['pilot_version']}{suffix}.json"
+    return RESULTS_DIRECTORY / f"{name}{suffix}.json"
 
 
-def run_live(plan, systems, model, output, limit, retry_errors):
+def run_live(plan, systems, model, output, limit, retry_errors, variant="full"):
     from google import genai
     from retrieval.gemini_chroma import api_key
 
@@ -515,17 +531,20 @@ def run_live(plan, systems, model, output, limit, retry_errors):
     if "adk" in systems:
         check_adk_settings(model)
     with genai.Client(api_key=api_key()) as client:
-        backend = live_backend(client, model, index_target, index)
+        backend = live_backend(client, model, index_target, index, variant)
         return run_comparison(plan, systems, backend, output, limit=limit, retry_errors=retry_errors)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ids", type=Path, default=DEFAULT_IDS, help="JSON file listing the reports to run.")
-    parser.add_argument("--systems", nargs="+", choices=SYSTEMS, default=list(SYSTEMS))
+    parser.add_argument("--systems", nargs="+", choices=SYSTEMS,
+                        help="Default: both systems, or only adk with a non-full --variant.")
+    parser.add_argument("--variant", choices=VARIANTS, default="full",
+                        help="ADK pipeline variant for the ablation comparison. The baseline has no variants.")
     parser.add_argument("--model", default=DEFAULT_MODEL, help="Generation model for both systems.")
     parser.add_argument("--output", type=Path,
-                        help="Results file. Default: data/comparison_results/<pilot_version>.json")
+                        help="Results file. Default: data/comparison_results/<pilot_version>[-<variant>].json")
     parser.add_argument("--limit", type=int, help="Maximum generation calls this run.")
     parser.add_argument("--retry-errors", action="store_true", help="Run failed records again.")
     parser.add_argument("--offline", action="store_true", help="Use scripted responses; no API calls.")
@@ -538,18 +557,21 @@ def main(argv=None):
         parser.error("--limit must be positive.")
     if bool(args.export_scoring) != bool(args.key_facts_dir):
         parser.error("--export-scoring and --key-facts-dir must be used together.")
+    ablation = args.variant != "full"
+    if ablation and args.systems and "baseline" in args.systems:
+        parser.error("--variant applies to adk only; leave baseline out of --systems.")
+    systems = list(dict.fromkeys(args.systems or (["adk"] if ablation else SYSTEMS)))
     try:
-        output = args.output or default_output(args.ids, args.offline)
+        output = args.output or default_output(args.ids, args.offline, args.variant)
         if args.export_scoring:
             export_scoring_input(output, args.key_facts_dir, args.export_scoring)
             return
         plan = load_plan(args.ids)
-        systems = list(dict.fromkeys(args.systems))
         if args.offline:
-            run_comparison(plan, systems, offline_backend(), output,
+            run_comparison(plan, systems, offline_backend(args.variant), output,
                            limit=args.limit, retry_errors=args.retry_errors)
         else:
-            run_live(plan, systems, args.model, output, args.limit, args.retry_errors)
+            run_live(plan, systems, args.model, output, args.limit, args.retry_errors, args.variant)
     except (ValueError, RuntimeError, OSError, KeyError) as exc:
         parser.exit(1, f"Comparison stopped: {type(exc).__name__}: {exc}\n")
     print(f"Results: {output}")

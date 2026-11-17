@@ -38,7 +38,7 @@ def test_comparison_runner_supplies_report_as_current_message():
 
     received = []
 
-    async def invoke(message, session_id, events, scripted=False):
+    async def invoke(message, session_id, events, scripted=False, variant='full'):
         received.append(message)
         state = {}
         assert prepare(context(message, state)) is None
@@ -47,7 +47,7 @@ def test_comparison_runner_supplies_report_as_current_message():
 
     # Match the public runner invocation contract without any generation calls.
     with patch('evaluation.run_comparison.invoke_adk', new=invoke):
-        _, trace = run_adk_attempt(SimpleNamespace(mode='live', check_model=False),
+        _, trace = run_adk_attempt(SimpleNamespace(mode='live', check_model=False, variant='full'),
                                   'The current comparison report.', 'isolated-test')
     assert trace['state']['source_report'] == 'The current comparison report.'
     assert received == ['The current comparison report.']

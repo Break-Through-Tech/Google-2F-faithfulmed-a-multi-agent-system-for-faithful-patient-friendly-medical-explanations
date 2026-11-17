@@ -113,5 +113,64 @@ class WorkflowTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn('Simplifier', [event.author for event in events])
 
 
+class VariantTests(unittest.IsolatedAsyncioTestCase):
+    """Ablation variants (issue #34): only the dropped stage may differ from the full pipeline."""
+
+    async def invoke(self, variant, message):
+        sessions = InMemorySessionService()
+        await sessions.create_session(app_name='faithfulmed_demo', user_id='test', session_id='test')
+        runner = Runner(agent=build_agent(variant), app_name='faithfulmed_demo', session_service=sessions)
+        events = [event async for event in runner.run_async(user_id='test', session_id='test',
+            new_message=types.Content(role='user', parts=[types.Part(text=message)]))]
+        session = await sessions.get_session(app_name='faithfulmed_demo', user_id='test', session_id='test')
+        return events, session.state
+
+    @staticmethod
+    def rows(state, readability):
+        return [(row['stage'], row['name'], row['status']) for row in state['execution_trace']
+                if (row['stage'] == 'Readability') == readability]
+
+    async def test_no_readability_releases_the_verified_draft_unchanged(self):
+        full_events, full = await self.invoke('full', '/offline-error')
+        with (patch('faithfulmed_demo.agent.run_readability', side_effect=AssertionError('scorer ran')) as scorer,
+              patch('faithfulmed_demo.agent.rewrite_for_readability', side_effect=AssertionError('rewrite ran')) as rewrite):
+            events, state = await self.invoke('no_readability', '/offline-error')
+        scorer.assert_not_called()
+        rewrite.assert_not_called()
+        authors = lambda found: list(dict.fromkeys(event.author for event in found if event.content))
+        self.assertEqual(authors(events), authors(full_events))
+        self.assertEqual(len(state['refinement_history']), 1)
+        self.assertNotIn(fixtures.BAD_CLAIM, state['revised_draft'])
+        self.assertEqual(state['final_answer'], state['revised_draft'])
+        self.assertEqual(state['run_status'], 'complete')
+        self.assertEqual(state['readability_status'], 'not_run')
+        self.assertEqual(state['readability_score'], {'status': 'not_run'})
+        self.assertEqual(state['readability_history'], [])
+        self.assertIsNone(state['suggestion'])
+        self.assertEqual(state['variant'], 'no_readability')
+        self.assertEqual(full['variant'], 'full')
+        self.assertEqual(self.rows(state, readability=False), self.rows(full, readability=False))
+        self.assertEqual(self.rows(state, readability=True),
+                         [('Readability', 'Readability', 'completed'),
+                          ('Readability', 'run_readability', 'skipped'),
+                          ('Readability', 'Readability rewrite', 'skipped')])
+
+    async def test_no_readability_keeps_the_release_gate(self):
+        from unittest.mock import AsyncMock
+        verdict = {'issues': [{'category': 'omission', 'claim': '', 'replacement': 'Missing fact.',
+                               'reason': 'Test fixture', 'source_quote': ''}],
+                   'supported_examples': [], 'scope': 'test'}
+        with patch('faithfulmed_demo.agent.judge', new=AsyncMock(return_value=verdict)):
+            _, state = await self.invoke('no_readability', '/offline')
+        self.assertEqual(state['run_status'], 'needs_review')
+        self.assertEqual(state['final_answer'], '')
+        self.assertEqual(state['readability_status'], 'not_run')
+        self.assertIn('Omission', state['repair_blocker'])
+
+    def test_unknown_variant_is_refused(self):
+        with self.assertRaisesRegex(ValueError, 'Unknown pipeline variant'):
+            build_agent('no_such_variant')
+
+
 if __name__ == '__main__':
     unittest.main()
