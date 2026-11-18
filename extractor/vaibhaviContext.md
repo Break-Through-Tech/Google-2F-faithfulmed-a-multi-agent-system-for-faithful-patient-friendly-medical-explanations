@@ -130,3 +130,21 @@ Update this file after meaningful work. Preserve verified results and distinguis
 - Next: teammate review and integration into the shared ADK pipeline.
 - Integration must call `validate_source_quotes` explicitly; the agent
   factory does not automatically enforce quote validation.
+
+## Session Log: November 18, 2026
+
+- Reviewed five saved pilot Extractor traces with LLM assistance.
+  Findings are documented in evaluation/EXTRACTOR_CHECK.md.
+- Updated Extractor instructions to preserve examination limitations,
+  medication-risk context, post-treatment status, medication-use
+  conditions, and more complete supporting quotes.
+- Added instructions to retain source-section attribution for
+  conflicting statements without guessing a resolution.
+- Expanded the live synthetic smoke test with targeted assertions.
+  The run with the added checks passed.
+- Python compilation and whitespace checks passed after cleanup.
+- Output schema and assertion labels remain unchanged.
+- EpiPen assertion labeling varied between the two observed runs.
+  Assertion conventions remain an open issue.
+- The five real pilot reports have not been rerun with this update.
+- Full second-computer pipeline setup remains unverified.
