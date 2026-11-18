@@ -264,3 +264,77 @@ works on this computer.
   establish how later code changes perform.
 - No Extractor fixes or regression tests were completed during
   this review.
+
+## Follow-Up: Extractor-Only Rerun, November 18, 2026
+
+Ran the updated Extractor once on each pilot's saved source report
+using gemini-3.8-flash at temperature 0. Original traces were unchanged.
+These were Extractor-only runs, not full-pipeline evaluations.
+
+### Saved Results
+
+All paths below are under data/extractor_reruns/:
+
+- 3606: 20261118T233610799507Z/3606.json
+- 4998: 20261118T233807172380Z/4998.json
+- 3938: 20261118T234007484167Z/3938.json
+- 3808: 20261118T234007484167Z/3808.json
+- 2964: 20261118T234007484167Z/2964.json
+
+### Validation Outcome
+
+Four of five attempts passed schema and exact-quote validation.
+Report 4998 failed because a generated quote changed source spacing.
+This is a validation count, not a clinical accuracy score.
+
+### Targeted Observations
+
+- 3606: The previously omitted noncontrast examination limitation
+  is now included. The adrenal statement identifies the impression,
+  but the renal statement lacks section attribution and the
+  discrepancy remains unflagged. The limitation is categorized
+  as diagnosis, which needs review.
+
+- 3808: Negation quotes now retain governing phrases such as
+  "does not have". Bactrim retains 400/80 without an added unit
+  or invented duration. Source discrepancies and assertion-label
+  ambiguity remain. One atom incorrectly attributes the Endocrine
+  statement to review of systems rather than physical examination.
+
+- 3938: Allergy quotes now include the ALLERGIES heading.
+  All five prednisone taper steps, antibiotic duration, follow-ups,
+  and the abnormal cardiac finding remain preserved.
+  Later taper-step quotes omit the medication name.
+  Assertion and type-label concerns remain.
+
+- 2964: At least 50% narrowing, laterality, and the recommended
+  CTA remain preserved. The left common carotid quote now includes
+  "On the left". Other quotes still omit needed location or
+  antecedent context, including a CTA quote beginning with "This".
+
+- 4998: The rejected output includes the previously missing
+  atenolol risk, medical-necessity explanation, post-discharge
+  status, and EpiPen conditions. It is not a validated result.
+  The urticaria quote does not exactly match source spacing.
+  Some other quotes still depend on surrounding context.
+
+### Runner Behavior
+
+The first batch stopped on report 4998's validation failure.
+The failure and generated output were saved.
+The runner was then updated to save ValueError failures and continue.
+The three unattempted reports were run separately.
+The failed allergy report was not retried or silently corrected.
+
+### Interpretation and Remaining Work
+
+The observations show partial improvement and unresolved problems.
+One attempt per report cannot establish consistent behavior or
+attribute every difference solely to the prompt change.
+
+Keep exact-quote validation strict. Preserve failed attempts.
+Prioritize quote fidelity, correct section attribution, source
+discrepancies, and assertion/type conventions in further work.
+
+No full-pipeline rerun or independent clinical adjudication was
+completed. Second-computer vector-store integration remains unverified.
