@@ -26,6 +26,7 @@ class ReadabilityTests(unittest.TestCase):
     def test_refusal_vs_disclaimer(self):
         self.assertTrue(evaluate_readability("I cannot help with this request.")["is_refusal"])
         self.assertFalse(evaluate_readability("I cannot help with this request.")["passes_readability"])
+        self.assertTrue(evaluate_readability("I can’t help with this request.")["is_refusal"])
         self.assertFalse(evaluate_readability("Ask your doctor if you have questions.")["is_refusal"])
 
     def test_baseline_handoff_and_denominator(self):

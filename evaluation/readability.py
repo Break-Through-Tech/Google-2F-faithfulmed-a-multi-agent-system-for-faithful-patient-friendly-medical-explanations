@@ -25,9 +25,29 @@ REFUSAL_PATTERN = re.compile(
 )
 
 
+def normalize_text_for_scoring(text):
+    """Normalize copied text before tokenization and refusal detection."""
+    replacements = {
+        "’": "'",
+        "‘": "'",
+        "“": '"',
+        "”": '"',
+        "–": "-",
+        "—": "-",
+        "‑": "-",
+        "‒": "-",
+        "−": "-",
+    }
+    normalized = text
+    for source, target in replacements.items():
+        normalized = normalized.replace(source, target)
+    return normalized
+
+
 def count_sentences(text):
     """Protect decimals/common abbreviations before splitting punctuation/newlines."""
-    protected = re.sub(r"(?<=\d)\.(?=\d)", "<DOT>", text)
+    protected = normalize_text_for_scoring(text)
+    protected = re.sub(r"(?<=\d)\.(?=\d)", "<DOT>", protected)
     protected = re.sub(
         r"\b(?:Dr|Mr|Mrs|Ms|Prof|vs|e\.g|i\.e)\.",
         lambda m: m[0].replace(".", "<DOT>"), protected, flags=re.I,
@@ -41,8 +61,9 @@ def evaluate_readability(text, max_grade=8, max_words=None):
     if not isinstance(text, str) or not text.strip():
         return {"status": "error", "error": "Text is empty or invalid.",
                 "is_refusal": None, "passes_readability": False}
-    clean_text = " ".join(text.split())
-    words = re.findall(r"\b[a-zA-Z]+(?:['â€™-][a-zA-Z]+)*\b", clean_text.lower())
+    normalized_text = normalize_text_for_scoring(text)
+    clean_text = " ".join(normalized_text.split())
+    words = re.findall(r"\b[a-zA-Z]+(?:['-][a-zA-Z]+)*\b", clean_text.lower())
     if not words:
         return {"status": "error", "error": "Text contains no alphabetic words.",
                 "is_refusal": None, "passes_readability": False}
@@ -56,7 +77,7 @@ def evaluate_readability(text, max_grade=8, max_words=None):
     fk_grade = .39 * word_count / sentence_count + 11.8 * sum(syllables) / word_count - 15.59
     smog_grade = (1.043 * math.sqrt(30 * sum(s >= 3 for s in syllables) / sentence_count)
                   + 3.1291) if sentence_count >= 3 else None
-    is_refusal = bool(REFUSAL_PATTERN.search(clean_text.replace("â€™", "'")))
+    is_refusal = bool(REFUSAL_PATTERN.search(normalized_text))
     grade_pass = fk_grade <= max_grade
     length_pass = max_words is None or word_count <= max_words
     return {
