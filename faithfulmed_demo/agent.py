@@ -183,7 +183,7 @@ class VerifierStage(DemoStage):
         async for e in execution.call(ctx,self.name,'Verifier judgment','scripted' if state['mode']=='offline-scripted' else 'model',
                 judge,box,state,state['draft'],inputs={'draft':state['draft']}):yield e
         verdict=box['result']
-        mode = 'scripted fixture check' if state['mode'] == 'offline-scripted' else 'live Gemini judgment; uncalibrated'
+        mode = 'scripted fixture check' if state['mode'] == 'offline-scripted' else 'live Gemini report check'
         yield emit(ctx, self.name, f'Verifier — {mode}\n\n' + json.dumps(verdict, indent=2),
                    verdict=verdict, stage_modes={**state['stage_modes'], 'Verifier': mode})
 
@@ -277,7 +277,7 @@ class ReadabilityStage(DemoStage):
                     'Unresolved clinical findings' if unresolved else 'No rewrite required by readability check')
             yield execution.skip(ctx,self.name,'Readability rewrite','model',reason)
         status = 'needs_review' if unresolved else ('complete' if result['readability_pass'] else result['readability_status'])
-        banner = 'OFFLINE SCRIPTED WALKTHROUGH' if state['mode'] == 'offline-scripted' else 'LIVE DEMO — uncalibrated'
+        banner = 'OFFLINE SCRIPTED WALKTHROUGH' if state['mode'] == 'offline-scripted' else 'LIVE DEMO'
         grade = result['readability_score'].get('flesch_kincaid_grade')
         passed = result['readability_pass']
         answer = result['final_answer'] if not unresolved else None

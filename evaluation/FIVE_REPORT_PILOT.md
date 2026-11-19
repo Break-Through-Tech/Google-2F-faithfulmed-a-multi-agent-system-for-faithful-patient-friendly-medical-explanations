@@ -133,7 +133,11 @@ No personal documentation was included, and nothing was committed or pushed.
    complete claim-level comparison. Keep failed scoring attempts visible.
 4. Repeat this fixed pilot after intentional pipeline changes in a new versioned run.
    Preserve these outputs for comparison. Expand to all 50 after the release/scoring
-   behavior is understood. Calibration remains a separate unfinished task.
+   behavior is understood. The MedAESQA citation-support comparison was later
+   completed at 25/31 agreement (80.65%) and kappa 0.609 on a retrospective
+   rerun; see [the final record](CALIBRATION.md). Measuring the live report
+   Verifier against new report-level human labels would be optional follow-up
+   validation, not an additional requirement in the overview's MedAESQA task.
 
 ## Validation
 

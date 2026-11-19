@@ -76,7 +76,12 @@ Both baseline and ADK now default to top-k 3, and the Simplifier uses temperatur
 The UI inherits those shared settings rather than defining a separate pipeline.
 
 Reading grade uses the existing grade-8 check. A completed run or a readable
-answer does not establish clinical accuracy: the Verifier is still uncalibrated.
+answer does not establish clinical accuracy. The overview's MedAESQA
+evidence-support comparison reached 25/31 agreement (80.65%) and Cohen's kappa
+0.609 in a retrospective run; see [the evaluation record](../evaluation/CALIBRATION.md).
+Those numbers measure citation-support judgments, not the accuracy of this
+live report check. Testing the live report Verifier against new human report
+labels is an optional validation study, not another overview requirement.
 Trying a frozen report in this UI is exploratory, not a saved benchmark run.
 
 In live mode, the final stage can try at most two readability rewrites after clinical

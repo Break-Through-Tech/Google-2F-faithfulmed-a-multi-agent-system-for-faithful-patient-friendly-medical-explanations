@@ -2,13 +2,21 @@
 
 This package builds on Carlin's ADK scaffold and connects seven visible steps:
 **Intake → Extractor → QuoteCheck → Simplifier → Verifier → Refiner → Readability**.
-It is an initial development demo, not a calibrated clinical system or a benchmark result.
+It is an initial development demo. Its completed checks do not establish clinical accuracy.
 Carlin's original runnable scaffold and setup guide are preserved as
 [`scaffold_agent.py`](scaffold_agent.py) and [`SCAFFOLD_README.md`](SCAFFOLD_README.md).
 The active `agent.py` adds live roles to that flow; the scaffold files record her
 original contribution and can be inspected separately.
 
 ## Start on Rafi's computer
+
+The live Verifier shares evidence rules with the citation evaluator: preserve
+qualifiers, distinguish missing evidence from contradiction, avoid unsupported
+causal or population inferences, and quote the source exactly. It still checks
+every patient claim and important omission. The citation rule that one supported
+claim can establish a citation match does not apply to approving a whole report.
+The published MedAESQA scores belong to the citation evaluator; this prompt
+alignment does not transfer those scores to live report checks.
 
 From the repository root in VS Code's PowerShell terminal:
 
@@ -83,7 +91,8 @@ if you want the no-API walkthrough instead.
   up to three real MedlinePlus chunks. Scripted mode uses one checked-in cited passage.
 - **Verifier:** compares the draft with the original note, atoms, and background.
   Its structured findings distinguish unsupported claims, contradictions, and omissions.
-  The live judgment is not calibrated. The offline check recognizes only the intentional
+  The live judgment checks this report; the MedAESQA citation-support score does
+  not measure its accuracy. The offline check recognizes only the intentional
   demonstration error; it cannot judge arbitrary medical text.
 - **Refiner:** uses Zurabi's `run_refiner` through an adapter. Only an exact
   source-quote replacement or deletion of one unambiguous draft span is applied.
@@ -101,7 +110,11 @@ if you want the no-API walkthrough instead.
 
 `complete` means the demo finished without unresolved findings from its own check;
 it is not a clinical faithfulness certificate. Readability can still fail separately.
-The 50-report evaluation, human calibration, and model comparison remain later work.
+The 50-report evaluation and model comparison remain later work. The overview's
+MedAESQA evidence-support comparison reached 25/31 agreement (80.65%) and
+kappa 0.609 in a retrospective run; see [the evaluation record](../evaluation/CALIBRATION.md).
+Checking this live report Verifier against new human report labels would be an
+optional follow-up study, not an additional overview requirement.
 
 ## Reproduce a run outside the browser
 

@@ -68,7 +68,7 @@ def build_ui():
                         checks = gr.Markdown(checks_markdown({}), sanitize_html=True)
                         with gr.Accordion("Inspect the saved workflow fields", open=False):
                             trace = gr.JSON(value={}, label="Current run")
-                gr.Markdown("Research prototype. Automated checks are still being calibrated; this demo does not establish clinical accuracy.", elem_classes="result-footnote")
+                gr.Markdown("Research prototype. A completed check does not establish clinical accuracy.", elem_classes="result-footnote")
         gr.HTML('<footer class="page-footer"><span>FaithfulMed · Google 2F / Break Through Tech</span><span>From source report to a clearer explanation.</span></footer>')
 
         view_components = [status, progress, metrics, answer, sources, facts, checks, trace, timeline]
