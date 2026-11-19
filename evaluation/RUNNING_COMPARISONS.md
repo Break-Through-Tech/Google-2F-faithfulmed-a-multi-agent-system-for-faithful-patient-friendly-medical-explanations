@@ -66,7 +66,8 @@ Resume after an interruption by running the same command again. To run failed re
 | Option | Meaning |
 | --- | --- |
 | `--ids` | JSON file listing the reports. Default: `evaluation/pilot_ids.json`. It needs `pilot_version`, `frozen_set_version` and `source_row_ids`. |
-| `--systems` | `baseline`, `adk`, or both. Default: both. |
+| `--systems` | `baseline`, `adk`, or both. Default: both, or only `adk` with `--variant`. |
+| `--variant` | ADK pipeline variant: `full` or `no_readability`. Default: `full`. See [Ablation variants](#ablation-variants). |
 | `--model` | Generation model for both systems. Default: `gemini-3.8-flash`. |
 | `--output` | Results file. Default: `data/comparison_results/<pilot_version>.json`. |
 | `--limit` | Maximum generation calls in this run. Two calls make one pair. |
@@ -122,6 +123,23 @@ The fingerprint comes from the source files, so any edit to them counts as a cha
 For a different model, run the command again in a new process with `--model`. ADK reads its model once when it loads, and the runner stops if the loaded model is not the one you asked for.
 
 For all 50 reports, make a new ID file with its own `pilot_version` and all 50 `source_row_ids`, then pass it with `--ids`. Keep the five pilot records out of that file's results by leaving the default output path in place, which is named after the `pilot_version`.
+
+## Ablation variants
+
+For issue #34, a variant runs the ADK pipeline with one stage turned off, so its results can be compared with the baseline and the full pipeline. Only `no_readability` exists so far:
+
+- **`no_readability`:** the text the Verifier cleared after the Refiner is released as it is. There is no readability scoring and no readability rewrite, and the readability fields say `not_run`. Every other stage runs as normal. Text with unresolved Verifier findings is still held for review.
+
+Try it offline, then run it live (Mac / zsh):
+
+```zsh
+.venv/bin/python -m evaluation.run_comparison --offline --variant no_readability
+.venv/bin/python -m evaluation.run_comparison --variant no_readability
+```
+
+A variant applies to ADK only, so it runs only `adk`. Asking for `baseline` together with `--variant` stops with an error. Results go to `data/comparison_results/<pilot_version>-<variant>.json`, or `-<variant>-offline.json` offline, so they never mix with full-pipeline results. Each record has a `variant` field (`null` for the baseline), and a variant's ADK records also list it in `settings`. Retrieval settings do not change, so retrieval is still comparable with the baseline. Compare against the baseline and full ADK records from the normal results file.
+
+ADK Web can run a variant too: add `FAITHFULMED_VARIANT=no_readability` to the root `.env` and restart it. An unknown name stops it with an error.
 
 ## Passing results to the evaluator
 

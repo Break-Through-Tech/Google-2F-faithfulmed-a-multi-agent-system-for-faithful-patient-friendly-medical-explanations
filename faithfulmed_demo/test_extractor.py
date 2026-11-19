@@ -1,9 +1,7 @@
 """Run a live Extractor smoke test on a synthetic note."""
 
 import asyncio
-import json
 import os
-from pathlib import Path
 
 from dotenv import load_dotenv
 from google.adk.runners import Runner
@@ -22,13 +20,20 @@ async def main():
     load_dotenv(".env")
     os.environ["GOOGLE_API_KEY"] = os.environ["GEMINI_API_KEY"]
 
-    # Read the team's existing synthetic example.
-    example_path = Path("baseline/examples/synthetic_chest_pain.json")
-    example = json.loads(example_path.read_text())
     source_report = (
-    "The patient has no allergy to penicillin. "
-    "The patient takes metformin 500 mg twice daily."
-)
+        "The patient has no allergy to penicillin. "
+        "The patient takes metformin 500 mg twice daily. "
+        "Noncontrast technique limits evaluation of the abdominal organs. "
+        "Atenolol makes acute anaphylaxis harder to treat, "
+        "but remains medically necessary at this time. "
+        "No further problems were reported after discharge. "
+        "An EpiPen was prescribed for an allergic reaction "
+        "or a sensation of an impending allergic reaction. "
+        "Proceed directly to the emergency room after EpiPen administration. "
+        "The patient denies hypertension and kidney disorder. "
+        "FINDINGS: An indeterminate left renal nodule is seen. "
+        "IMPRESSION: An indeterminate left adrenal nodule is described."
+    )
 
     # Give the Extractor the original note through shared state.
     sessions = InMemorySessionService()
@@ -86,6 +91,56 @@ async def main():
         and "twice daily" in atom.text.lower()
         for atom in result.root
     ), "The medication, dosage, or frequency was lost."
+
+    texts = [atom.text.lower() for atom in result.root]
+
+    assert any(
+        "noncontrast" in text and "limit" in text
+        for text in texts
+    ), "The examination limitation is missing."
+
+    assert any(
+        "atenolol" in text and "harder" in text
+        for text in texts
+    ), "The atenolol treatment risk is missing."
+
+    assert any(
+        "atenolol" in text and "medically necessary" in text
+        for text in texts
+    ), "The reason for continuing atenolol is missing."
+
+    assert any(
+        "no further problems" in text and "discharge" in text
+        for text in texts
+    ), "The post-discharge status is missing."
+
+    assert any(
+        "epipen" in text
+        and "impending" in text
+        and "allergic reaction" in text
+        for text in texts
+    ), "The EpiPen use conditions are missing."
+
+    for condition in ("hypertension", "kidney disorder"):
+        assert any(
+            condition in atom.text.lower()
+            and atom.assertion == "negated"
+            and "denies" in atom.source_quote.lower()
+            and condition in atom.source_quote.lower()
+            for atom in result.root
+        ), f"Negation or supporting context missing: {condition}"
+
+    assert any(
+        "findings" in text and "renal" in text
+        for text in texts
+    ), "The renal finding lost its source section."
+
+    assert any(
+        "impression" in text and "adrenal" in text
+        for text in texts
+    ), "The adrenal finding lost its source section."
+
+    print("Additional synthetic coverage and quote-context checks passed.")
 
     print("Negation and dosage checks passed.")
 

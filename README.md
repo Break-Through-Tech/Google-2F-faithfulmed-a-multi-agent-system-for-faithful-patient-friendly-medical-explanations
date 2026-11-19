@@ -15,6 +15,7 @@ Run `python -m faithfulmed_ui.app` from the project root, then open http://127.0
 |-----------------------|---------------|--------------------------------------------------------------------------|
 | Jenna Hunte           | @jehunte      | Break Through Tech Coach                                                 |
 | Ruhma Arshad          | @ruhma-a      | Simplifier Agent                                                         |
+| Vaibhavi Srivastava   | @vai67        | Extractor Agent                                                          |
 | Sajib "Rafi" Hossain  | @rafihoss     | Verifier Agent                                                           |
 | Alicia Garcia         | @ag45566      | Readability Agent                                                        |
 | Zurabi Kochiashvili   | @Zurab1K      | Refiner Agent                                                            |
