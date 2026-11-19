@@ -53,7 +53,7 @@ The first exploratory live run overstated the negative test result and the Verif
 missed it. Both prompts were revised to preserve evidence strength. The subsequent
 streamed run preserved the source wording, and the explicit overstated-claim probe
 was detected. This demonstrates why a successful run must not be treated as proof
-of clinical accuracy or Verifier calibration.
+of clinical accuracy.
 
 ## Saved local evidence
 
@@ -74,7 +74,7 @@ state between turns, stopping on invalid/empty extraction, and the two-repair ca
   reproduce it. The checks above exercised the actual HTTP/SSE server; they do not
   claim a human has already completed that walkthrough.
 - Review these new modules with their original owners before merging.
-- Calibrate the Verifier, assess omissions and retrieval quality, and evaluate on
+- Assess omissions and retrieval quality, and evaluate on
   reviewed examples. One live retrieval result was Spanish; language filtering and
   multilingual quality are not established by this demo.
 - A readability failure is reported without rewriting. If a rewrite stage is added,

@@ -1,4 +1,4 @@
-"""First live Verifier slice; not calibrated against human labels yet."""
+"""Live report verification; citation benchmark scores do not validate this task."""
 
 import json
 from typing import Literal
@@ -30,6 +30,20 @@ MedlinePlus supports general definitions ONLY; a possible symptom or treatment i
 background text does not establish that it applies to this patient.
 Flag unsupported patient claims, contradictions (especially negation, uncertainty,
 pending results, numbers, dose, timing), and important source-note omissions.
+Check every independently checkable patient claim, including each item in a list.
+Support for one claim does not excuse an unsupported or contradicted neighboring
+claim. This is whole-report verification, not single-document citation attribution.
+Missing evidence means unsupported, not contradiction; contradiction requires
+source evidence that conflicts with the claim. Do not infer a negative finding
+merely because the report does not mention it.
+Read neighboring source sentences together. Allow meaning-preserving paraphrases,
+but do not use outside medical knowledge to fill gaps. Preserve population,
+negation, uncertainty, quantities, comparisons, timing, and treatment conditions.
+Do not turn a descriptive observation into an association or a causal conclusion,
+or assign the effect of combined treatment to one treatment alone. General or
+animal evidence does not establish a clinical outcome for this patient.
+If the source report conflicts with itself, preserve and explain the uncertainty;
+do not silently choose one version or invent a resolution. Flag a draft that does so.
 Preserve evidence strength: 'tests did not show a heart attack' does NOT support
 'you did not have a heart attack' or 'heart attack was ruled out'. Flag such
 strengthened conclusions and replace them with wording limited to the test result.
@@ -37,8 +51,13 @@ Do not require copying every background definition. Give reasons tied to the sou
 For each issue provide the exact unique draft substring to edit and a minimal replacement.
 Use an empty claim only for an omission, with a nonempty replacement to append.
 Do not propose overlapping edits. Give exact source quotes, not invented paraphrases.
+Each source_quote must be one contiguous span copied exactly from the original
+report, with no inserted ellipses or joined passages. Use an empty source_quote
+when there is no relevant report span; never put a retrieved passage in that field.
+Explain unsupported general-background statements using the supplied retrieved
+context in the reason; keep background separate from patient-specific facts.
 Return issues=[] for a supported complete draft. Include examples of supported claims.
-This is an uncalibrated demo judgment, not a clinical certification.'''
+This model check is not a clinical certification.'''
 
 
 def verify(source_report, atoms, draft, retrieved_context, model=MODEL):

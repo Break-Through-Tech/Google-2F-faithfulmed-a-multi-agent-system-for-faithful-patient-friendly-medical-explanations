@@ -157,7 +157,7 @@ def metrics_html(view: Snapshot) -> str:
     count = len(verdict.get("issues", [])) if isinstance(verdict, dict) and "issues" in verdict else None
     facts = state.get("atoms")
     cards = [(grade_text, "Reading grade", grade_note),
-             (str(count) if count is not None else "—", "Unresolved findings", "Model check · uncalibrated"),
+             (str(count) if count is not None else "—", "Unresolved findings", "Flagged by this run's Verifier check"),
              (str(len(facts)) if isinstance(facts, list) else "—", "Extracted facts", "Linked to source quotes")]
     return '<div class="metric-grid">' + "".join(
         f'<div class="metric"><strong>{escape(value)}</strong><span>{label}</span><small>{note}</small></div>'
