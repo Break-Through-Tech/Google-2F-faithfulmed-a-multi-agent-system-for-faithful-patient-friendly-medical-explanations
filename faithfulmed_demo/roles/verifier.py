@@ -30,6 +30,9 @@ MedlinePlus supports general definitions ONLY; a possible symptom or treatment i
 background text does not establish that it applies to this patient.
 Flag unsupported patient claims, contradictions (especially negation, uncertainty,
 pending results, numbers, dose, timing), and important source-note omissions.
+Flag added medication units or tablet counts when the report leaves them unspecified.
+Check for omitted reasons and tradeoffs behind documented medication decisions,
+even when the draft lists the correct medication.
 Check every independently checkable patient claim, including each item in a list.
 Support for one claim does not excuse an unsupported or contradicted neighboring
 claim. This is whole-report verification, not single-document citation attribution.

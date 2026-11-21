@@ -33,7 +33,11 @@ def run_simplifier(atoms: list | str, retrieved_context: str, *, model: str = MO
         "background separately and cite the supplied source URL.\n"
         "6. Preserve the strength of evidence: 'tests did not show a heart attack' must "
         "remain 'tests did not show a heart attack', not 'you did not have a heart attack' "
-        "or 'heart attack was ruled out'. Do not turn a test result into diagnostic certainty."
+        "or 'heart attack was ruled out'. Do not turn a test result into diagnostic certainty.\n"
+        "7. Copy documented medication strengths, units, and schedules faithfully. If a "
+        "unit or number of tablets per dose is missing, leave it unspecified. Do not "
+        "infer it from a product name or a typical dose. When the report explains a "
+        "medication decision, retain that reason and any stated risks or tradeoffs."
     )
     
     # create prompt using inputs agreed upon
