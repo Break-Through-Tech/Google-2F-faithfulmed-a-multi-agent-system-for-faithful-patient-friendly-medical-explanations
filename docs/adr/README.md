@@ -34,3 +34,7 @@ Copy `templates/adr-template.md` when creating a new ADR. `ADR-example.md` is a 
 
 - [ADR-001: Single-Gemini retrieval baseline](ADR-001-september-single-model-baseline.md) — Accepted.
 - [ADR-002: MedlinePlus-only Gemini retrieval index](ADR-002-medlineplus-gemini-retrieval.md) — Accepted.
+- [ADR-003: Bounded source-verified repairs](ADR-003-bounded-source-verified-repairs.md) — Proposed.
+- [ADR-004: Verify readability rewrites before acceptance](ADR-004-verified-readability-rewrites.md) — Proposed.
+- [ADR-005: Citation support evaluation scope](ADR-005-citation-support-evaluation-scope.md) — Proposed.
+- [ADR-006: Patient fact source authority](ADR-006-patient-fact-source-authority.md) — Proposed.

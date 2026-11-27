@@ -93,6 +93,55 @@ This makes a model call and refuses to replace an existing inventory. Save/reuse
 
 ## Failures and uncertainty
 
+### Fixed counting policy for the 50-report comparison (November 20)
+
+Use all 50 frozen report IDs for each system. Keep one outcome per report and
+system in the primary generation summary:
+
+| Outcome | How to count it |
+| --- | --- |
+| Released answer | A non-empty final explanation returned by the baseline or released by ADK. This describes availability, not verified correctness. |
+| Held draft | Text exists but the workflow withheld it for review. It is not a released answer. |
+| Refusal | An explicit refusal instead of a report explanation. It is not a released answer. |
+| Failed generation | A generation attempt ended in an error or an empty response without a usable draft. |
+| Not attempted | The report has not run, including when a batch stops early. Keep it visible. |
+
+These categories must sum to 50 per system. If an error occurs after a draft is
+saved and withheld, count the outcome as a held draft and retain the error as a
+separate diagnostic flag, without counting the report twice.
+
+- **Release rate:** released answers / 50, even if some reports were not attempted.
+  Also show attempted / 50 and the counts in every outcome category.
+- **Scoring coverage:** valid clinical assessments of released answers / released
+  answers. Show scoring failures separately from generation failures. A scoring
+  failure does not undo an answer's release.
+- **Primary quality comparison:** use exactly the same report IDs for both
+  systems, requiring two released answers, matching source/retrieval context and
+  fact inventories, and two valid assessments from the same evaluator version.
+  Publish the included IDs and each excluded ID with its reason. Report the
+  matched pair count / 50 alongside faithfulness, omissions, and hallucination.
+- **Readability:** show both released-answer coverage and the matched clinical
+  cohort's grade results. If a larger readability-only cohort is reported, label
+  its IDs and denominator separately. Do not silently switch cohorts.
+- **Held drafts:** optional diagnostic scores belong in a separate table. Never
+  pool them with released-answer quality scores.
+- **Missing scores:** use unavailable, not zero or 100% faithfulness, for failed
+  generations, refusals, absent outputs, or invalid assessments. A missing answer
+  is captured by release rate, not an invented clinical score.
+- **Retries:** primary results use the first recorded generation attempt per
+  report/system and the first scoring attempt for that saved text. Preserve all
+  failures. Report any technical retries and recovered results separately, with
+  the retry rule and attempt counts. Do not select the best answer or judgment.
+  Changed prompts/settings or rewritten outputs require a new versioned run.
+
+Example: if baseline releases 45 answers and ADK releases 40, report 45/50 and
+40/50 even if only 38 report IDs have valid matched assessments. The quality
+comparison then uses those same 38 reports for each system. Strong quality on
+those 38 does not conceal the other reports' outcomes.
+
+This policy applies prospectively to the full comparison. Historical pilot retry
+results remain labeled as retries and are not relabeled as first-attempt results.
+
 - Report attempted generations, released answers, successfully scored answers, drafts, refusals, and failures separately. Empty/failed responses never get faithfulness 100%.
 - An unreleased text must use `output_kind: draft`; draft scores are excluded from released-output summaries. Preserve its generation status.
 - Use Alicia's active readability scorer with identical thresholds/word-limit settings. Do not mix the older harness's calculations into the comparison.
