@@ -67,7 +67,7 @@ Resume after an interruption by running the same command again. To run failed re
 | --- | --- |
 | `--ids` | JSON file listing the reports. Default: `evaluation/pilot_ids.json`. It needs `pilot_version`, `frozen_set_version` and `source_row_ids`. |
 | `--systems` | `baseline`, `adk`, or both. Default: both, or only `adk` with `--variant`. |
-| `--variant` | ADK pipeline variant: `full` or `no_readability`. Default: `full`. See [Ablation variants](#ablation-variants). |
+| `--variant` | ADK pipeline variant: `full`, `no_readability`, `no_extractor`, `no_retrieval` or `no_verifier_refiner`. Default: `full`. See [Ablation variants](#ablation-variants). |
 | `--model` | Generation model for both systems. Default: `gemini-3.8-flash`. |
 | `--output` | Results file. Default: `data/comparison_results/<pilot_version>.json`. |
 | `--limit` | Maximum generation calls in this run. Two calls make one pair. |
@@ -126,18 +126,38 @@ For all 50 reports, make a new ID file with its own `pilot_version` and all 50 `
 
 ## Ablation variants
 
-For issue #34, a variant runs the ADK pipeline with one stage turned off, so its results can be compared with the baseline and the full pipeline. Only `no_readability` exists so far:
+For issue #34, a variant runs the ADK pipeline with one part turned off, so its results can be compared with the baseline and the full pipeline. Every variant keeps the same seven stages in the same order. A stage that is turned off still appears in the trace, marked as skipped, and its `stage_modes` entry says it was not run and which variant skipped it.
 
 - **`no_readability`:** the text the Verifier cleared after the Refiner is released as it is. There is no readability scoring and no readability rewrite, and the readability fields say `not_run`. Every other stage runs as normal. Text with unresolved Verifier findings is still held for review.
+- **`no_extractor`:** the Extractor and the quote check do not run, so no facts are pulled out of the report. Later stages get an empty fact list (`atoms` is `[]`) and still see the full report. Text with unresolved Verifier findings is still held for review.
+- **`no_retrieval`:** no MedlinePlus passages are looked up. The Simplifier writes from the facts and the report alone, and the Verifier and readability rewrite get no background passages. Records have `retrieved_chunks: []`. Text with unresolved Verifier findings is still held for review.
+- **`no_verifier_refiner`:** the Verifier and Refiner do not run, so the Simplifier's draft goes straight to the readability stage unchanged. A readability rewrite is kept only if it lowers the grade level, because there is no Verifier to recheck it. With no Verifier, nothing can hold text for review, so every finished run is released.
 
-Try it offline, then run it live (Mac / zsh):
+The release rule never changes: text is released only when there are no unresolved Verifier findings and no blocked repair. A draft held for review is never presented as a final answer.
+
+**Note:** `no_verifier_refiner` releases more often by design, because the check that holds text back is the part turned off. Compare faithfulness from the scorer across variants, not how often each one releases text.
+
+Try a variant offline, then run it live.
+
+Mac / zsh:
 
 ```zsh
-.venv/bin/python -m evaluation.run_comparison --offline --variant no_readability
-.venv/bin/python -m evaluation.run_comparison --variant no_readability
+.venv/bin/python -m evaluation.run_comparison --offline --variant no_retrieval
+.venv/bin/python -m evaluation.run_comparison --variant no_retrieval
+# Every variant offline once:
+for v in no_readability no_extractor no_retrieval no_verifier_refiner; do .venv/bin/python -m evaluation.run_comparison --offline --variant $v; done
 ```
 
-A variant applies to ADK only, so it runs only `adk`. Asking for `baseline` together with `--variant` stops with an error. Results go to `data/comparison_results/<pilot_version>-<variant>.json`, or `-<variant>-offline.json` offline, so they never mix with full-pipeline results. Each record has a `variant` field (`null` for the baseline), and a variant's ADK records also list it in `settings`. Retrieval settings do not change, so retrieval is still comparable with the baseline. Compare against the baseline and full ADK records from the normal results file.
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe -m evaluation.run_comparison --offline --variant no_retrieval
+.\.venv\Scripts\python.exe -m evaluation.run_comparison --variant no_retrieval
+# Every variant offline once:
+foreach ($v in "no_readability", "no_extractor", "no_retrieval", "no_verifier_refiner") { .\.venv\Scripts\python.exe -m evaluation.run_comparison --offline --variant $v }
+```
+
+A variant applies to ADK only, so it runs only `adk`. Asking for `baseline` together with `--variant` stops with an error. Results go to `data/comparison_results/<pilot_version>-<variant>.json`, or `-<variant>-offline.json` offline, so they never mix with full-pipeline results. Each record has a `variant` field (`null` for the baseline), and a variant's ADK records also list it in `settings`. The exported scoring input keeps the `variant` field too. Scored records do not yet: `score_outputs.py` is locked by the frozen citation evaluator, so keep each variant's scores in their own file. Retrieval settings do not change, so apart from `no_retrieval` (which looks nothing up) retrieval is still comparable with the baseline. Compare against the baseline and full ADK records from the normal results file.
 
 ADK Web can run a variant too: add `FAITHFULMED_VARIANT=no_readability` to the root `.env` and restart it. An unknown name stops it with an error.
 

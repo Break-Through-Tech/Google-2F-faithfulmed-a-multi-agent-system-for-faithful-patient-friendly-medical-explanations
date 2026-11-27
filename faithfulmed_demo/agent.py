@@ -25,7 +25,11 @@ def emit(ctx, author, message, **updates):
 
 
 # Pipeline variants for the ablation comparison (issue #34). Each one drops one stage.
-VARIANTS = ('full', 'no_readability')
+VARIANTS = ('full', 'no_readability', 'no_extractor', 'no_retrieval', 'no_verifier_refiner')
+
+# What the skipped Verifier and Refiner report under no_verifier_refiner. No findings means
+# nothing can hold the draft for review, which is the point of this ablation.
+NOT_RUN_VERDICT = {'issues': [], 'supported_examples': [], 'scope': 'not run (no_verifier_refiner variant)'}
 
 
 def check_variant(variant):
@@ -140,26 +144,57 @@ class QuoteCheckStage(DemoStage):
         yield emit(ctx, self.name, f'All {len(atoms.root)} source quotes found in the note.')
 
 
+class SkippedExtractorStage(DemoStage):
+    """no_extractor variant: no facts are extracted, so later stages get atoms=[]."""
+
+    async def run_stage(self, ctx):
+        state = ctx.session.state
+        yield execution.skip(ctx, self.name, 'ClinicalExtractor / Gemini', 'model', 'no_extractor variant; extractor not run')
+        yield emit(ctx, self.name, 'Extractor: not run (no_extractor variant). Later stages get no facts.',
+                   atoms=[], stage_modes={**state['stage_modes'], 'Extractor': 'not run (no_extractor variant)'})
+
+
+class SkippedQuoteCheckStage(DemoStage):
+    """no_extractor variant: there are no atoms whose quotes could be checked."""
+
+    async def run_stage(self, ctx):
+        state = ctx.session.state
+        yield execution.skip(ctx, self.name, 'validate_source_quotes', 'local', 'no_extractor variant; no atoms to check')
+        yield emit(ctx, self.name, 'QuoteCheck: not run (no_extractor variant).',
+                   stage_modes={**state['stage_modes'], 'QuoteCheck': 'not run (no_extractor variant)'})
+
+
 class SimplifierStage(DemoStage):
     async def run_stage(self, ctx):
         state = ctx.session.state
+        # no_retrieval keeps retrieval_query in state (the runner checks it) but never searches.
+        no_retrieval = state.get('variant') == 'no_retrieval'
+        if no_retrieval:
+            yield execution.skip(ctx, self.name, 'MedlinePlus search', 'retrieval',
+                                 'no_retrieval variant; no background passages')
         if state['mode'] == 'offline-scripted':
-            context = fixtures.CONTEXT
+            context = [] if no_retrieval else fixtures.CONTEXT
             draft = fixtures.DRAFT + (' ' + fixtures.BAD_CLAIM if state['inject_demo_error'] else '')
-            mode = 'scripted draft and cited fixture; no model call or vector search'
-            yield execution.skip(ctx,self.name,'MedlinePlus search','retrieval','Scripted reference passage')
+            mode = ('scripted draft; no model call; retrieval not run (no_retrieval variant)' if no_retrieval else
+                    'scripted draft and cited fixture; no model call or vector search')
+            if not no_retrieval:
+                yield execution.skip(ctx,self.name,'MedlinePlus search','retrieval','Scripted reference passage')
             yield execution.skip(ctx,self.name,'run_simplifier / Gemini','model','Scripted draft')
         else:
-            from retrieval.gemini_chroma import search
             box={}
-            async for e in execution.call(ctx,self.name,'gemini_chroma.search','retrieval',search,box,
-                    state['retrieval_query'],inputs={'query':state['retrieval_query']}):yield e
-            context=box['result']
-            if not context or not any(row['text'].strip() for row in context):
-                raise ValueError('No usable retrieval context.')
-            mode = 'live Gemini draft with Gemini/Chroma retrieval'
-            yield emit(ctx, self.name, 'Retrieved MedlinePlus passages:\n' + json.dumps(context, indent=2),
-                       retrieved_context=context)
+            if no_retrieval:
+                context = []
+                mode = 'live Gemini draft; retrieval not run (no_retrieval variant)'
+            else:
+                from retrieval.gemini_chroma import search
+                async for e in execution.call(ctx,self.name,'gemini_chroma.search','retrieval',search,box,
+                        state['retrieval_query'],inputs={'query':state['retrieval_query']}):yield e
+                context=box['result']
+                if not context or not any(row['text'].strip() for row in context):
+                    raise ValueError('No usable retrieval context.')
+                mode = 'live Gemini draft with Gemini/Chroma retrieval'
+                yield emit(ctx, self.name, 'Retrieved MedlinePlus passages:\n' + json.dumps(context, indent=2),
+                           retrieved_context=context)
             async for e in execution.call(ctx,self.name,'run_simplifier / Gemini','model',run_simplifier,box,
                     state['atoms'],json.dumps(context),model=state['model'],source_report=state['source_report'],
                     inputs={'fact_count':len(state['atoms']),'passage_count':len(context),'model':state['model']}):yield e
@@ -219,6 +254,28 @@ class RefinerStage(DemoStage):
                    stage_modes={**state['stage_modes'], 'Refiner': mode})
 
 
+class SkippedVerifierStage(DemoStage):
+    """no_verifier_refiner variant: the draft is not checked against the report."""
+
+    async def run_stage(self, ctx):
+        state = ctx.session.state
+        yield execution.skip(ctx, self.name, 'Verifier judgment', 'model', 'no_verifier_refiner variant; verifier not run')
+        yield emit(ctx, self.name, 'Verifier: not run (no_verifier_refiner variant).', verdict=NOT_RUN_VERDICT,
+                   stage_modes={**state['stage_modes'], 'Verifier': 'not run (no_verifier_refiner variant)'})
+
+
+class SkippedRefinerStage(DemoStage):
+    """no_verifier_refiner variant: pass the Simplifier draft on unchanged."""
+
+    async def run_stage(self, ctx):
+        state = ctx.session.state
+        yield execution.skip(ctx, self.name, 'apply_verified_edits', 'local', 'no_verifier_refiner variant; refiner not run')
+        yield emit(ctx, self.name, 'Refiner: not run (no_verifier_refiner variant).\n\n' + state['draft'],
+                   revised_draft=state['draft'], final_verdict=NOT_RUN_VERDICT, refinement_history=[],
+                   repair_blocker='',
+                   stage_modes={**state['stage_modes'], 'Refiner': 'not run (no_verifier_refiner variant)'})
+
+
 class ReadabilityStage(DemoStage):
     async def run_stage(self, ctx):
         state = ctx.session.state
@@ -228,6 +285,7 @@ class ReadabilityStage(DemoStage):
         result=box['result']
         unresolved = bool(state['final_verdict']['issues']) or bool(state['repair_blocker'])
         history, blocker = [], state['repair_blocker']
+        no_verifier = state.get('variant') == 'no_verifier_refiner'
         # Readability rewrites are separate from Zurabi's exact clinical repairs.
         # Never use wording changes to bypass unresolved clinical findings.
         if state['mode'] != 'offline-scripted' and not unresolved:
@@ -247,9 +305,14 @@ class ReadabilityStage(DemoStage):
                 yield emit(ctx, self.name,
                     f'Readability rewrite {round_number}: checking faithfulness before release.',
                     readability_history=history, faithfulness_recheck_required=True, final_answer='')
-                async for e in execution.call(ctx,self.name,f'Verifier recheck / wording {round_number}','model',judge,box,state,candidate,
-                        inputs={'candidate':candidate}):yield e
-                candidate_verdict=box['result']
+                if no_verifier:
+                    yield execution.skip(ctx, self.name, f'Verifier recheck / wording {round_number}', 'model',
+                                         'no_verifier_refiner variant')
+                    candidate_verdict = NOT_RUN_VERDICT
+                else:
+                    async for e in execution.call(ctx,self.name,f'Verifier recheck / wording {round_number}','model',judge,box,state,candidate,
+                            inputs={'candidate':candidate}):yield e
+                    candidate_verdict=box['result']
                 async for e in execution.call(ctx,self.name,f'run_readability / round {round_number}','local',run_readability,box,candidate,
                         inputs={'text':candidate}):yield e
                 candidate_result=box['result']
@@ -288,6 +351,8 @@ class ReadabilityStage(DemoStage):
                    f'readability status "{result["readability_status"]}" is Alicia’s pass decision.\n'
                    f'{result["suggestion"] or ""}\n'
                    + ('Unresolved Verifier findings: needs review.' if unresolved else
+                      'Verifier not run (no_verifier_refiner variant); this text was not checked against the report.'
+                      if no_verifier else
                       'No unresolved findings in this demo check. This is not a clinical validation.'))
         updates = {'final_answer': answer or '',
                    'revised_draft': text, 'final_verdict': verdict,
@@ -329,20 +394,30 @@ class SkippedReadabilityStage(DemoStage):
                    stage_modes={**state['stage_modes'], 'Readability': 'not run (no_readability variant)'})
 
 
+def stages_for(variant):
+    """The seven stages for a variant. A dropped stage is swapped for a Skipped* class with the
+    same name, so the stage order and trace layout stay the same across variants."""
+    if variant == 'no_extractor':
+        extractor, quote_check = SkippedExtractorStage(name='Extractor'), SkippedQuoteCheckStage(name='QuoteCheck')
+    else:
+        model_agent = create_extractor(MODEL)
+        model_agent.name = 'ClinicalExtractor'
+        model_agent.include_contents = 'none'
+        extractor = ExtractorStage(name='Extractor', sub_agents=[model_agent])
+        quote_check = QuoteCheckStage(name='QuoteCheck')
+    # no_retrieval is handled inside SimplifierStage, which reads state['variant'].
+    skip_checks = variant == 'no_verifier_refiner'
+    verifier = (SkippedVerifierStage if skip_checks else VerifierStage)(name='Verifier')
+    refiner = (SkippedRefinerStage if skip_checks else RefinerStage)(name='Refiner')
+    readability = (SkippedReadabilityStage if variant == 'no_readability' else ReadabilityStage)(name='Readability')
+    return [IntakeStage(name='Intake'), extractor, quote_check, SimplifierStage(name='Simplifier'),
+            verifier, refiner, readability]
+
+
 def build_agent(variant='full'):
     check_variant(variant)
-    extractor = create_extractor(MODEL)
-    extractor.name = 'ClinicalExtractor'
-    extractor.include_contents = 'none'
-    # Keep the stage name 'Readability' so the seven-stage order and trace stay the same.
-    readability = (SkippedReadabilityStage if variant == 'no_readability' else ReadabilityStage)(name='Readability')
     return SequentialAgent(name='FaithfulMed', description='Seven-stage clinical explanation demo. Start with /offline-error or /demo.',
-        before_agent_callback=prepare_for(variant),
-        sub_agents=[IntakeStage(name='Intake'),
-                    ExtractorStage(name='Extractor', sub_agents=[extractor]),
-                    QuoteCheckStage(name='QuoteCheck'),
-                    SimplifierStage(name='Simplifier'), VerifierStage(name='Verifier'),
-                    RefinerStage(name='Refiner'), readability])
+        before_agent_callback=prepare_for(variant), sub_agents=stages_for(variant))
 
 
 # Read here rather than in config.py: the frozen citation evaluator fingerprints config.py.

@@ -40,7 +40,7 @@ QUERY_RULE = "full-report-text"
 SYSTEMS = ("baseline", "adk")
 # Must match faithfulmed_demo.agent.VARIANTS (a test checks this). It is copied because
 # importing the agent here would load ADK before check_adk_settings sets the model.
-VARIANTS = ("full", "no_readability")
+VARIANTS = ("full", "no_readability", "no_extractor", "no_retrieval", "no_verifier_refiner")
 RETRYABLE = {"error", "failed", "no_context"}
 DRAFT_STATUSES = {"needs_review", "needs_simplification"}
 # The same access and quota errors that stop evaluation/score_outputs.py.
@@ -160,8 +160,10 @@ def use_scripted_extractor(agent, report):
         async def generate_content_async(self, llm_request, stream=False):
             yield LlmResponse(content=types.Content(role="model", parts=[types.Part(text=self.response_text)]))
 
-    agent.find_agent("ClinicalExtractor").model = ScriptedLlm(model=OFFLINE_MODEL,
-                                                              response_text=scripted_atoms(report))
+    extractor = agent.find_agent("ClinicalExtractor")
+    if extractor is None:
+        return  # The no_extractor variant has no Extractor model to replace.
+    extractor.model = ScriptedLlm(model=OFFLINE_MODEL, response_text=scripted_atoms(report))
 
 
 @contextmanager
@@ -502,6 +504,7 @@ def export_scoring_input(results_path, key_facts_directory, output, *, directory
             raise ValueError(f"The key facts for source row {row_id} were prepared from different text.")
         validate_key_facts(report, facts["key_facts"])
         jobs.append({"case_id": record["case_id"], "system": record["system"],
+                     "variant": record.get("variant"),
                      "generation_model": record["generation_model"],
                      "output_kind": "draft" if record["output_kind"] == "needs_review_draft" else "final",
                      "run_status": record["status"], "source_report": report, "key_facts": facts["key_facts"],

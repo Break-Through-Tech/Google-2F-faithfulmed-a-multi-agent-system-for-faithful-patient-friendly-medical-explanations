@@ -171,6 +171,103 @@ class VariantTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaisesRegex(ValueError, 'Unknown pipeline variant'):
             build_agent('no_such_variant')
 
+    # Stages each new variant replaces or changes; every other trace row must match full.
+    DROPPED = {'no_extractor': {'Extractor', 'QuoteCheck'}, 'no_retrieval': {'Simplifier'},
+               'no_verifier_refiner': {'Verifier', 'Refiner'}}
+    OMISSION = {'issues': [{'category': 'omission', 'claim': '', 'replacement': 'Missing fact.',
+                            'reason': 'Test fixture', 'source_quote': ''}],
+                'supported_examples': [], 'scope': 'test'}
+
+    @staticmethod
+    def rows_outside(state, dropped):
+        return [(row['stage'], row['name'], row['status']) for row in state['execution_trace']
+                if row['stage'] not in dropped]
+
+    @staticmethod
+    def authors(events):
+        return list(dict.fromkeys(event.author for event in events if event.content))
+
+    async def test_new_variants_keep_the_stages_and_trace_of_full(self):
+        full_events, full = await self.invoke('full', '/offline-error')
+        for variant, dropped in self.DROPPED.items():
+            with self.subTest(variant=variant):
+                events, state = await self.invoke(variant, '/offline-error')
+                self.assertEqual(self.authors(events), self.authors(full_events))
+                self.assertEqual(self.rows_outside(state, dropped), self.rows_outside(full, dropped))
+                self.assertEqual(state['variant'], variant)
+                for stage in dropped - {'Simplifier'}:
+                    self.assertEqual(state['stage_modes'][stage], f'not run ({variant} variant)')
+
+    async def test_no_extractor_passes_no_atoms_and_still_repairs(self):
+        with (patch('faithfulmed_demo.agent.validate_source_quotes', side_effect=AssertionError('quote check ran')) as quotes,
+              patch('faithfulmed_demo.agent.create_extractor', side_effect=AssertionError('extractor built'))):
+            agent = build_agent('no_extractor')
+            self.assertIsNone(agent.find_agent('ClinicalExtractor'))
+            _, state = await self.invoke('no_extractor', '/offline-error')
+        quotes.assert_not_called()
+        self.assertEqual(state['atoms'], [])
+        self.assertEqual(len(state['refinement_history']), 1)
+        self.assertNotIn(fixtures.BAD_CLAIM, state['final_answer'])
+        self.assertEqual(state['run_status'], 'complete')
+        skipped = [(row['stage'], row['name']) for row in state['execution_trace'] if row['status'] == 'skipped']
+        self.assertIn(('Extractor', 'ClinicalExtractor / Gemini'), skipped)
+        self.assertIn(('QuoteCheck', 'validate_source_quotes'), skipped)
+
+    async def test_no_retrieval_offline_has_no_context(self):
+        _, state = await self.invoke('no_retrieval', '/offline-error')
+        self.assertEqual(state['retrieved_context'], [])
+        self.assertEqual(state['retrieval_query'], fixtures.EXAMPLE['retrieval_query'])
+        self.assertIn('retrieval not run', state['stage_modes']['Simplifier'])
+        self.assertEqual(state['run_status'], 'complete')
+
+    async def test_no_retrieval_live_never_searches(self):
+        from evaluation.run_comparison import use_scripted_extractor
+        clean = {'issues': [], 'supported_examples': [], 'scope': 'test'}
+        note = fixtures.SOURCE
+        sessions = InMemorySessionService()
+        await sessions.create_session(app_name='faithfulmed_demo', user_id='test', session_id='test')
+        agent = build_agent('no_retrieval')
+        use_scripted_extractor(agent, note)
+        runner = Runner(agent=agent, app_name='faithfulmed_demo', session_service=sessions)
+        with (patch('retrieval.gemini_chroma.search', side_effect=AssertionError('search ran')) as search,
+              patch('faithfulmed_demo.agent.run_simplifier', return_value=fixtures.DRAFT) as simplifier,
+              patch('faithfulmed_demo.agent.verify', return_value=clean),
+              patch('faithfulmed_demo.agent.rewrite_for_readability', side_effect=AssertionError('rewrite ran'))):
+            [event async for event in runner.run_async(user_id='test', session_id='test',
+                new_message=types.Content(role='user', parts=[types.Part(text=note)]))]
+        state = (await sessions.get_session(app_name='faithfulmed_demo', user_id='test', session_id='test')).state
+        search.assert_not_called()
+        simplifier.assert_called_once()
+        self.assertEqual(simplifier.call_args.args[1], '[]')
+        self.assertEqual(state['mode'], 'live')
+        self.assertEqual(state['retrieved_context'], [])
+        self.assertEqual(state['retrieval_query'], note)
+        self.assertEqual(state['run_status'], 'complete', state['error'])
+
+    async def test_no_verifier_refiner_releases_the_unchecked_draft(self):
+        with (patch('faithfulmed_demo.agent.judge', side_effect=AssertionError('judge ran')) as judge,
+              patch('faithfulmed_demo.agent.apply_verified_edits', side_effect=AssertionError('refiner ran')) as edits):
+            _, state = await self.invoke('no_verifier_refiner', '/offline-error')
+        judge.assert_not_called()
+        edits.assert_not_called()
+        self.assertEqual(state['revised_draft'], state['draft'])
+        self.assertIn(fixtures.BAD_CLAIM, state['revised_draft'])
+        self.assertEqual(state['final_verdict']['scope'], 'not run (no_verifier_refiner variant)')
+        self.assertEqual(state['refinement_history'], [])
+        # Nothing can hold the draft for review, so it is released.
+        self.assertEqual(state['run_status'], 'complete')
+        self.assertIn(fixtures.BAD_CLAIM, state['final_answer'])
+
+    async def test_new_variants_keep_the_release_gate(self):
+        from unittest.mock import AsyncMock
+        for variant in ('no_extractor', 'no_retrieval'):
+            with self.subTest(variant=variant):
+                with patch('faithfulmed_demo.agent.judge', new=AsyncMock(return_value=self.OMISSION)):
+                    _, state = await self.invoke(variant, '/offline')
+                self.assertEqual(state['run_status'], 'needs_review')
+                self.assertEqual(state['final_answer'], '')
+                self.assertIn('Omission', state['repair_blocker'])
+
 
 if __name__ == '__main__':
     unittest.main()

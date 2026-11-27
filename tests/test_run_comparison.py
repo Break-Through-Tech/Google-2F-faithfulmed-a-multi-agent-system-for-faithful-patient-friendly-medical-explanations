@@ -278,6 +278,35 @@ class VariantRunTests(RunnerTestCase):
         self.assertEqual((fields["status"], fields["output_kind"]), ("error", None))
         self.assertIn("variant", fields["error"]["message"])
 
+    NEW_VARIANTS = ("no_extractor", "no_retrieval", "no_verifier_refiner")
+
+    def test_new_variants_run_only_adk_and_record_the_variant(self):
+        ids = self.folder / "ids.json"
+        ids.write_text(json.dumps({"pilot_version": "test-pilot"}), encoding="utf-8")
+        for variant in self.NEW_VARIANTS:
+            with self.subTest(variant=variant):
+                self.output = self.folder / f"{variant}.json"
+                records = self.run_cli("--variant", variant)
+                self.assertEqual(set(records), {"adk"})
+                record = records["adk"]
+                self.assertEqual((record["variant"], record["settings"]["variant"]), (variant, variant))
+                self.assertEqual(record["status"], "complete", record["error"])
+                trace = json.loads((self.output.parent / record["trace_path"]).read_text(encoding="utf-8"))
+                self.assertEqual(trace["state"]["variant"], variant)
+                self.assertEqual(rc.default_output(ids, True, variant).name, f"test-pilot-{variant}-offline.json")
+
+    def test_no_extractor_offline_skips_the_scripted_extractor_and_keeps_retrieval(self):
+        record = self.run_cli("--variant", "no_extractor")["adk"]
+        self.assertEqual(record["status"], "complete", record["error"])
+        self.assertEqual(record["retrieved_chunks"], rc.normalize_chunks([rc.SCRIPTED_CHUNK]))
+        trace = json.loads((self.output.parent / record["trace_path"]).read_text(encoding="utf-8"))
+        self.assertEqual(trace["state"]["atoms"], [])
+
+    def test_no_retrieval_offline_records_no_chunks(self):
+        record = self.run_cli("--variant", "no_retrieval")["adk"]
+        self.assertEqual((record["status"], record["retrieved_chunks"]), ("complete", []))
+        self.assertEqual(record["retrieval_query"], REPORT)
+
     def test_runner_variants_match_the_agent(self):
         from faithfulmed_demo.agent import VARIANTS
         self.assertEqual(rc.VARIANTS, VARIANTS)
@@ -433,6 +462,15 @@ class ScoringExportTests(RunnerTestCase):
             scored = score_outputs.run(list(jobs.values()), results, model="test-judge")
         self.assertEqual(len(scored["records"]), 2)
         self.assertEqual({record["output_kind"] for record in scored["records"]}, {"final", "draft"})
+
+    def test_export_keeps_the_variant(self):
+        backend = fake_live_backend()
+        backend.variant = "no_retrieval"
+        state = live_state(variant="no_retrieval", retrieved_context=[])
+        with patch.object(rc, "invoke_adk", new=AsyncMock(return_value=state)), quiet():
+            rc.run_comparison(PLAN, ["adk"], backend, self.output)
+        job = self.export()["adk"]
+        self.assertEqual((job["variant"], job["retrieved_context"]), ("no_retrieval", []))
 
     def test_failed_generation_stays_in_the_denominator(self):
         with (patch.object(rc, "run_baseline", side_effect=RuntimeError("forced")),
