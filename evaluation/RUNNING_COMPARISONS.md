@@ -157,7 +157,7 @@ Windows PowerShell:
 foreach ($v in "no_readability", "no_extractor", "no_retrieval", "no_verifier_refiner") { .\.venv\Scripts\python.exe -m evaluation.run_comparison --offline --variant $v }
 ```
 
-A variant applies to ADK only, so it runs only `adk`. Asking for `baseline` together with `--variant` stops with an error. Results go to `data/comparison_results/<pilot_version>-<variant>.json`, or `-<variant>-offline.json` offline, so they never mix with full-pipeline results. Each record has a `variant` field (`null` for the baseline), and a variant's ADK records also list it in `settings`. The exported scoring input keeps the `variant` field too. Scored records do not yet: `score_outputs.py` is locked by the frozen citation evaluator, so keep each variant's scores in their own file. Retrieval settings do not change, so apart from `no_retrieval` (which looks nothing up) retrieval is still comparable with the baseline. Compare against the baseline and full ADK records from the normal results file.
+A variant applies to ADK only, so it runs only `adk`. Asking for `baseline` together with `--variant` stops with an error. Results go to `data/comparison_results/<pilot_version>-<variant>.json`, or `-<variant>-offline.json` offline, so they never mix with full-pipeline results. Each record has a `variant` field (`null` for the baseline), and a variant's ADK records also list it in `settings`. The exported scoring input keeps the `variant` field too. `score_outputs.py` cannot keep it, because the frozen citation evaluator locks that file, so add it to the scored records afterwards with `--add-variants` (see [Passing results to the evaluator](#passing-results-to-the-evaluator)). Retrieval settings do not change, so apart from `no_retrieval` (which looks nothing up) retrieval is still comparable with the baseline. Compare against the baseline and full ADK records from the normal results file.
 
 ADK Web can run a variant too: add `FAITHFULMED_VARIANT=no_readability` to the root `.env` and restart it. An unknown name stops it with an error.
 
@@ -180,6 +180,16 @@ Windows PowerShell:
 ```
 
 Add `--output` to the export command if your results are not at the default path. Scoring makes live model calls, so `--limit 2` starts with one pair. Remove it to continue.
+
+To record which pipeline variant each scored answer came from, run this after scoring. Run it again after more records are scored. It copies `variant` from the scoring input onto each scored record, matched by `generation_run_id`. It changes nothing else, so scoring can still resume. This step is separate from `score_outputs.py` because the frozen citation evaluator locks that file: any change to it stops the evaluator.
+
+```zsh
+.venv/bin/python -m evaluation.run_comparison --add-variants data/scoring_results/comparison_v1.json --scoring-input data/comparison_results/scoring_inputs.json
+```
+
+```powershell
+.\.venv\Scripts\python.exe -m evaluation.run_comparison --add-variants data/scoring_results/comparison_v1.json --scoring-input data/comparison_results/scoring_inputs.json
+```
 
 The export changes these labels to the ones the evaluator expects:
 

@@ -472,6 +472,30 @@ class ScoringExportTests(RunnerTestCase):
         job = self.export()["adk"]
         self.assertEqual((job["variant"], job["retrieved_context"]), ("no_retrieval", []))
 
+    def test_add_variants_labels_scored_records_without_touching_the_digest(self):
+        backend = fake_live_backend()
+        backend.variant = "no_retrieval"
+        with patch.object(rc, "invoke_adk", new=AsyncMock(return_value=live_state(variant="no_retrieval"))), quiet():
+            rc.run_comparison(PLAN, ["adk"], backend, self.output)
+        jobs = list(self.export().values())
+        scored = self.folder / "scored.json"
+        with patch.object(score_outputs, "assess_output", side_effect=ValueError("no judge in tests")), quiet():
+            before = score_outputs.run(jobs, scored, model="test-judge")
+        self.assertNotIn("variant", before["records"][0])
+        for _ in range(2):  # Running it again is harmless.
+            with quiet():
+                rc.main(["--add-variants", str(scored), "--scoring-input", str(self.scoring)])
+        after = json.loads(scored.read_text(encoding="utf-8"))
+        self.assertEqual(after["run_digest"], before["run_digest"])
+        self.assertEqual([record["variant"] for record in after["records"]], ["no_retrieval"])
+        # Resuming the scoring run still accepts the labelled file.
+        with patch.object(score_outputs, "assess_output", side_effect=ValueError("no judge in tests")), quiet():
+            score_outputs.run(jobs, scored, model="test-judge")
+        after["records"][0]["generation_run_id"] = "not-in-the-input"
+        scored.write_text(json.dumps(after), encoding="utf-8")
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
+            rc.main(["--add-variants", str(scored), "--scoring-input", str(self.scoring)])
+
     def test_failed_generation_stays_in_the_denominator(self):
         with (patch.object(rc, "run_baseline", side_effect=RuntimeError("forced")),
               patch.object(rc, "invoke_adk", new=AsyncMock(return_value=live_state()))):

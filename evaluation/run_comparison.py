@@ -519,6 +519,31 @@ def export_scoring_input(results_path, key_facts_directory, output, *, directory
     print(f"Saved {len(jobs)} scoring inputs to {output}")
 
 
+def add_variants(scoring_input, scored_path):
+    """Copy each job's variant onto its scored record, matched by generation_run_id.
+
+    score_outputs.py is hash-pinned by the frozen citation evaluator, so it cannot keep the
+    variant itself. This only adds a key to each record; run_digest is unchanged, so scoring
+    can still resume, and running this again afterwards labels the new records.
+    """
+    jobs = json.loads(Path(scoring_input).read_text(encoding="utf-8"))["records"]
+    variants = {}
+    for job in jobs:
+        if "variant" not in job:
+            raise ValueError(f"{scoring_input} has no variant field. Export it again with --export-scoring.")
+        variants[job["generation_run_id"]] = job["variant"]
+    scored = json.loads(Path(scored_path).read_text(encoding="utf-8"))
+    for record in scored["records"]:
+        run_id = record.get("generation_run_id")
+        if run_id not in variants:
+            raise ValueError(f"Scored record {record.get('case_id')} ({record.get('system')}) is not in {scoring_input}.")
+        if record.get("variant", variants[run_id]) != variants[run_id]:
+            raise ValueError(f"Scored record {record.get('case_id')} is already labelled {record['variant']!r}.")
+        record["variant"] = variants[run_id]
+    write_json(Path(scored_path), scored)
+    print(f"Added the variant to {len(scored['records'])} scored records in {scored_path}")
+
+
 def default_output(ids_path, offline, variant="full"):
     plan = json.loads(Path(ids_path).read_text(encoding="utf-8"))
     name = plan["pilot_version"] + ("" if variant == "full" else f"-{variant}")
@@ -555,11 +580,23 @@ def main(argv=None):
                         help="Do not generate. Convert saved results to score_outputs.py input at PATH.")
     parser.add_argument("--key-facts-dir", type=Path,
                         help="With --export-scoring: folder of source_row_<id>.json key-fact files.")
+    parser.add_argument("--add-variants", type=Path, metavar="SCORED",
+                        help="Do not generate. Copy each job's variant from --scoring-input onto the "
+                             "score_outputs.py results at SCORED.")
+    parser.add_argument("--scoring-input", type=Path, help="With --add-variants: the exported scoring input.")
     args = parser.parse_args(argv)
     if args.limit is not None and args.limit < 1:
         parser.error("--limit must be positive.")
     if bool(args.export_scoring) != bool(args.key_facts_dir):
         parser.error("--export-scoring and --key-facts-dir must be used together.")
+    if bool(args.add_variants) != bool(args.scoring_input):
+        parser.error("--add-variants and --scoring-input must be used together.")
+    if args.add_variants:
+        try:
+            add_variants(args.scoring_input, args.add_variants)
+        except (ValueError, OSError, KeyError) as exc:
+            parser.exit(1, f"Adding variants stopped: {type(exc).__name__}: {exc}\n")
+        return
     ablation = args.variant != "full"
     if ablation and args.systems and "baseline" in args.systems:
         parser.error("--variant applies to adk only; leave baseline out of --systems.")
